@@ -1,0 +1,141 @@
+name: publish
+
+on:
+  push:
+    branches:
+      - main
+  release: 
+    types: [published]
+
+jobs:
+  
+  prebuild:
+    name: test, lint, type check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    permissions:
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up environment
+        run: >-
+          pip install .[dev]
+      - name: Lint with ruff
+        run: >-
+          ruff check neurop/
+      - name: Type check with mypy
+        run: >-
+          mypy neurop/
+
+  build:
+    if: github.event_name == 'release'
+    needs:
+      - prebuild
+    name: build distribution
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install pypa/build
+        run: >-
+          python -m pip install build --user
+      - name: Build a binary wheel and a source tarball
+        run: python -m build
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+  
+  create-docs:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    needs: prebuild
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: False
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+      - name: Install dependencies
+        run: >-
+          pip install .[dev]
+      - name: Build pdoc documentation
+        run: >-
+          pdoc --html neurop/ -o _build/
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdoc-docs
+          path: _build/
+
+  deploy-docs:
+    if: github.event_name == 'release'
+    needs:
+      - create-docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download docs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pdoc-docs
+          path: _build/
+
+      - name: Deploy documentation
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: _build/neurop
+          clean: true
+
+  pypi-publish:
+    if: github.event_name == 'release'
+    needs:
+      - build
+      - deploy-docs
+    name: upload release to PyPI
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: pypi
+      url: https://pypi.org/p/neurop
+    permissions:
+      id-token: write
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc

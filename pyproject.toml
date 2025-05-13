@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "neurop"
+dynamic = ["version"]
+description = "Neural Operators!"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+author = { name = "John Doe", email = "johndoe@gmail.com" }
+keywords = [
+    'neural operator', 
+    'machine learning'
+]
+classifiers = [
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "numpy ~= 2.0.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/lonelyneutrin0/neurop"
+
+[project.optional-dependencies]
+dev = [
+    "hatchling~=1.27.0",
+    "pytest~=8.0.2",
+    "ruff~=0.9.4",
+    "mypy~=1.13.0",
+    "pdoc3~=0.11.5"
+]
+
+[tool.hatch.version]
+path = "neurop/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/neurop",
+]
