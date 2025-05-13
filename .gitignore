@@ -180,4 +180,5 @@ report/*.fls
 report/*.log
 report/*.run.xml
 report/*.synctex.gz
+report/main.tex
 report/rho-bib
