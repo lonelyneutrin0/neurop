@@ -6,6 +6,6 @@
 
 This project contains an independent implementation of the technique described in:
 
-[Karn Tiwari, N M Anoop Krishnan, Prathosh A P], "[CoNO: Complex Neural Operator for Continuous Dynamical Systems]," [arXiv], [2023].  
-Inspired by the code from [https://github.com/M3RG-IITD/Complex-Neural-Operator/tree/main], but not based on or derived from it.
+Karn Tiwari, N M Anoop Krishnan, Prathosh A P, "CoNO: Complex Neural Operator for Continuous Dynamical Systems," arXiv, 2023.  
+Inspired by the code from [this repo](https://github.com/M3RG-IITD/Complex-Neural-Operator/tree/main), but not based on or derived from it.
 
