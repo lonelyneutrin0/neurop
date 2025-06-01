@@ -4,6 +4,8 @@
 [![PyPI version shields.io](https://img.shields.io/pypi/v/neurop.svg)](https://pypi.python.org/pypi/neurop/)
 [![PyPI pyversions shields.io](https://img.shields.io/pypi/pyversions/neurop.svg)](https://pypi.python.org/pypi/neurop/)
 
+Package implementing Neural Operators! 
+
 This project contains an independent implementation of the technique described in:
 
 Karn Tiwari, N M Anoop Krishnan, Prathosh A P, "CoNO: Complex Neural Operator for Continuous Dynamical Systems," arXiv, 2023.  
