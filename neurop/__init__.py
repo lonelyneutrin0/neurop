@@ -7,4 +7,5 @@ __author_emails__ = [
 ]
 __url__ = "https://github.com/lonelyneutrin0/neurop"
 
-from . import src as src
+from . import operators as operators
+from . import utilities as utilities
