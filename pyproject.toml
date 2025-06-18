@@ -11,6 +11,7 @@ license = "MIT"
 requires-python = ">=3.9"
 authors = [ 
     { name = "Hrishikesh Belagali", email = "belagal1@msu.edu" }
+    { name = "Aditya Narayan", email = "ma24btech11001@iith.ac.in}
 ]
 keywords = [
     'neural operator', 
