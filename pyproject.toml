@@ -9,7 +9,9 @@ description = "Neural Operators!"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
-author = { name = "John Doe", email = "johndoe@gmail.com" }
+authors = [ 
+    { name = "Hrishikesh Belagali", email = "belagal1@msu.edu" }
+]
 keywords = [
     'neural operator', 
     'machine learning'
