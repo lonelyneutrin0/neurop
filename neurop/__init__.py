@@ -1,3 +1,7 @@
+r""" 
+.. include:: ../README.md
+""" 
+
 __version__ = "0.0.4"
 __authors__ = [
     "Hrishikesh Belagali",
