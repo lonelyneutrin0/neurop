@@ -10,4 +10,3 @@ __author_emails__ = [
 __url__ = "https://github.com/lonelyneutrin0/neurop"
 
 from . import base as base
-from . import utilities as utilities
