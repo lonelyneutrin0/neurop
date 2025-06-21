@@ -6,7 +6,6 @@ from torch.types import Tensor
 from typing import Callable
 
 from pathlib import Path
-from utilities import Metrics # type: ignore
 
 @dataclass
 class NeuralOperator(ABC):
@@ -101,7 +100,7 @@ class NeuralOperator(ABC):
         self.readout.to(device)
 
     @abstractmethod
-    def calculate_metrics(self, ground_truth: Tensor, predicted: Tensor) -> Metrics: 
+    def calculate_metrics(self, ground_truth: Tensor, predicted: Tensor): 
         """
         Compute the desired metrics and output a TypedDict 
         """
