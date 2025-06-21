@@ -1,4 +1,4 @@
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 __authors__ = [
     "Hrishikesh Belagali",
     "Aditya Narayan"
@@ -9,5 +9,5 @@ __author_emails__ = [
 ]
 __url__ = "https://github.com/lonelyneutrin0/neurop"
 
-from . import operators as operators
+from . import base as base
 from . import utilities as utilities

@@ -106,9 +106,3 @@ class NeuralOperator(ABC):
         Compute the desired metrics and output a TypedDict 
         """
         pass
-
-class FourierNeuralOperator(NeuralOperator):
-    pass
-
-class ComplexNeuralOperator(NeuralOperator):
-    pass
