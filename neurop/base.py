@@ -1,18 +1,18 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import torch 
 from torch.types import Tensor
-from typing import Callable
+from typing import Callable, Optional
 
 from pathlib import Path
 
 @dataclass
-class NeuralOperator(ABC):
+class NeuralOperator(torch.nn.Module, ABC):
     """
     Abstract class for Neural Operators.
 
-    Class Attributes: 
+    Instance Attributes: 
 
         readin: (torch.nn.Module) 
             Reads in input data and projects to higher dimensional space 
@@ -36,17 +36,14 @@ class NeuralOperator(ABC):
     readin: torch.nn.Module
     kernel_integral: torch.nn.Module
     readout: torch.nn.Module
-    optimizer: torch.optim.Optimizer = field(init=False)
+    optimizer: Optional[torch.optim.Optimizer]
     activation_function: Callable[[Tensor], Tensor] = torch.relu
 
     def __post_init__(self,):
-        pass
+        super().__init__()
 
-    @property
-    def parameters(self):
-        return list(self.readin.parameters()) + \
-            list(self.kernel_integral.parameters()) + \
-            list(self.readout.parameters())
+        if not self.optimizer:
+            self.optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
     
     @abstractmethod
     def forward(self, x: Tensor) -> Tensor:
@@ -90,7 +87,6 @@ class NeuralOperator(ABC):
         """
         pass
 
-    @abstractmethod
     def to_device(self, device: torch.device): 
         """
         Send data to a Torch device 
