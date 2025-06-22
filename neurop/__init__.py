@@ -13,7 +13,7 @@ __author_emails__ = [
 ]
 __url__ = "https://github.com/lonelyneutrin0/neurop"
 
-from base import NeuralOperator #type: ignore
+from .base import NeuralOperator #type: ignore
 
 from .fno import FNO1D
 from .deeponet import DeepONet
