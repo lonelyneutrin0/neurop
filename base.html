@@ -48,7 +48,7 @@ el.replaceWith(d);
 <dl>
 <dt id="neurop.base.NeuralOperator"><code class="flex name class">
 <span>class <span class="ident">NeuralOperator</span></span>
-<span>(</span><span>readin: torch.nn.modules.module.Module,<br>kernel_integral: torch.nn.modules.module.Module,<br>readout: torch.nn.modules.module.Module,<br>activation_function: Callable[[torch.Tensor], torch.Tensor] = &lt;built-in method relu of type object&gt;)</span>
+<span>(</span><span>readin: torch.nn.modules.module.Module,<br>kernel_integral: torch.nn.modules.module.Module,<br>readout: torch.nn.modules.module.Module,<br>optimizer: torch.optim.optimizer.Optimizer | None,<br>activation_function: Callable[[torch.Tensor], torch.Tensor] = &lt;built-in method relu of type object&gt;)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -56,11 +56,11 @@ el.replaceWith(d);
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@dataclass
-class NeuralOperator(ABC):
+class NeuralOperator(torch.nn.Module, ABC):
     &#34;&#34;&#34;
     Abstract class for Neural Operators.
 
-    Class Attributes: 
+    Instance Attributes: 
 
         readin: (torch.nn.Module) 
             Reads in input data and projects to higher dimensional space 
@@ -84,17 +84,14 @@ class NeuralOperator(ABC):
     readin: torch.nn.Module
     kernel_integral: torch.nn.Module
     readout: torch.nn.Module
-    optimizer: torch.optim.Optimizer = field(init=False)
+    optimizer: Optional[torch.optim.Optimizer]
     activation_function: Callable[[Tensor], Tensor] = torch.relu
 
     def __post_init__(self,):
-        pass
+        super().__init__()
 
-    @property
-    def parameters(self):
-        return list(self.readin.parameters()) + \
-            list(self.kernel_integral.parameters()) + \
-            list(self.readout.parameters())
+        if not self.optimizer:
+            self.optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
     
     @abstractmethod
     def forward(self, x: Tensor) -&gt; Tensor:
@@ -138,7 +135,6 @@ class NeuralOperator(ABC):
         &#34;&#34;&#34;
         pass
 
-    @abstractmethod
     def to_device(self, device: torch.device): 
         &#34;&#34;&#34;
         Send data to a Torch device 
@@ -155,7 +151,7 @@ class NeuralOperator(ABC):
         pass</code></pre>
 </details>
 <div class="desc"><p>Abstract class for Neural Operators.</p>
-<p>Class Attributes: </p>
+<p>Instance Attributes: </p>
 <pre><code>readin: (torch.nn.Module) 
     Reads in input data and projects to higher dimensional space
 
@@ -176,6 +172,7 @@ activation_function: (Callable[[Tensor], Tensor])
 </code></pre></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
+<li>torch.nn.modules.module.Module</li>
 <li>abc.ABC</li>
 </ul>
 <h3>Instance variables</h3>
@@ -184,22 +181,8 @@ activation_function: (Callable[[Tensor], Tensor])
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="neurop.base.NeuralOperator.optimizer"><code class="name">var <span class="ident">optimizer</span> : torch.optim.optimizer.Optimizer</code></dt>
+<dt id="neurop.base.NeuralOperator.optimizer"><code class="name">var <span class="ident">optimizer</span> : torch.optim.optimizer.Optimizer | None</code></dt>
 <dd>
-<div class="desc"></div>
-</dd>
-<dt id="neurop.base.NeuralOperator.parameters"><code class="name">prop <span class="ident">parameters</span></code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@property
-def parameters(self):
-    return list(self.readin.parameters()) + \
-        list(self.kernel_integral.parameters()) + \
-        list(self.readout.parameters())</code></pre>
-</details>
 <div class="desc"></div>
 </dd>
 <dt id="neurop.base.NeuralOperator.readin"><code class="name">var <span class="ident">readin</span> : torch.nn.modules.module.Module</code></dt>
@@ -329,8 +312,7 @@ def save(self, path: Path):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@abstractmethod
-def to_device(self, device: torch.device): 
+<pre><code class="python">def to_device(self, device: torch.device): 
     &#34;&#34;&#34;
     Send data to a Torch device 
     &#34;&#34;&#34;
@@ -385,7 +367,6 @@ def train_step(self, x: Tensor, y: Tensor) -&gt; Tensor:
 <li><code><a title="neurop.base.NeuralOperator.load" href="#neurop.base.NeuralOperator.load">load</a></code></li>
 <li><code><a title="neurop.base.NeuralOperator.loss" href="#neurop.base.NeuralOperator.loss">loss</a></code></li>
 <li><code><a title="neurop.base.NeuralOperator.optimizer" href="#neurop.base.NeuralOperator.optimizer">optimizer</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.parameters" href="#neurop.base.NeuralOperator.parameters">parameters</a></code></li>
 <li><code><a title="neurop.base.NeuralOperator.readin" href="#neurop.base.NeuralOperator.readin">readin</a></code></li>
 <li><code><a title="neurop.base.NeuralOperator.readout" href="#neurop.base.NeuralOperator.readout">readout</a></code></li>
 <li><code><a title="neurop.base.NeuralOperator.save" href="#neurop.base.NeuralOperator.save">save</a></code></li>
