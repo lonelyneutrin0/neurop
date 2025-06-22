@@ -2,7 +2,7 @@ r"""
 .. include:: ../README.md
 """ 
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 __authors__ = [
     "Hrishikesh Belagali",
     "Aditya Narayan"
@@ -13,4 +13,13 @@ __author_emails__ = [
 ]
 __url__ = "https://github.com/lonelyneutrin0/neurop"
 
-from . import base as base
+from base import NeuralOperator #type: ignore
+
+from .fno import FNO1D
+from .deeponet import DeepONet
+
+__all__ = [
+    "NeuralOperator",
+    "FNO1D",
+    "DeepONet"
+]
