@@ -63,11 +63,11 @@ Inspired by the code from <a href="https://github.com/M3RG-IITD/Complex-Neural-O
 <dd>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="neurop.deeponet" href="deeponet/index.html">neurop.deeponet</a></code></dt>
+<dt><code class="name"><a title="neurop.layers" href="layers/index.html">neurop.layers</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="neurop.fno" href="fno/index.html">neurop.fno</a></code></dt>
+<dt><code class="name"><a title="neurop.operators" href="operators/index.html">neurop.operators</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -80,216 +80,121 @@ Inspired by the code from <a href="https://github.com/M3RG-IITD/Complex-Neural-O
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="neurop.DeepONet"><code class="flex name class">
-<span>class <span class="ident">DeepONet</span></span>
-<span>(</span><span>readin: torch.nn.modules.module.Module,<br>kernel_integral: torch.nn.modules.module.Module,<br>readout: torch.nn.modules.module.Module,<br>optimizer: torch.optim.optimizer.Optimizer | None,<br>activation_function: Callable[[torch.Tensor], torch.Tensor] = &lt;built-in method relu of type object&gt;)</span>
+<dt id="neurop.Layer"><code class="flex name class">
+<span>class <span class="ident">Layer</span></span>
+<span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class DeepONet(NeuralOperator):
+<pre><code class="python">class Layer(torch.nn.Module, ABC):
+    &#34;&#34;&#34;
+    Abstract base class for all layers in a NeuralOperator.
+    &#34;&#34;&#34;
+    @abstractmethod
+    def forward(self, x) -&gt; Tensor:
         pass</code></pre>
 </details>
-<div class="desc"><p>Abstract class for Neural Operators.</p>
-<p>Instance Attributes: </p>
-<pre><code>readin: (torch.nn.Module) 
-    Reads in input data and projects to higher dimensional space
-
-kernel_integral: (torch.nn.Module) 
-    Performs the kernel operator on the data
-
-readout: (torch.nn.Module)
-    Reads out data to lower dimensional space
-
-optimizer: (torch.optim.Optimizer) 
-    Optimization algorithm to choose. Defaults to Adam(lr=1e-3)
-
-parameters: (torch.nn.Parameter)
-    Neural operator parameters
-
-activation_function: (Callable[[Tensor], Tensor])
-    Activation to introduce nonlinearity between kernel operations
-</code></pre></div>
+<div class="desc"><p>Abstract base class for all layers in a NeuralOperator.</p>
+<p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="neurop.base.NeuralOperator" href="base.html#neurop.base.NeuralOperator">NeuralOperator</a></li>
 <li>torch.nn.modules.module.Module</li>
 <li>abc.ABC</li>
 </ul>
-<h3>Instance variables</h3>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="neurop.layers.iolayers.ReadinLayer" href="layers/iolayers.html#neurop.layers.iolayers.ReadinLayer">ReadinLayer</a></li>
+<li><a title="neurop.layers.iolayers.ReadoutLayer" href="layers/iolayers.html#neurop.layers.iolayers.ReadoutLayer">ReadoutLayer</a></li>
+<li><a title="neurop.layers.spectralconv.SpectralConvLayer" href="layers/spectralconv.html#neurop.layers.spectralconv.SpectralConvLayer">SpectralConvLayer</a></li>
+</ul>
+<h3>Class variables</h3>
 <dl>
-<dt id="neurop.DeepONet.kernel_integral"><code class="name">var <span class="ident">kernel_integral</span> : torch.nn.modules.module.Module</code></dt>
+<dt id="neurop.Layer.call_super_init"><code class="name">var <span class="ident">call_super_init</span> : bool</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="neurop.DeepONet.optimizer"><code class="name">var <span class="ident">optimizer</span> : torch.optim.optimizer.Optimizer | None</code></dt>
+<dt id="neurop.Layer.dump_patches"><code class="name">var <span class="ident">dump_patches</span> : bool</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="neurop.DeepONet.readin"><code class="name">var <span class="ident">readin</span> : torch.nn.modules.module.Module</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="neurop.DeepONet.readout"><code class="name">var <span class="ident">readout</span> : torch.nn.modules.module.Module</code></dt>
+<dt id="neurop.Layer.training"><code class="name">var <span class="ident">training</span> : bool</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="neurop.DeepONet.activation_function"><code class="name flex">
-<span>def <span class="ident">activation_function</span></span>(<span>...) ‑> Callable[[torch.Tensor], torch.Tensor]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
-<h3>Inherited members</h3>
-<ul class="hlist">
-<li><code><b><a title="neurop.base.NeuralOperator" href="base.html#neurop.base.NeuralOperator">NeuralOperator</a></b></code>:
-<ul class="hlist">
-<li><code><a title="neurop.base.NeuralOperator.calculate_metrics" href="base.html#neurop.base.NeuralOperator.calculate_metrics">calculate_metrics</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.evaluate" href="base.html#neurop.base.NeuralOperator.evaluate">evaluate</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.forward" href="base.html#neurop.base.NeuralOperator.forward">forward</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.load" href="base.html#neurop.base.NeuralOperator.load">load</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.loss" href="base.html#neurop.base.NeuralOperator.loss">loss</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.save" href="base.html#neurop.base.NeuralOperator.save">save</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.to_device" href="base.html#neurop.base.NeuralOperator.to_device">to_device</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.train_step" href="base.html#neurop.base.NeuralOperator.train_step">train_step</a></code></li>
-</ul>
-</li>
-</ul>
-</dd>
-<dt id="neurop.FNO1D"><code class="flex name class">
-<span>class <span class="ident">FNO1D</span></span>
-<span>(</span><span>readin: torch.nn.modules.module.Module,<br>kernel_integral: torch.nn.modules.module.Module,<br>readout: torch.nn.modules.module.Module,<br>optimizer: torch.optim.optimizer.Optimizer | None,<br>activation_function: Callable[[torch.Tensor], torch.Tensor] = &lt;built-in method relu of type object&gt;)</span>
+<dt id="neurop.Layer.forward"><code class="name flex">
+<span>def <span class="ident">forward</span></span>(<span>self, x) ‑> torch.Tensor</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class FNO1D(NeuralOperator):
+<pre><code class="python">@abstractmethod
+def forward(self, x) -&gt; Tensor:
     pass</code></pre>
 </details>
-<div class="desc"><p>Abstract class for Neural Operators.</p>
-<p>Instance Attributes: </p>
-<pre><code>readin: (torch.nn.Module) 
-    Reads in input data and projects to higher dimensional space
-
-kernel_integral: (torch.nn.Module) 
-    Performs the kernel operator on the data
-
-readout: (torch.nn.Module)
-    Reads out data to lower dimensional space
-
-optimizer: (torch.optim.Optimizer) 
-    Optimization algorithm to choose. Defaults to Adam(lr=1e-3)
-
-parameters: (torch.nn.Parameter)
-    Neural operator parameters
-
-activation_function: (Callable[[Tensor], Tensor])
-    Activation to introduce nonlinearity between kernel operations
-</code></pre></div>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li><a title="neurop.base.NeuralOperator" href="base.html#neurop.base.NeuralOperator">NeuralOperator</a></li>
-<li>torch.nn.modules.module.Module</li>
-<li>abc.ABC</li>
-</ul>
-<h3>Instance variables</h3>
-<dl>
-<dt id="neurop.FNO1D.kernel_integral"><code class="name">var <span class="ident">kernel_integral</span> : torch.nn.modules.module.Module</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="neurop.FNO1D.optimizer"><code class="name">var <span class="ident">optimizer</span> : torch.optim.optimizer.Optimizer | None</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="neurop.FNO1D.readin"><code class="name">var <span class="ident">readin</span> : torch.nn.modules.module.Module</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="neurop.FNO1D.readout"><code class="name">var <span class="ident">readout</span> : torch.nn.modules.module.Module</code></dt>
-<dd>
-<div class="desc"></div>
+<div class="desc"><p>Define the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the :class:<code>Module</code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div></div>
 </dd>
 </dl>
-<h3>Methods</h3>
-<dl>
-<dt id="neurop.FNO1D.activation_function"><code class="name flex">
-<span>def <span class="ident">activation_function</span></span>(<span>...) ‑> Callable[[torch.Tensor], torch.Tensor]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
-<h3>Inherited members</h3>
-<ul class="hlist">
-<li><code><b><a title="neurop.base.NeuralOperator" href="base.html#neurop.base.NeuralOperator">NeuralOperator</a></b></code>:
-<ul class="hlist">
-<li><code><a title="neurop.base.NeuralOperator.calculate_metrics" href="base.html#neurop.base.NeuralOperator.calculate_metrics">calculate_metrics</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.evaluate" href="base.html#neurop.base.NeuralOperator.evaluate">evaluate</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.forward" href="base.html#neurop.base.NeuralOperator.forward">forward</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.load" href="base.html#neurop.base.NeuralOperator.load">load</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.loss" href="base.html#neurop.base.NeuralOperator.loss">loss</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.save" href="base.html#neurop.base.NeuralOperator.save">save</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.to_device" href="base.html#neurop.base.NeuralOperator.to_device">to_device</a></code></li>
-<li><code><a title="neurop.base.NeuralOperator.train_step" href="base.html#neurop.base.NeuralOperator.train_step">train_step</a></code></li>
-</ul>
-</li>
-</ul>
 </dd>
 <dt id="neurop.NeuralOperator"><code class="flex name class">
 <span>class <span class="ident">NeuralOperator</span></span>
-<span>(</span><span>readin: torch.nn.modules.module.Module,<br>kernel_integral: torch.nn.modules.module.Module,<br>readout: torch.nn.modules.module.Module,<br>optimizer: torch.optim.optimizer.Optimizer | None,<br>activation_function: Callable[[torch.Tensor], torch.Tensor] = &lt;built-in method relu of type object&gt;)</span>
+<span>(</span><span>readin: <a title="neurop.base.Layer" href="base.html#neurop.base.Layer">Layer</a>,<br>kernel_integral: <a title="neurop.base.Layer" href="base.html#neurop.base.Layer">Layer</a>,<br>readout: <a title="neurop.base.Layer" href="base.html#neurop.base.Layer">Layer</a>,<br>optimizer: torch.optim.optimizer.Optimizer | None = None,<br>activation_function: Callable[[torch.Tensor], torch.Tensor] = &lt;built-in method relu of type object&gt;)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@dataclass
-class NeuralOperator(torch.nn.Module, ABC):
+<pre><code class="python">class NeuralOperator(torch.nn.Module, ABC):
     &#34;&#34;&#34;
     Abstract class for Neural Operators.
 
     Instance Attributes: 
 
-        readin: (torch.nn.Module) 
+        readin: (Layer)
             Reads in input data and projects to higher dimensional space 
 
-        kernel_integral: (torch.nn.Module) 
-            Performs the kernel operator on the data
+        kernel_integral: (Layer) 
+            The kernel integral operator that performs the main computation
 
-        readout: (torch.nn.Module)
+        readout: (Layer)
             Reads out data to lower dimensional space
 
         optimizer: (torch.optim.Optimizer) 
             Optimization algorithm to choose. Defaults to Adam(lr=1e-3)
         
-        parameters: (torch.nn.Parameter)
-            Neural operator parameters
-        
         activation_function: (Callable[[Tensor], Tensor])
             Activation to introduce nonlinearity between kernel operations
     &#34;&#34;&#34;
 
-    readin: torch.nn.Module
-    kernel_integral: torch.nn.Module
-    readout: torch.nn.Module
-    optimizer: Optional[torch.optim.Optimizer]
-    activation_function: Callable[[Tensor], Tensor] = torch.relu
-
-    def __post_init__(self,):
+    def __init__(self,
+                 readin: Layer,
+                 kernel_integral: Layer,
+                 readout: Layer,
+                 optimizer: Optional[torch.optim.Optimizer] = None,
+                 activation_function: Callable[[Tensor], Tensor] = torch.relu
+                 ):
+        &#34;&#34;&#34;
+        __init__ method to initialize NeuralOperator
+        &#34;&#34;&#34;
         super().__init__()
 
-        if not self.optimizer:
-            self.optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        self.optimizer = optimizer or torch.optim.Adam(self.parameters(), lr=1e-3)
     
     @abstractmethod
     def forward(self, x: Tensor) -&gt; Tensor:
@@ -326,10 +231,11 @@ class NeuralOperator(torch.nn.Module, ABC):
         &#34;&#34;&#34;
         pass
 
+    @classmethod
     @abstractmethod
-    def load(self, path: Path):
+    def load(cls, path: Path):
         &#34;&#34;&#34;
-        Load model parameters from a file 
+        Load a neural operator from a file
         &#34;&#34;&#34;
         pass
 
@@ -346,28 +252,33 @@ class NeuralOperator(torch.nn.Module, ABC):
         &#34;&#34;&#34;
         Compute the desired metrics and output a TypedDict 
         &#34;&#34;&#34;
+        pass
+
+    @abstractmethod
+    def __repr__(self) -&gt; str:
+        &#34;&#34;&#34;
+        Brief overview of the model architecture
+        &#34;&#34;&#34;
         pass</code></pre>
 </details>
 <div class="desc"><p>Abstract class for Neural Operators.</p>
 <p>Instance Attributes: </p>
-<pre><code>readin: (torch.nn.Module) 
+<pre><code>readin: (Layer)
     Reads in input data and projects to higher dimensional space
 
-kernel_integral: (torch.nn.Module) 
-    Performs the kernel operator on the data
+kernel_integral: (Layer) 
+    The kernel integral operator that performs the main computation
 
-readout: (torch.nn.Module)
+readout: (Layer)
     Reads out data to lower dimensional space
 
 optimizer: (torch.optim.Optimizer) 
     Optimization algorithm to choose. Defaults to Adam(lr=1e-3)
 
-parameters: (torch.nn.Parameter)
-    Neural operator parameters
-
 activation_function: (Callable[[Tensor], Tensor])
     Activation to introduce nonlinearity between kernel operations
-</code></pre></div>
+</code></pre>
+<p><strong>init</strong> method to initialize NeuralOperator</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>torch.nn.modules.module.Module</li>
@@ -375,36 +286,34 @@ activation_function: (Callable[[Tensor], Tensor])
 </ul>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li><a title="neurop.deeponet.deeponet.DeepONet" href="deeponet/deeponet.html#neurop.deeponet.deeponet.DeepONet">DeepONet</a></li>
-<li><a title="neurop.fno.fno1d.FNO1D" href="fno/fno1d.html#neurop.fno.fno1d.FNO1D">FNO1D</a></li>
+<li><a title="neurop.operators.fourier.FourierOperator" href="operators/fourier.html#neurop.operators.fourier.FourierOperator">FourierOperator</a></li>
 </ul>
-<h3>Instance variables</h3>
+<h3>Class variables</h3>
 <dl>
-<dt id="neurop.NeuralOperator.kernel_integral"><code class="name">var <span class="ident">kernel_integral</span> : torch.nn.modules.module.Module</code></dt>
+<dt id="neurop.NeuralOperator.call_super_init"><code class="name">var <span class="ident">call_super_init</span> : bool</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="neurop.NeuralOperator.optimizer"><code class="name">var <span class="ident">optimizer</span> : torch.optim.optimizer.Optimizer | None</code></dt>
+<dt id="neurop.NeuralOperator.dump_patches"><code class="name">var <span class="ident">dump_patches</span> : bool</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="neurop.NeuralOperator.readin"><code class="name">var <span class="ident">readin</span> : torch.nn.modules.module.Module</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="neurop.NeuralOperator.readout"><code class="name">var <span class="ident">readout</span> : torch.nn.modules.module.Module</code></dt>
+<dt id="neurop.NeuralOperator.training"><code class="name">var <span class="ident">training</span> : bool</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
 </dl>
-<h3>Methods</h3>
+<h3>Static methods</h3>
 <dl>
-<dt id="neurop.NeuralOperator.activation_function"><code class="name flex">
-<span>def <span class="ident">activation_function</span></span>(<span>...) ‑> Callable[[torch.Tensor], torch.Tensor]</span>
+<dt id="neurop.NeuralOperator.load"><code class="name flex">
+<span>def <span class="ident">load</span></span>(<span>path: pathlib.Path)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Load a neural operator from a file</p></div>
 </dd>
+</dl>
+<h3>Methods</h3>
+<dl>
 <dt id="neurop.NeuralOperator.calculate_metrics"><code class="name flex">
 <span>def <span class="ident">calculate_metrics</span></span>(<span>self, ground_truth: torch.Tensor, predicted: torch.Tensor)</span>
 </code></dt>
@@ -455,23 +364,6 @@ def forward(self, x: Tensor) -&gt; Tensor:
     pass</code></pre>
 </details>
 <div class="desc"><p>Forward pass to be implemented by subclasses.</p></div>
-</dd>
-<dt id="neurop.NeuralOperator.load"><code class="name flex">
-<span>def <span class="ident">load</span></span>(<span>self, path: pathlib.Path)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@abstractmethod
-def load(self, path: Path):
-    &#34;&#34;&#34;
-    Load model parameters from a file 
-    &#34;&#34;&#34;
-    pass</code></pre>
-</details>
-<div class="desc"><p>Load model parameters from a file</p></div>
 </dd>
 <dt id="neurop.NeuralOperator.loss"><code class="name flex">
 <span>def <span class="ident">loss</span></span>(<span>self, prediction: torch.Tensor, target: torch.Tensor) ‑> torch.Tensor</span>
@@ -563,48 +455,35 @@ def train_step(self, x: Tensor, y: Tensor) -&gt; Tensor:
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="neurop.base" href="base.html">neurop.base</a></code></li>
-<li><code><a title="neurop.deeponet" href="deeponet/index.html">neurop.deeponet</a></code></li>
-<li><code><a title="neurop.fno" href="fno/index.html">neurop.fno</a></code></li>
+<li><code><a title="neurop.layers" href="layers/index.html">neurop.layers</a></code></li>
+<li><code><a title="neurop.operators" href="operators/index.html">neurop.operators</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="neurop.DeepONet" href="#neurop.DeepONet">DeepONet</a></code></h4>
+<h4><code><a title="neurop.Layer" href="#neurop.Layer">Layer</a></code></h4>
 <ul class="">
-<li><code><a title="neurop.DeepONet.activation_function" href="#neurop.DeepONet.activation_function">activation_function</a></code></li>
-<li><code><a title="neurop.DeepONet.kernel_integral" href="#neurop.DeepONet.kernel_integral">kernel_integral</a></code></li>
-<li><code><a title="neurop.DeepONet.optimizer" href="#neurop.DeepONet.optimizer">optimizer</a></code></li>
-<li><code><a title="neurop.DeepONet.readin" href="#neurop.DeepONet.readin">readin</a></code></li>
-<li><code><a title="neurop.DeepONet.readout" href="#neurop.DeepONet.readout">readout</a></code></li>
-</ul>
-</li>
-<li>
-<h4><code><a title="neurop.FNO1D" href="#neurop.FNO1D">FNO1D</a></code></h4>
-<ul class="">
-<li><code><a title="neurop.FNO1D.activation_function" href="#neurop.FNO1D.activation_function">activation_function</a></code></li>
-<li><code><a title="neurop.FNO1D.kernel_integral" href="#neurop.FNO1D.kernel_integral">kernel_integral</a></code></li>
-<li><code><a title="neurop.FNO1D.optimizer" href="#neurop.FNO1D.optimizer">optimizer</a></code></li>
-<li><code><a title="neurop.FNO1D.readin" href="#neurop.FNO1D.readin">readin</a></code></li>
-<li><code><a title="neurop.FNO1D.readout" href="#neurop.FNO1D.readout">readout</a></code></li>
+<li><code><a title="neurop.Layer.call_super_init" href="#neurop.Layer.call_super_init">call_super_init</a></code></li>
+<li><code><a title="neurop.Layer.dump_patches" href="#neurop.Layer.dump_patches">dump_patches</a></code></li>
+<li><code><a title="neurop.Layer.forward" href="#neurop.Layer.forward">forward</a></code></li>
+<li><code><a title="neurop.Layer.training" href="#neurop.Layer.training">training</a></code></li>
 </ul>
 </li>
 <li>
 <h4><code><a title="neurop.NeuralOperator" href="#neurop.NeuralOperator">NeuralOperator</a></code></h4>
 <ul class="two-column">
-<li><code><a title="neurop.NeuralOperator.activation_function" href="#neurop.NeuralOperator.activation_function">activation_function</a></code></li>
 <li><code><a title="neurop.NeuralOperator.calculate_metrics" href="#neurop.NeuralOperator.calculate_metrics">calculate_metrics</a></code></li>
+<li><code><a title="neurop.NeuralOperator.call_super_init" href="#neurop.NeuralOperator.call_super_init">call_super_init</a></code></li>
+<li><code><a title="neurop.NeuralOperator.dump_patches" href="#neurop.NeuralOperator.dump_patches">dump_patches</a></code></li>
 <li><code><a title="neurop.NeuralOperator.evaluate" href="#neurop.NeuralOperator.evaluate">evaluate</a></code></li>
 <li><code><a title="neurop.NeuralOperator.forward" href="#neurop.NeuralOperator.forward">forward</a></code></li>
-<li><code><a title="neurop.NeuralOperator.kernel_integral" href="#neurop.NeuralOperator.kernel_integral">kernel_integral</a></code></li>
 <li><code><a title="neurop.NeuralOperator.load" href="#neurop.NeuralOperator.load">load</a></code></li>
 <li><code><a title="neurop.NeuralOperator.loss" href="#neurop.NeuralOperator.loss">loss</a></code></li>
-<li><code><a title="neurop.NeuralOperator.optimizer" href="#neurop.NeuralOperator.optimizer">optimizer</a></code></li>
-<li><code><a title="neurop.NeuralOperator.readin" href="#neurop.NeuralOperator.readin">readin</a></code></li>
-<li><code><a title="neurop.NeuralOperator.readout" href="#neurop.NeuralOperator.readout">readout</a></code></li>
 <li><code><a title="neurop.NeuralOperator.save" href="#neurop.NeuralOperator.save">save</a></code></li>
 <li><code><a title="neurop.NeuralOperator.to_device" href="#neurop.NeuralOperator.to_device">to_device</a></code></li>
 <li><code><a title="neurop.NeuralOperator.train_step" href="#neurop.NeuralOperator.train_step">train_step</a></code></li>
+<li><code><a title="neurop.NeuralOperator.training" href="#neurop.NeuralOperator.training">training</a></code></li>
 </ul>
 </li>
 </ul>
