@@ -13,13 +13,16 @@ __author_emails__ = [
 ]
 __url__ = "https://github.com/lonelyneutrin0/neurop"
 
-from .base import NeuralOperator #type: ignore
+from .base import NeuralOperator 
+from .base import Layer
 
-from .fno import FNO1D
-from .deeponet import DeepONet
+from . import operators 
+from . import layers
 
 __all__ = [
     "NeuralOperator",
-    "FNO1D",
-    "DeepONet"
-]
+    "Layer",
+    "operators",
+    "layers"
+] #type: ignore 
+
