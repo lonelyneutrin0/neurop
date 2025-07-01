@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
 import torch 
 from torch.types import Tensor
@@ -7,43 +6,49 @@ from typing import Callable, Optional
 
 from pathlib import Path
 
-@dataclass
+class Layer(torch.nn.Module, ABC):
+    """
+    Abstract base class for all layers in a NeuralOperator.
+    """
+    @abstractmethod
+    def forward(self, x):
+        pass
+
 class NeuralOperator(torch.nn.Module, ABC):
     """
     Abstract class for Neural Operators.
 
     Instance Attributes: 
 
-        readin: (torch.nn.Module) 
+        readin: (Layer)
             Reads in input data and projects to higher dimensional space 
 
-        kernel_integral: (torch.nn.Module) 
-            Performs the kernel operator on the data
+        kernel_integral: (Layer) 
+            The kernel integral operator that performs the main computation
 
-        readout: (torch.nn.Module)
+        readout: (Layer)
             Reads out data to lower dimensional space
 
         optimizer: (torch.optim.Optimizer) 
             Optimization algorithm to choose. Defaults to Adam(lr=1e-3)
         
-        parameters: (torch.nn.Parameter)
-            Neural operator parameters
-        
         activation_function: (Callable[[Tensor], Tensor])
             Activation to introduce nonlinearity between kernel operations
     """
 
-    readin: torch.nn.Module
-    kernel_integral: torch.nn.Module
-    readout: torch.nn.Module
-    optimizer: Optional[torch.optim.Optimizer]
-    activation_function: Callable[[Tensor], Tensor] = torch.relu
-
-    def __post_init__(self,):
+    def __init__(self,
+                 readin: Layer,
+                 kernel_integral: Layer,
+                 readout: Layer,
+                 optimizer: Optional[torch.optim.Optimizer] = None,
+                 activation_function: Callable[[Tensor], Tensor] = torch.relu
+                 ):
+        """
+        __init__ method to initialize NeuralOperator
+        """
         super().__init__()
 
-        if not self.optimizer:
-            self.optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        self.optimizer = optimizer or torch.optim.Adam(self.parameters(), lr=1e-3)
     
     @abstractmethod
     def forward(self, x: Tensor) -> Tensor:
@@ -80,10 +85,11 @@ class NeuralOperator(torch.nn.Module, ABC):
         """
         pass
 
+    @classmethod
     @abstractmethod
-    def load(self, path: Path):
+    def load(cls, path: Path):
         """
-        Load model parameters from a file 
+        Load a neural operator from a file
         """
         pass
 
@@ -99,5 +105,12 @@ class NeuralOperator(torch.nn.Module, ABC):
     def calculate_metrics(self, ground_truth: Tensor, predicted: Tensor): 
         """
         Compute the desired metrics and output a TypedDict 
+        """
+        pass
+
+    @abstractmethod
+    def __repr__(self):
+        """
+        Brief overview of the model architecture
         """
         pass
