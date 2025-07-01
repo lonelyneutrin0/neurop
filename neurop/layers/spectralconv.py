@@ -2,6 +2,7 @@ import torch
 from ..base import Layer
 
 from torch import Tensor
+from typing import Tuple   
 
 import warnings
 
@@ -16,7 +17,7 @@ class SpectralConv1DLayer(Layer):
         - $N$ is the length of the signal,
     
     the layer first transforms the data to the frequency domain:
-        $$\vec{x} = \mathcal{F}\left [ \vec x\right ]$$ 
+        $$x = \mathcal{F}\left [ x\right ]$$ 
     
     Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
     The shape of the weight matrix is $(C, O, K)$, where:
@@ -24,10 +25,10 @@ class SpectralConv1DLayer(Layer):
         - $O$ is the number of output channels,
         - $K$ is the number of modes considered in the spectral convolution.    
     
-    $$\hat{y_{b, o, k} = \hat W_{c, o, k} \hat{x_{b, c, k}} $$
+    $$y_{b, o, k} =  W_{c, o, k} x_{b, c, k} $$
     In other words, it's a tensor contraction over the Fourier coefficients of the input signal and the weights. 
     Finally, the output is transformed back to the time domain using the inverse Fourier transform. 
-    $$\vec{y} = \mathcal{F}^{-1}\left [ \hat y \right ]$$
+    $$y = \mathcal{F}^{-1}\left [ y \right ]$$
     """
 
     def __init__(self, in_channels: int, out_channels: int, modes: int):
@@ -59,20 +60,89 @@ class SpectralConv1DLayer(Layer):
         """
         batchsize, _, n = x.shape
 
+        modes = min(self.modes, n)  # Clip modes to input length
         if self.modes > n:
             warnings.warn(
                 f"Number of modes {self.modes} cannot be greater than input length {n}. Clipping modes to {n}..."
             )
-            self.modes = n
 
         x_ft = torch.fft.fft(x, dim=-1)
         out_ft = torch.zeros(
             batchsize, self.out_channels, n, dtype=torch.cfloat, device=x.device
         )
-        out_ft[..., :self.modes] = torch.einsum(
-            "bix,iox->box", x_ft[..., :self.modes], self.weight
+        out_ft[..., :modes] = torch.einsum(
+            "bix,iox->box", x_ft[..., :modes], self.weight
         )
 
         x_out = torch.fft.ifft(out_ft, dim=-1).real 
         return x_out
-        
+
+
+class SpectralConv2DLayer(Layer):
+    """
+    Spectral Convolution 2 Dimensional Layer.
+    This layer applies a convolution operation to 2 dimensional data in the frequency domain.
+
+    Given an input signal $x$ of shape $(B, C, H, W)$, where:
+        - $B$ is the batch size,
+        - $C$ is the number of input channels,
+        - $H$ is the height of the signal,
+        - $W$ is the width of the signal,
+    
+    the layer first transforms the data to the frequency domain:
+        $$x = \mathcal{F}\left [ x\right ]$$ 
+    
+    Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
+    The shape of the weight matrix is $(C, O, K_H, K_W)$, where:
+        - $C$ is the number of input channels,
+        - $O$ is the number of output channels,
+        - $K_H$ is the number of modes considered in height,
+        - $K_W$ is the number of modes considered in width.    
+    
+    $$y_{b, o, k_h, k_w} = W_{c, o, k_h, k_w} x_{b, c, k_h, k_w} $$
+    In other words, it's a tensor contraction over the Fourier coefficients of the input signal and the weights. 
+    Finally, the output is transformed back to the time domain using the inverse Fourier transform. 
+    $$y = \mathcal{F}^{-1}\left [  y \right ]$$
+    """
+
+    def __init__(self, in_channels: int, out_channels: int, modes: Tuple[int, int]):
+        """
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            modes (Tuple[int, int]): Number of modes to consider in height and width.
+        """
+        super().__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.modes = modes
+
+        # Complex weights
+        self.weight = torch.nn.Parameter(
+            torch.randn(in_channels, out_channels, *modes, dtype=torch.cfloat)
+        )
+
+    def forward(self, x: Tensor) -> Tensor:
+        """
+        Forward pass for the Spectral Convolution 2D layer.
+        """
+        batchsize, _, h, w = x.shape
+
+        modes_h = min(self.modes[0], h)
+        modes_w = min(self.modes[1], w)
+
+        if self.modes[0] > h or self.modes[1] > w:
+            warnings.warn(
+                f"Number of modes {self.modes} cannot be greater than input dimensions {(h, w)}. Clipping modes..."
+            )
+
+        x_ft = torch.fft.fft2(x)
+        out_ft = torch.zeros(
+            batchsize, self.out_channels, h, w, dtype=torch.cfloat, device=x.device
+        )
+        out_ft[..., :modes_h, :modes_w] = torch.einsum(
+            "bixy,ioxy->boxy", x_ft[..., :modes_h, :modes_w], self.weight[..., :modes_h, :modes_w]
+        )
+
+        x_out = torch.fft.ifft2(out_ft).real
+        return x_out
