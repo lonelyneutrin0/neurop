@@ -109,7 +109,7 @@ class NeuralOperator(torch.nn.Module, ABC):
         pass
 
     @abstractmethod
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Brief overview of the model architecture
         """
