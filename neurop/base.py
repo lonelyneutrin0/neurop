@@ -11,7 +11,7 @@ class Layer(torch.nn.Module, ABC):
     Abstract base class for all layers in a NeuralOperator.
     """
     @abstractmethod
-    def forward(self, x):
+    def forward(self, x) -> Tensor:
         pass
 
 class NeuralOperator(torch.nn.Module, ABC):
