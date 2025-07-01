@@ -2,10 +2,17 @@ from abc import ABC, abstractmethod
 
 import torch 
 from torch.types import Tensor
-from typing import Callable, Optional
+from typing import Callable, Optional, TypedDict
 
 from pathlib import Path
 
+class Metrics(TypedDict, total=False):
+    """
+    TypedDict to hold metrics for evaluation.
+    All fields are optional for flexibility
+    """
+    loss: float
+    accuracy: float
 class Layer(torch.nn.Module, ABC):
     """
     Abstract base class for all layers in a NeuralOperator.
@@ -18,21 +25,16 @@ class NeuralOperator(torch.nn.Module, ABC):
     """
     Abstract class for Neural Operators.
 
-    Instance Attributes: 
-
-        readin: (Layer)
+    Attributes: 
+        readin (Layer):
             Reads in input data and projects to higher dimensional space 
-
-        kernel_integral: (Layer) 
+        kernel_integral (Layer):
             The kernel integral operator that performs the main computation
-
-        readout: (Layer)
+        readout (Layer):
             Reads out data to lower dimensional space
-
-        optimizer: (torch.optim.Optimizer) 
+        optimizer (torch.optim.Optimizer):
             Optimization algorithm to choose. Defaults to Adam(lr=1e-3)
-        
-        activation_function: (Callable[[Tensor], Tensor])
+        activation_function (Callable[[Tensor], Tensor]):
             Activation to introduce nonlinearity between kernel operations
     """
 
@@ -102,7 +104,7 @@ class NeuralOperator(torch.nn.Module, ABC):
         self.readout.to(device)
 
     @abstractmethod
-    def calculate_metrics(self, ground_truth: Tensor, predicted: Tensor): 
+    def calculate_metrics(self, ground_truth: Tensor, predicted: Tensor) -> Metrics: 
         """
         Compute the desired metrics and output a TypedDict 
         """
