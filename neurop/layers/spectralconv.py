@@ -99,7 +99,7 @@ class SpectralConv2DLayer(Layer):
         - $K_H$ is the number of modes considered in height,
         - $K_W$ is the number of modes considered in width.    
     
-    $$y_{b, o, k_h, k_w} = W_{c, o, k_h, k_w} x_{b, c, k_h, k_w} $$
+    $$y_{b, o, k_h, k_w} = W_{c, o, k_h, k_w} x_{b, o, k_h, k_w} $$
     In other words, it's a tensor contraction over the Fourier coefficients of the input signal and the weights. 
     Finally, the output is transformed back to the time domain using the inverse Fourier transform. 
     $$y = \mathcal{F}^{-1}\left [  y \right ]$$
@@ -146,3 +146,76 @@ class SpectralConv2DLayer(Layer):
 
         x_out = torch.fft.ifft2(out_ft).real
         return x_out
+    
+class SpectralConv3DLayer(Layer):
+    """
+    Spectral Convolution 3 Dimensional Layer.
+    This layer applies a convolution operation to 3 dimensional data in the frequency domain.
+
+    Given an input signal $x$ of shape $(B, C, D, H, W)$, where:
+        - $B$ is the batch size,
+        - $C$ is the number of input channels,
+        - $D$ is the depth of the signal,
+        - $H$ is the height of the signal,
+        - $W$ is the width of the signal,
+    
+    the layer first transforms the data to the frequency domain:
+        $$x = \mathcal{F}\left [ x\right ]$$ 
+    
+    Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
+    The shape of the weight matrix is $(C, O, K_D, K_H, K_W)$, where:
+        - $C$ is the number of input channels,
+        - $O$ is the number of output channels,
+        - $K_D$ is the number of modes considered in depth,
+        - $K_H$ is the number of modes considered in height,
+        - $K_W$ is the number of modes considered in width.    
+    
+    $$y_{b, o, k_d, k_h, k_w} = W_{c, o, k_d, k_h, k_w} x_{b, o, k_d, k_h, k_w} $$
+    In other words, it's a tensor contraction over the Fourier coefficients of the input signal and the weights. 
+    Finally, the output is transformed back to the time domain using the inverse Fourier transform. 
+    $$y = \mathcal{F}^{-1}\left [  y \right ]$$
+    """
+
+    def __init__(self, in_channels: int, out_channels: int, modes: Tuple[int, int, int]):
+        """
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            modes (Tuple[int, int, int]): Number of modes to consider in depth and height and width.
+        """
+        super().__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.modes = modes
+
+        # Complex weights
+        self.weight = torch.nn.Parameter(
+            torch.randn(in_channels, out_channels, *modes, dtype=torch.cfloat)
+        )
+
+    def forward(self, x: Tensor) -> Tensor:
+        """
+        Forward pass for the Spectral Convolution 3D layer.
+        """
+        batchsize, _, d, h, w = x.shape
+
+        modes_d = min(self.modes[0], d)
+        modes_h = min(self.modes[1], h)
+        modes_w = min(self.modes[2], w)
+
+        if self.modes[0] > d or self.modes[1] > h or self.modes[2] > w:
+            warnings.warn(
+                f"Number of modes {self.modes} cannot be greater than input dimensions {(d, h, w)}. Clipping modes..."
+            )
+
+        x_ft = torch.fft.fftn(x, dim=(-3, -2, -1))
+        out_ft = torch.zeros(
+            batchsize, self.out_channels, d, h, w, dtype=torch.cfloat, device=x.device
+        )
+        out_ft[..., :modes_d, :modes_h, :modes_w] = torch.einsum(
+            "bixyw,ioxyw->boxyw", x_ft[..., :modes_d, :modes_h, :modes_w], self.weight[..., :modes_d, :modes_h, :modes_w]
+        )
+
+        x_out = torch.fft.ifftn(out_ft, dim=(-3, -2, -1)).real
+        return x_out
+    
