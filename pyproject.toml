@@ -37,7 +37,7 @@ dev = [
     "pytest~=8.0.2",
     "ruff~=0.9.4",
     "mypy~=1.13.0",
-    "pdoc3~=0.11.5"
+    "pdoc~=15.0.4"
 ]
 
 [tool.hatch.version]
