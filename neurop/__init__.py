@@ -18,11 +18,3 @@ from .base import Layer
 
 from . import operators 
 from . import layers
-
-__all__ = [
-    "NeuralOperator",
-    "Layer",
-    "operators",
-    "layers"
-] #type: ignore 
-

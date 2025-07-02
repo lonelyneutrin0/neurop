@@ -83,7 +83,7 @@ jobs:
           pip install .[dev]
       - name: Build pdoc documentation
         run: >-
-          pdoc --html neurop/ -o _build/
+          pdoc -d google neurop/ -o _build/ --math 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
