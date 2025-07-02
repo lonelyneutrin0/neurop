@@ -1,1 +1,1 @@
-from .fourier import FourierOperator
+from .fourier import FourierOperator as FourierOperator
