@@ -113,7 +113,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: _build/neurop
+          folder: _build/
           clean: true
 
   pypi-publish:
