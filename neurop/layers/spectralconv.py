@@ -17,7 +17,7 @@ class SpectralConv1DLayer(Layer):
         - $N$ is the length of the signal,
     
     the layer first transforms the data to the frequency domain:
-        $$x = \mathcal{F}\left [ x\right ]$$ 
+    $$x = \mathcal{F} [x]$$ 
     
     Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
     The shape of the weight matrix is $(C, O, K)$, where:
@@ -28,7 +28,7 @@ class SpectralConv1DLayer(Layer):
     $$y_{b, o, k} =  W_{c, o, k} x_{b, c, k} $$
     In other words, it's a tensor contraction over the Fourier coefficients of the input signal and the weights. 
     Finally, the output is transformed back to the time domain using the inverse Fourier transform. 
-    $$y = \mathcal{F}^{-1}\left [ y \right ]$$
+    $$y = \mathcal{F}^{-1} [ y  ]$$
     """
 
     def __init__(self, in_channels: int, out_channels: int, modes: int):
@@ -90,7 +90,7 @@ class SpectralConv2DLayer(Layer):
         - $W$ is the width of the signal,
     
     the layer first transforms the data to the frequency domain:
-        $$x = \mathcal{F}\left [ x\right ]$$ 
+        $$x = \mathcal{F} [ x ]$$ 
     
     Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
     The shape of the weight matrix is $(C, O, K_H, K_W)$, where:
@@ -102,7 +102,7 @@ class SpectralConv2DLayer(Layer):
     $$y_{b, o, k_h, k_w} = W_{c, o, k_h, k_w} x_{b, o, k_h, k_w} $$
     In other words, it's a tensor contraction over the Fourier coefficients of the input signal and the weights. 
     Finally, the output is transformed back to the time domain using the inverse Fourier transform. 
-    $$y = \mathcal{F}^{-1}\left [  y \right ]$$
+    $$y = \mathcal{F}^{-1}[  y ]$$
     """
 
     def __init__(self, in_channels: int, out_channels: int, modes: Tuple[int, int]):
@@ -160,7 +160,7 @@ class SpectralConv3DLayer(Layer):
         - $W$ is the width of the signal,
     
     the layer first transforms the data to the frequency domain:
-        $$x = \mathcal{F}\left [ x\right ]$$ 
+        $$x = \mathcal{F} [ x ]$$ 
     
     Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
     The shape of the weight matrix is $(C, O, K_D, K_H, K_W)$, where:
@@ -173,7 +173,7 @@ class SpectralConv3DLayer(Layer):
     $$y_{b, o, k_d, k_h, k_w} = W_{c, o, k_d, k_h, k_w} x_{b, o, k_d, k_h, k_w} $$
     In other words, it's a tensor contraction over the Fourier coefficients of the input signal and the weights. 
     Finally, the output is transformed back to the time domain using the inverse Fourier transform. 
-    $$y = \mathcal{F}^{-1}\left [  y \right ]$$
+    $$y = \mathcal{F}^{-1}[  y  ]$$
     """
 
     def __init__(self, in_channels: int, out_channels: int, modes: Tuple[int, int, int]):
@@ -218,4 +218,3 @@ class SpectralConv3DLayer(Layer):
 
         x_out = torch.fft.ifftn(out_ft, dim=(-3, -2, -1)).real
         return x_out
-    
