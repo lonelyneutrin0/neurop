@@ -46,28 +46,58 @@ el.replaceWith(d);
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="neurop.layers.spectralconv.SpectralConvLayer"><code class="flex name class">
-<span>class <span class="ident">SpectralConvLayer</span></span>
-<span>(</span><span>in_channels, out_channels, kernel_size)</span>
+<dt id="neurop.layers.spectralconv.SpectralConv1DLayer"><code class="flex name class">
+<span>class <span class="ident">SpectralConv1DLayer</span></span>
+<span>(</span><span>in_channels: int, out_channels: int, modes: int)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class SpectralConvLayer(Layer):
+<pre><code class="python">class SpectralConv1DLayer(Layer):
     &#34;&#34;&#34;
-    Spectral Convolution Layer.
-    This layer applies a convolution operation in the frequency domain.
+    Spectral Convolution 1 Dimensional Layer.
+    This layer applies a convolution operation to 1 dimensional data in the frequency domain.
+
+    Given an input signal $x$ of shape $(B, C, N)$, where:
+        - $B$ is the batch size,
+        - $C$ is the number of input channels,
+        - $N$ is the length of the signal,
+    
+    the layer first transforms the data to the frequency domain:
+        $$x = \mathcal{F}\left [ x\right ]$$ 
+    
+    Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
+    The shape of the weight matrix is $(C, O, K)$, where:
+        - $C$ is the number of input channels,
+        - $O$ is the number of output channels,
+        - $K$ is the number of modes considered in the spectral convolution.    
+    
+    $$y_{b, o, k} =  W_{c, o, k} x_{b, c, k} $$
+    In other words, it&#39;s a tensor contraction over the Fourier coefficients of the input signal and the weights. 
+    Finally, the output is transformed back to the time domain using the inverse Fourier transform. 
+    $$y = \mathcal{F}^{-1}\left [ y \right ]$$
     &#34;&#34;&#34;
 
-    def __init__(self, in_channels, out_channels, kernel_size):
+    def __init__(self, in_channels: int, out_channels: int, modes: int):
+        &#34;&#34;&#34;
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            modes (int): Number of modes to consider in the spectral convolution.
+        &#34;&#34;&#34;
         super().__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
-        self.kernel_size = kernel_size
+        self.modes = modes
 
-    def forward(self, x) -&gt; Tensor:
+        # Complex weights
+        self.weight = torch.nn.Parameter(
+            torch.randn(in_channels, out_channels, modes, dtype=torch.cfloat)
+        )
+
+    def forward(self, x: Tensor) -&gt; Tensor:
         &#34;&#34;&#34;
         Forward pass for the spectral convolution layer.
         
@@ -77,12 +107,55 @@ el.replaceWith(d);
         Returns:
             Tensor: Output tensor after applying spectral convolution.
         &#34;&#34;&#34;
-        # Implement the spectral convolution logic here
-        return x</code></pre>
+        batchsize, _, n = x.shape
+
+        modes = min(self.modes, n)  # Clip modes to input length
+        if self.modes &gt; n:
+            warnings.warn(
+                f&#34;Number of modes {self.modes} cannot be greater than input length {n}. Clipping modes to {n}...&#34;
+            )
+
+        x_ft = torch.fft.fft(x, dim=-1)
+        out_ft = torch.zeros(
+            batchsize, self.out_channels, n, dtype=torch.cfloat, device=x.device
+        )
+        out_ft[..., :modes] = torch.einsum(
+            &#34;bix,iox-&gt;box&#34;, x_ft[..., :modes], self.weight
+        )
+
+        x_out = torch.fft.ifft(out_ft, dim=-1).real 
+        return x_out</code></pre>
 </details>
-<div class="desc"><p>Spectral Convolution Layer.
-This layer applies a convolution operation in the frequency domain.</p>
-<p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p></div>
+<div class="desc"><p>Spectral Convolution 1 Dimensional Layer.
+This layer applies a convolution operation to 1 dimensional data in the frequency domain.</p>
+<p>Given an input signal $x$ of shape $(B, C, N)$, where:
+- $B$ is the batch size,
+- $C$ is the number of input channels,
+- $N$ is the length of the signal,</p>
+<p>the layer first transforms the data to the frequency domain:
+$$x = \mathcal{F}\left [ x
+ight ]$$ </p>
+<p>Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
+The shape of the weight matrix is $(C, O, K)$, where:
+- $C$ is the number of input channels,
+- $O$ is the number of output channels,
+- $K$ is the number of modes considered in the spectral convolution.
+</p>
+<p>$$y_{b, o, k} =
+W_{c, o, k} x_{b, c, k} $$
+In other words, it's a tensor contraction over the Fourier coefficients of the input signal and the weights.
+Finally, the output is transformed back to the time domain using the inverse Fourier transform.
+$$y = \mathcal{F}^{-1}\left [ y
+ight ]$$</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>in_channels</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of input channels.</dd>
+<dt><strong><code>out_channels</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of output channels.</dd>
+<dt><strong><code>modes</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of modes to consider in the spectral convolution.</dd>
+</dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="neurop.base.Layer" href="../base.html#neurop.base.Layer">Layer</a></li>
@@ -91,30 +164,30 @@ This layer applies a convolution operation in the frequency domain.</p>
 </ul>
 <h3>Class variables</h3>
 <dl>
-<dt id="neurop.layers.spectralconv.SpectralConvLayer.call_super_init"><code class="name">var <span class="ident">call_super_init</span> : bool</code></dt>
+<dt id="neurop.layers.spectralconv.SpectralConv1DLayer.call_super_init"><code class="name">var <span class="ident">call_super_init</span> : bool</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="neurop.layers.spectralconv.SpectralConvLayer.dump_patches"><code class="name">var <span class="ident">dump_patches</span> : bool</code></dt>
+<dt id="neurop.layers.spectralconv.SpectralConv1DLayer.dump_patches"><code class="name">var <span class="ident">dump_patches</span> : bool</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="neurop.layers.spectralconv.SpectralConvLayer.training"><code class="name">var <span class="ident">training</span> : bool</code></dt>
+<dt id="neurop.layers.spectralconv.SpectralConv1DLayer.training"><code class="name">var <span class="ident">training</span> : bool</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="neurop.layers.spectralconv.SpectralConvLayer.forward"><code class="name flex">
-<span>def <span class="ident">forward</span></span>(<span>self, x) ‑> torch.Tensor</span>
+<dt id="neurop.layers.spectralconv.SpectralConv1DLayer.forward"><code class="name flex">
+<span>def <span class="ident">forward</span></span>(<span>self, x: torch.Tensor) ‑> torch.Tensor</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def forward(self, x) -&gt; Tensor:
+<pre><code class="python">def forward(self, x: Tensor) -&gt; Tensor:
     &#34;&#34;&#34;
     Forward pass for the spectral convolution layer.
     
@@ -124,8 +197,24 @@ This layer applies a convolution operation in the frequency domain.</p>
     Returns:
         Tensor: Output tensor after applying spectral convolution.
     &#34;&#34;&#34;
-    # Implement the spectral convolution logic here
-    return x</code></pre>
+    batchsize, _, n = x.shape
+
+    modes = min(self.modes, n)  # Clip modes to input length
+    if self.modes &gt; n:
+        warnings.warn(
+            f&#34;Number of modes {self.modes} cannot be greater than input length {n}. Clipping modes to {n}...&#34;
+        )
+
+    x_ft = torch.fft.fft(x, dim=-1)
+    out_ft = torch.zeros(
+        batchsize, self.out_channels, n, dtype=torch.cfloat, device=x.device
+    )
+    out_ft[..., :modes] = torch.einsum(
+        &#34;bix,iox-&gt;box&#34;, x_ft[..., :modes], self.weight
+    )
+
+    x_out = torch.fft.ifft(out_ft, dim=-1).real 
+    return x_out</code></pre>
 </details>
 <div class="desc"><p>Forward pass for the spectral convolution layer.</p>
 <h2 id="args">Args</h2>
@@ -138,6 +227,352 @@ This layer applies a convolution operation in the frequency domain.</p>
 <dt><code>Tensor</code></dt>
 <dd>Output tensor after applying spectral convolution.</dd>
 </dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="neurop.layers.spectralconv.SpectralConv2DLayer"><code class="flex name class">
+<span>class <span class="ident">SpectralConv2DLayer</span></span>
+<span>(</span><span>in_channels: int, out_channels: int, modes: Tuple[int, int])</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SpectralConv2DLayer(Layer):
+    &#34;&#34;&#34;
+    Spectral Convolution 2 Dimensional Layer.
+    This layer applies a convolution operation to 2 dimensional data in the frequency domain.
+
+    Given an input signal $x$ of shape $(B, C, H, W)$, where:
+        - $B$ is the batch size,
+        - $C$ is the number of input channels,
+        - $H$ is the height of the signal,
+        - $W$ is the width of the signal,
+    
+    the layer first transforms the data to the frequency domain:
+        $$x = \mathcal{F}\left [ x\right ]$$ 
+    
+    Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
+    The shape of the weight matrix is $(C, O, K_H, K_W)$, where:
+        - $C$ is the number of input channels,
+        - $O$ is the number of output channels,
+        - $K_H$ is the number of modes considered in height,
+        - $K_W$ is the number of modes considered in width.    
+    
+    $$y_{b, o, k_h, k_w} = W_{c, o, k_h, k_w} x_{b, o, k_h, k_w} $$
+    In other words, it&#39;s a tensor contraction over the Fourier coefficients of the input signal and the weights. 
+    Finally, the output is transformed back to the time domain using the inverse Fourier transform. 
+    $$y = \mathcal{F}^{-1}\left [  y \right ]$$
+    &#34;&#34;&#34;
+
+    def __init__(self, in_channels: int, out_channels: int, modes: Tuple[int, int]):
+        &#34;&#34;&#34;
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            modes (Tuple[int, int]): Number of modes to consider in height and width.
+        &#34;&#34;&#34;
+        super().__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.modes = modes
+
+        # Complex weights
+        self.weight = torch.nn.Parameter(
+            torch.randn(in_channels, out_channels, *modes, dtype=torch.cfloat)
+        )
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        &#34;&#34;&#34;
+        Forward pass for the Spectral Convolution 2D layer.
+        &#34;&#34;&#34;
+        batchsize, _, h, w = x.shape
+
+        modes_h = min(self.modes[0], h)
+        modes_w = min(self.modes[1], w)
+
+        if self.modes[0] &gt; h or self.modes[1] &gt; w:
+            warnings.warn(
+                f&#34;Number of modes {self.modes} cannot be greater than input dimensions {(h, w)}. Clipping modes...&#34;
+            )
+
+        x_ft = torch.fft.fft2(x)
+        out_ft = torch.zeros(
+            batchsize, self.out_channels, h, w, dtype=torch.cfloat, device=x.device
+        )
+        out_ft[..., :modes_h, :modes_w] = torch.einsum(
+            &#34;bixy,ioxy-&gt;boxy&#34;, x_ft[..., :modes_h, :modes_w], self.weight[..., :modes_h, :modes_w]
+        )
+
+        x_out = torch.fft.ifft2(out_ft).real
+        return x_out</code></pre>
+</details>
+<div class="desc"><p>Spectral Convolution 2 Dimensional Layer.
+This layer applies a convolution operation to 2 dimensional data in the frequency domain.</p>
+<p>Given an input signal $x$ of shape $(B, C, H, W)$, where:
+- $B$ is the batch size,
+- $C$ is the number of input channels,
+- $H$ is the height of the signal,
+- $W$ is the width of the signal,</p>
+<p>the layer first transforms the data to the frequency domain:
+$$x = \mathcal{F}\left [ x
+ight ]$$ </p>
+<p>Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
+The shape of the weight matrix is $(C, O, K_H, K_W)$, where:
+- $C$ is the number of input channels,
+- $O$ is the number of output channels,
+- $K_H$ is the number of modes considered in height,
+- $K_W$ is the number of modes considered in width.
+</p>
+<p>$$y_{b, o, k_h, k_w} = W_{c, o, k_h, k_w} x_{b, o, k_h, k_w} $$
+In other words, it's a tensor contraction over the Fourier coefficients of the input signal and the weights.
+Finally, the output is transformed back to the time domain using the inverse Fourier transform.
+$$y = \mathcal{F}^{-1}\left [
+y
+ight ]$$</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>in_channels</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of input channels.</dd>
+<dt><strong><code>out_channels</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of output channels.</dd>
+<dt><strong><code>modes</code></strong> :&ensp;<code>Tuple[int, int]</code></dt>
+<dd>Number of modes to consider in height and width.</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="neurop.base.Layer" href="../base.html#neurop.base.Layer">Layer</a></li>
+<li>torch.nn.modules.module.Module</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="neurop.layers.spectralconv.SpectralConv2DLayer.call_super_init"><code class="name">var <span class="ident">call_super_init</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="neurop.layers.spectralconv.SpectralConv2DLayer.dump_patches"><code class="name">var <span class="ident">dump_patches</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="neurop.layers.spectralconv.SpectralConv2DLayer.training"><code class="name">var <span class="ident">training</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="neurop.layers.spectralconv.SpectralConv2DLayer.forward"><code class="name flex">
+<span>def <span class="ident">forward</span></span>(<span>self, x: torch.Tensor) ‑> torch.Tensor</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def forward(self, x: Tensor) -&gt; Tensor:
+    &#34;&#34;&#34;
+    Forward pass for the Spectral Convolution 2D layer.
+    &#34;&#34;&#34;
+    batchsize, _, h, w = x.shape
+
+    modes_h = min(self.modes[0], h)
+    modes_w = min(self.modes[1], w)
+
+    if self.modes[0] &gt; h or self.modes[1] &gt; w:
+        warnings.warn(
+            f&#34;Number of modes {self.modes} cannot be greater than input dimensions {(h, w)}. Clipping modes...&#34;
+        )
+
+    x_ft = torch.fft.fft2(x)
+    out_ft = torch.zeros(
+        batchsize, self.out_channels, h, w, dtype=torch.cfloat, device=x.device
+    )
+    out_ft[..., :modes_h, :modes_w] = torch.einsum(
+        &#34;bixy,ioxy-&gt;boxy&#34;, x_ft[..., :modes_h, :modes_w], self.weight[..., :modes_h, :modes_w]
+    )
+
+    x_out = torch.fft.ifft2(out_ft).real
+    return x_out</code></pre>
+</details>
+<div class="desc"><p>Forward pass for the Spectral Convolution 2D layer.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="neurop.layers.spectralconv.SpectralConv3DLayer"><code class="flex name class">
+<span>class <span class="ident">SpectralConv3DLayer</span></span>
+<span>(</span><span>in_channels: int, out_channels: int, modes: Tuple[int, int, int])</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SpectralConv3DLayer(Layer):
+    &#34;&#34;&#34;
+    Spectral Convolution 3 Dimensional Layer.
+    This layer applies a convolution operation to 3 dimensional data in the frequency domain.
+
+    Given an input signal $x$ of shape $(B, C, D, H, W)$, where:
+        - $B$ is the batch size,
+        - $C$ is the number of input channels,
+        - $D$ is the depth of the signal,
+        - $H$ is the height of the signal,
+        - $W$ is the width of the signal,
+    
+    the layer first transforms the data to the frequency domain:
+        $$x = \mathcal{F}\left [ x\right ]$$ 
+    
+    Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
+    The shape of the weight matrix is $(C, O, K_D, K_H, K_W)$, where:
+        - $C$ is the number of input channels,
+        - $O$ is the number of output channels,
+        - $K_D$ is the number of modes considered in depth,
+        - $K_H$ is the number of modes considered in height,
+        - $K_W$ is the number of modes considered in width.    
+    
+    $$y_{b, o, k_d, k_h, k_w} = W_{c, o, k_d, k_h, k_w} x_{b, o, k_d, k_h, k_w} $$
+    In other words, it&#39;s a tensor contraction over the Fourier coefficients of the input signal and the weights. 
+    Finally, the output is transformed back to the time domain using the inverse Fourier transform. 
+    $$y = \mathcal{F}^{-1}\left [  y \right ]$$
+    &#34;&#34;&#34;
+
+    def __init__(self, in_channels: int, out_channels: int, modes: Tuple[int, int, int]):
+        &#34;&#34;&#34;
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            modes (Tuple[int, int, int]): Number of modes to consider in depth and height and width.
+        &#34;&#34;&#34;
+        super().__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.modes = modes
+
+        # Complex weights
+        self.weight = torch.nn.Parameter(
+            torch.randn(in_channels, out_channels, *modes, dtype=torch.cfloat)
+        )
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        &#34;&#34;&#34;
+        Forward pass for the Spectral Convolution 3D layer.
+        &#34;&#34;&#34;
+        batchsize, _, d, h, w = x.shape
+
+        modes_d = min(self.modes[0], d)
+        modes_h = min(self.modes[1], h)
+        modes_w = min(self.modes[2], w)
+
+        if self.modes[0] &gt; d or self.modes[1] &gt; h or self.modes[2] &gt; w:
+            warnings.warn(
+                f&#34;Number of modes {self.modes} cannot be greater than input dimensions {(d, h, w)}. Clipping modes...&#34;
+            )
+
+        x_ft = torch.fft.fftn(x, dim=(-3, -2, -1))
+        out_ft = torch.zeros(
+            batchsize, self.out_channels, d, h, w, dtype=torch.cfloat, device=x.device
+        )
+        out_ft[..., :modes_d, :modes_h, :modes_w] = torch.einsum(
+            &#34;bixyw,ioxyw-&gt;boxyw&#34;, x_ft[..., :modes_d, :modes_h, :modes_w], self.weight[..., :modes_d, :modes_h, :modes_w]
+        )
+
+        x_out = torch.fft.ifftn(out_ft, dim=(-3, -2, -1)).real
+        return x_out</code></pre>
+</details>
+<div class="desc"><p>Spectral Convolution 3 Dimensional Layer.
+This layer applies a convolution operation to 3 dimensional data in the frequency domain.</p>
+<p>Given an input signal $x$ of shape $(B, C, D, H, W)$, where:
+- $B$ is the batch size,
+- $C$ is the number of input channels,
+- $D$ is the depth of the signal,
+- $H$ is the height of the signal,
+- $W$ is the width of the signal,</p>
+<p>the layer first transforms the data to the frequency domain:
+$$x = \mathcal{F}\left [ x
+ight ]$$ </p>
+<p>Then, a convolution is applied (which is multiplication with a weight matrix in the frequency domain).
+The shape of the weight matrix is $(C, O, K_D, K_H, K_W)$, where:
+- $C$ is the number of input channels,
+- $O$ is the number of output channels,
+- $K_D$ is the number of modes considered in depth,
+- $K_H$ is the number of modes considered in height,
+- $K_W$ is the number of modes considered in width.
+</p>
+<p>$$y_{b, o, k_d, k_h, k_w} = W_{c, o, k_d, k_h, k_w} x_{b, o, k_d, k_h, k_w} $$
+In other words, it's a tensor contraction over the Fourier coefficients of the input signal and the weights.
+Finally, the output is transformed back to the time domain using the inverse Fourier transform.
+$$y = \mathcal{F}^{-1}\left [
+y
+ight ]$$</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>in_channels</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of input channels.</dd>
+<dt><strong><code>out_channels</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of output channels.</dd>
+<dt><strong><code>modes</code></strong> :&ensp;<code>Tuple[int, int, int]</code></dt>
+<dd>Number of modes to consider in depth and height and width.</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="neurop.base.Layer" href="../base.html#neurop.base.Layer">Layer</a></li>
+<li>torch.nn.modules.module.Module</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="neurop.layers.spectralconv.SpectralConv3DLayer.call_super_init"><code class="name">var <span class="ident">call_super_init</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="neurop.layers.spectralconv.SpectralConv3DLayer.dump_patches"><code class="name">var <span class="ident">dump_patches</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="neurop.layers.spectralconv.SpectralConv3DLayer.training"><code class="name">var <span class="ident">training</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="neurop.layers.spectralconv.SpectralConv3DLayer.forward"><code class="name flex">
+<span>def <span class="ident">forward</span></span>(<span>self, x: torch.Tensor) ‑> torch.Tensor</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def forward(self, x: Tensor) -&gt; Tensor:
+    &#34;&#34;&#34;
+    Forward pass for the Spectral Convolution 3D layer.
+    &#34;&#34;&#34;
+    batchsize, _, d, h, w = x.shape
+
+    modes_d = min(self.modes[0], d)
+    modes_h = min(self.modes[1], h)
+    modes_w = min(self.modes[2], w)
+
+    if self.modes[0] &gt; d or self.modes[1] &gt; h or self.modes[2] &gt; w:
+        warnings.warn(
+            f&#34;Number of modes {self.modes} cannot be greater than input dimensions {(d, h, w)}. Clipping modes...&#34;
+        )
+
+    x_ft = torch.fft.fftn(x, dim=(-3, -2, -1))
+    out_ft = torch.zeros(
+        batchsize, self.out_channels, d, h, w, dtype=torch.cfloat, device=x.device
+    )
+    out_ft[..., :modes_d, :modes_h, :modes_w] = torch.einsum(
+        &#34;bixyw,ioxyw-&gt;boxyw&#34;, x_ft[..., :modes_d, :modes_h, :modes_w], self.weight[..., :modes_d, :modes_h, :modes_w]
+    )
+
+    x_out = torch.fft.ifftn(out_ft, dim=(-3, -2, -1)).real
+    return x_out</code></pre>
+</details>
+<div class="desc"><p>Forward pass for the Spectral Convolution 3D layer.</p></div>
 </dd>
 </dl>
 </dd>
@@ -157,12 +592,30 @@ This layer applies a convolution operation in the frequency domain.</p>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="neurop.layers.spectralconv.SpectralConvLayer" href="#neurop.layers.spectralconv.SpectralConvLayer">SpectralConvLayer</a></code></h4>
+<h4><code><a title="neurop.layers.spectralconv.SpectralConv1DLayer" href="#neurop.layers.spectralconv.SpectralConv1DLayer">SpectralConv1DLayer</a></code></h4>
 <ul class="">
-<li><code><a title="neurop.layers.spectralconv.SpectralConvLayer.call_super_init" href="#neurop.layers.spectralconv.SpectralConvLayer.call_super_init">call_super_init</a></code></li>
-<li><code><a title="neurop.layers.spectralconv.SpectralConvLayer.dump_patches" href="#neurop.layers.spectralconv.SpectralConvLayer.dump_patches">dump_patches</a></code></li>
-<li><code><a title="neurop.layers.spectralconv.SpectralConvLayer.forward" href="#neurop.layers.spectralconv.SpectralConvLayer.forward">forward</a></code></li>
-<li><code><a title="neurop.layers.spectralconv.SpectralConvLayer.training" href="#neurop.layers.spectralconv.SpectralConvLayer.training">training</a></code></li>
+<li><code><a title="neurop.layers.spectralconv.SpectralConv1DLayer.call_super_init" href="#neurop.layers.spectralconv.SpectralConv1DLayer.call_super_init">call_super_init</a></code></li>
+<li><code><a title="neurop.layers.spectralconv.SpectralConv1DLayer.dump_patches" href="#neurop.layers.spectralconv.SpectralConv1DLayer.dump_patches">dump_patches</a></code></li>
+<li><code><a title="neurop.layers.spectralconv.SpectralConv1DLayer.forward" href="#neurop.layers.spectralconv.SpectralConv1DLayer.forward">forward</a></code></li>
+<li><code><a title="neurop.layers.spectralconv.SpectralConv1DLayer.training" href="#neurop.layers.spectralconv.SpectralConv1DLayer.training">training</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="neurop.layers.spectralconv.SpectralConv2DLayer" href="#neurop.layers.spectralconv.SpectralConv2DLayer">SpectralConv2DLayer</a></code></h4>
+<ul class="">
+<li><code><a title="neurop.layers.spectralconv.SpectralConv2DLayer.call_super_init" href="#neurop.layers.spectralconv.SpectralConv2DLayer.call_super_init">call_super_init</a></code></li>
+<li><code><a title="neurop.layers.spectralconv.SpectralConv2DLayer.dump_patches" href="#neurop.layers.spectralconv.SpectralConv2DLayer.dump_patches">dump_patches</a></code></li>
+<li><code><a title="neurop.layers.spectralconv.SpectralConv2DLayer.forward" href="#neurop.layers.spectralconv.SpectralConv2DLayer.forward">forward</a></code></li>
+<li><code><a title="neurop.layers.spectralconv.SpectralConv2DLayer.training" href="#neurop.layers.spectralconv.SpectralConv2DLayer.training">training</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="neurop.layers.spectralconv.SpectralConv3DLayer" href="#neurop.layers.spectralconv.SpectralConv3DLayer">SpectralConv3DLayer</a></code></h4>
+<ul class="">
+<li><code><a title="neurop.layers.spectralconv.SpectralConv3DLayer.call_super_init" href="#neurop.layers.spectralconv.SpectralConv3DLayer.call_super_init">call_super_init</a></code></li>
+<li><code><a title="neurop.layers.spectralconv.SpectralConv3DLayer.dump_patches" href="#neurop.layers.spectralconv.SpectralConv3DLayer.dump_patches">dump_patches</a></code></li>
+<li><code><a title="neurop.layers.spectralconv.SpectralConv3DLayer.forward" href="#neurop.layers.spectralconv.SpectralConv3DLayer.forward">forward</a></code></li>
+<li><code><a title="neurop.layers.spectralconv.SpectralConv3DLayer.training" href="#neurop.layers.spectralconv.SpectralConv3DLayer.training">training</a></code></li>
 </ul>
 </li>
 </ul>

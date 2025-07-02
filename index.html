@@ -108,7 +108,9 @@ Inspired by the code from <a href="https://github.com/M3RG-IITD/Complex-Neural-O
 <ul class="hlist">
 <li><a title="neurop.layers.iolayers.ReadinLayer" href="layers/iolayers.html#neurop.layers.iolayers.ReadinLayer">ReadinLayer</a></li>
 <li><a title="neurop.layers.iolayers.ReadoutLayer" href="layers/iolayers.html#neurop.layers.iolayers.ReadoutLayer">ReadoutLayer</a></li>
-<li><a title="neurop.layers.spectralconv.SpectralConvLayer" href="layers/spectralconv.html#neurop.layers.spectralconv.SpectralConvLayer">SpectralConvLayer</a></li>
+<li><a title="neurop.layers.spectralconv.SpectralConv1DLayer" href="layers/spectralconv.html#neurop.layers.spectralconv.SpectralConv1DLayer">SpectralConv1DLayer</a></li>
+<li><a title="neurop.layers.spectralconv.SpectralConv2DLayer" href="layers/spectralconv.html#neurop.layers.spectralconv.SpectralConv2DLayer">SpectralConv2DLayer</a></li>
+<li><a title="neurop.layers.spectralconv.SpectralConv3DLayer" href="layers/spectralconv.html#neurop.layers.spectralconv.SpectralConv3DLayer">SpectralConv3DLayer</a></li>
 </ul>
 <h3>Class variables</h3>
 <dl>
@@ -164,21 +166,16 @@ registered hooks while the latter silently ignores them.</p>
     &#34;&#34;&#34;
     Abstract class for Neural Operators.
 
-    Instance Attributes: 
-
-        readin: (Layer)
+    Attributes: 
+        readin (Layer):
             Reads in input data and projects to higher dimensional space 
-
-        kernel_integral: (Layer) 
+        kernel_integral (Layer):
             The kernel integral operator that performs the main computation
-
-        readout: (Layer)
+        readout (Layer):
             Reads out data to lower dimensional space
-
-        optimizer: (torch.optim.Optimizer) 
+        optimizer (torch.optim.Optimizer):
             Optimization algorithm to choose. Defaults to Adam(lr=1e-3)
-        
-        activation_function: (Callable[[Tensor], Tensor])
+        activation_function (Callable[[Tensor], Tensor]):
             Activation to introduce nonlinearity between kernel operations
     &#34;&#34;&#34;
 
@@ -248,7 +245,7 @@ registered hooks while the latter silently ignores them.</p>
         self.readout.to(device)
 
     @abstractmethod
-    def calculate_metrics(self, ground_truth: Tensor, predicted: Tensor): 
+    def calculate_metrics(self, ground_truth: Tensor, predicted: Tensor) -&gt; Metrics: 
         &#34;&#34;&#34;
         Compute the desired metrics and output a TypedDict 
         &#34;&#34;&#34;
@@ -262,22 +259,17 @@ registered hooks while the latter silently ignores them.</p>
         pass</code></pre>
 </details>
 <div class="desc"><p>Abstract class for Neural Operators.</p>
-<p>Instance Attributes: </p>
-<pre><code>readin: (Layer)
-    Reads in input data and projects to higher dimensional space
-
-kernel_integral: (Layer) 
-    The kernel integral operator that performs the main computation
-
-readout: (Layer)
-    Reads out data to lower dimensional space
-
-optimizer: (torch.optim.Optimizer) 
-    Optimization algorithm to choose. Defaults to Adam(lr=1e-3)
-
-activation_function: (Callable[[Tensor], Tensor])
-    Activation to introduce nonlinearity between kernel operations
-</code></pre>
+<p>Attributes:
+readin (Layer):
+Reads in input data and projects to higher dimensional space
+kernel_integral (Layer):
+The kernel integral operator that performs the main computation
+readout (Layer):
+Reads out data to lower dimensional space
+optimizer (torch.optim.Optimizer):
+Optimization algorithm to choose. Defaults to Adam(lr=1e-3)
+activation_function (Callable[[Tensor], Tensor]):
+Activation to introduce nonlinearity between kernel operations</p>
 <p><strong>init</strong> method to initialize NeuralOperator</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -315,7 +307,7 @@ activation_function: (Callable[[Tensor], Tensor])
 <h3>Methods</h3>
 <dl>
 <dt id="neurop.NeuralOperator.calculate_metrics"><code class="name flex">
-<span>def <span class="ident">calculate_metrics</span></span>(<span>self, ground_truth: torch.Tensor, predicted: torch.Tensor)</span>
+<span>def <span class="ident">calculate_metrics</span></span>(<span>self, ground_truth: torch.Tensor, predicted: torch.Tensor) ‑> <a title="neurop.base.Metrics" href="base.html#neurop.base.Metrics">Metrics</a></span>
 </code></dt>
 <dd>
 <details class="source">
@@ -323,7 +315,7 @@ activation_function: (Callable[[Tensor], Tensor])
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abstractmethod
-def calculate_metrics(self, ground_truth: Tensor, predicted: Tensor): 
+def calculate_metrics(self, ground_truth: Tensor, predicted: Tensor) -&gt; Metrics: 
     &#34;&#34;&#34;
     Compute the desired metrics and output a TypedDict 
     &#34;&#34;&#34;

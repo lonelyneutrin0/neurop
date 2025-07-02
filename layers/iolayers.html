@@ -61,14 +61,21 @@ el.replaceWith(d);
     &#34;&#34;&#34;
     
     def __init__(self, input_dim: int, output_dim: int):
+        &#34;&#34;&#34;
+        Args:   
+            input_dim (int): Dimension of the input data.
+            output_dim (int): Dimension of the output data after projection.
+        &#34;&#34;&#34;
         super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim)
     
-    def forward(self, x: torch.Tensor) -&gt; torch.Tensor:
+    def forward(self, x: Tensor) -&gt; Tensor:
         return self.linear(x)</code></pre>
 </details>
 <div class="desc"><p>Reads in input data and projects it to a higher dimensional space.</p>
-<p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p></div>
+<p>Args: <br>
+input_dim (int): Dimension of the input data.
+output_dim (int): Dimension of the output data after projection.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="neurop.base.Layer" href="../base.html#neurop.base.Layer">Layer</a></li>
@@ -114,14 +121,21 @@ el.replaceWith(d);
     &#34;&#34;&#34;
     
     def __init__(self, input_dim: int, output_dim: int):
+        &#34;&#34;&#34;
+        Args:   
+            input_dim (int): Dimension of the input data.
+            output_dim (int): Dimension of the output data after projection.
+        &#34;&#34;&#34;
         super().__init__()
         self.linear = torch.nn.Linear(input_dim, output_dim)
     
-    def forward(self, x: torch.Tensor) -&gt; torch.Tensor:
+    def forward(self, x: Tensor) -&gt; Tensor:
         return self.linear(x)</code></pre>
 </details>
 <div class="desc"><p>Reads out data to lower dimensional space.</p>
-<p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p></div>
+<p>Args: <br>
+input_dim (int): Dimension of the input data.
+output_dim (int): Dimension of the output data after projection.</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="neurop.base.Layer" href="../base.html#neurop.base.Layer">Layer</a></li>
