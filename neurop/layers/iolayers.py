@@ -47,7 +47,7 @@ class ReadoutLayer(torch.nn.Module):
         """
 
         # Reshape input to (batch_size, d_1, d_2, .... d_n, hidden_features)
-        x = x.permute(0, *range(2, x.ndim), -1)
+        x = x.permute(0, *range(2, x.ndim), 1)
         y = self.linear(x)
 
         # Reshape back to (batch_size, output_features, d_1, d_2, .... d_n)
