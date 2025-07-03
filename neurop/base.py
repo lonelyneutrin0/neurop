@@ -2,9 +2,8 @@ from abc import ABC, abstractmethod
 
 import torch 
 from torch.types import Tensor
-from typing import Callable, Optional, TypedDict
+from typing import TypedDict
 
-from pathlib import Path
 
 class Metrics(TypedDict, total=False):
     """
