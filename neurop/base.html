@@ -65,46 +65,13 @@
 
             </li>
             <li>
-                    <a class="class" href="#Layer">Layer</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#Layer.forward">forward</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
                     <a class="class" href="#NeuralOperator">NeuralOperator</a>
                             <ul class="memberlist">
                         <li>
                                 <a class="function" href="#NeuralOperator.__init__">NeuralOperator</a>
                         </li>
                         <li>
-                                <a class="variable" href="#NeuralOperator.optimizer">optimizer</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#NeuralOperator.forward">forward</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#NeuralOperator.loss">loss</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#NeuralOperator.train_step">train_step</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#NeuralOperator.evaluate">evaluate</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#NeuralOperator.save">save</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#NeuralOperator.load">load</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#NeuralOperator.to_device">to_device</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#NeuralOperator.calculate_metrics">calculate_metrics</a>
                         </li>
                 </ul>
 
@@ -134,120 +101,104 @@
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a>
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span> 
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">torch.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypedDict</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypedDict</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Metrics</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="sd">    TypedDict to hold metrics for evaluation.</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="sd">    All fields are optional for flexibility</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>    <span class="n">loss</span><span class="p">:</span> <span class="nb">float</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>    <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Layer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">    Abstract base class for all layers in a NeuralOperator.</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>        <span class="k">pass</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="sd">    Abstract class for Neural Operators.</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="sd">    Attributes: </span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="sd">        readin (Layer):</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="sd">            Reads in input data and projects to higher dimensional space </span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="sd">        kernel_integral (Layer):</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="sd">            The kernel integral operator that performs the main computation</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="sd">        readout (Layer):</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">            Reads out data to lower dimensional space</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">        optimizer (torch.optim.Optimizer):</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">            Optimization algorithm to choose. Defaults to Adam(lr=1e-3)</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="sd">        activation_function (Callable[[Tensor], Tensor]):</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="sd">            Activation to introduce nonlinearity between kernel operations</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>                 <span class="n">readin</span><span class="p">:</span> <span class="n">Layer</span><span class="p">,</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>                 <span class="n">kernel_integral</span><span class="p">:</span> <span class="n">Layer</span><span class="p">,</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>                 <span class="n">readout</span><span class="p">:</span> <span class="n">Layer</span><span class="p">,</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>                 <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>                 <span class="n">activation_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>                 <span class="p">):</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="sd">        __init__ method to initialize NeuralOperator</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Metrics</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="sd">    TypedDict to hold metrics for evaluation.</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="sd">    All fields are optional for flexibility</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>    <span class="n">loss</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>    <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="sd">    Abstract class for Neural Operators.</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">    Attributes: </span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">        readin (torch.nn.Module):</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">            Reads in input data and projects to higher dimensional space </span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="sd">        kernel_integral (torch.nn.Module):</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="sd">            The kernel integral operator that performs the main computation</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">        readout (torch.nn.Module):</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="sd">            Reads out data to lower dimensional space</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="sd">        optimizer (torch.optim.Optimizer):</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="sd">            Optimization algorithm to choose. Defaults to Adam(lr=1e-3)</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="sd">        activation_function (Callable[[Tensor], Tensor]):</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="sd">            Activation to introduce nonlinearity between kernel operations</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">        __init__ method to initialize NeuralOperator</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>        <span class="k">pass</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="sd">        Forward pass to be implemented by subclasses.</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>        <span class="k">pass</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>    <span class="c1"># def loss(self, prediction: Tensor, target: Tensor) -&gt; Tensor:</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>    <span class="c1">#     Loss function specific to the problem/operator.</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>    <span class="c1">#     pass</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span> <span class="ow">or</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">        Forward pass to be implemented by subclasses.</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>        <span class="k">pass</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prediction</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">        Loss function specific to the problem/operator.</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>        <span class="k">pass</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">train_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">        One training step: forward + loss + backward + optimizer step.</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>        <span class="k">pass</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">        Evaluate model performance on validation/test data.</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>        <span class="k">pass</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span> 
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">        Write model parameters to a file  </span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="k">pass</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="c1"># def train_step(self, x: Tensor, y: Tensor) -&gt; Tensor:</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="c1">#     One training step: forward + loss + backward + optimizer step.</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>    <span class="c1">#     pass</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="c1"># def evaluate(self, x: Tensor, y: Tensor) -&gt; float:</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>    <span class="c1">#     Evaluate model performance on validation/test data.</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>    <span class="c1">#     pass</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="c1"># def save(self, path: Path): </span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>    <span class="c1">#     Write model parameters to a file  </span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>    <span class="c1">#     pass</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="c1"># @classmethod</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>    <span class="c1"># def load(cls, path: Path):</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="c1">#     Load a neural operator from a file</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>    <span class="c1">#     pass</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="c1"># def to_device(self, device: torch.device): </span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>    <span class="c1">#     Send data to a Torch device </span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>    <span class="c1">#     self.readin.to(device)</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="c1">#     self.kernel_integral.to(device)</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    <span class="c1">#     self.readout.to(device)</span>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="nd">@classmethod</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">        Load a neural operator from a file</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>        <span class="k">pass</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">):</span> 
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">        Send data to a Torch device </span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">readin</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">kernel_integral</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ground_truth</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">predicted</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Metrics</span><span class="p">:</span> 
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="sd">        Compute the desired metrics and output a TypedDict </span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="k">pass</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">        Brief overview of the model architecture</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="k">pass</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="c1"># def calculate_metrics(self, ground_truth: Tensor, predicted: Tensor) -&gt; Metrics: </span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="c1">#     Compute the desired metrics and output a TypedDict </span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="c1">#     pass</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="c1"># def __repr__(self) -&gt; str:</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="c1">#     Brief overview of the model architecture</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>    <span class="c1">#     pass</span>
 </span></pre></div>
 
 
@@ -263,13 +214,13 @@
 
     </div>
     <a class="headerlink" href="#Metrics"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Metrics-10"><a href="#Metrics-10"><span class="linenos">10</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Metrics</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-</span><span id="Metrics-11"><a href="#Metrics-11"><span class="linenos">11</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Metrics-12"><a href="#Metrics-12"><span class="linenos">12</span></a><span class="sd">    TypedDict to hold metrics for evaluation.</span>
-</span><span id="Metrics-13"><a href="#Metrics-13"><span class="linenos">13</span></a><span class="sd">    All fields are optional for flexibility</span>
-</span><span id="Metrics-14"><a href="#Metrics-14"><span class="linenos">14</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Metrics-15"><a href="#Metrics-15"><span class="linenos">15</span></a>    <span class="n">loss</span><span class="p">:</span> <span class="nb">float</span>
-</span><span id="Metrics-16"><a href="#Metrics-16"><span class="linenos">16</span></a>    <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Metrics-9"><a href="#Metrics-9"><span class="linenos"> 9</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Metrics</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</span><span id="Metrics-10"><a href="#Metrics-10"><span class="linenos">10</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Metrics-11"><a href="#Metrics-11"><span class="linenos">11</span></a><span class="sd">    TypedDict to hold metrics for evaluation.</span>
+</span><span id="Metrics-12"><a href="#Metrics-12"><span class="linenos">12</span></a><span class="sd">    All fields are optional for flexibility</span>
+</span><span id="Metrics-13"><a href="#Metrics-13"><span class="linenos">13</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Metrics-14"><a href="#Metrics-14"><span class="linenos">14</span></a>    <span class="n">loss</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="Metrics-15"><a href="#Metrics-15"><span class="linenos">15</span></a>    <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span>
 </span></pre></div>
 
 
@@ -301,66 +252,6 @@ All fields are optional for flexibility</p>
 
                             </div>
                 </section>
-                <section id="Layer">
-                            <input id="Layer-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">Layer</span><wbr>(<span class="base">torch.nn.modules.module.Module</span>, <span class="base">abc.ABC</span>):
-
-                <label class="view-source-button" for="Layer-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#Layer"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Layer-17"><a href="#Layer-17"><span class="linenos">17</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Layer</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-</span><span id="Layer-18"><a href="#Layer-18"><span class="linenos">18</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Layer-19"><a href="#Layer-19"><span class="linenos">19</span></a><span class="sd">    Abstract base class for all layers in a NeuralOperator.</span>
-</span><span id="Layer-20"><a href="#Layer-20"><span class="linenos">20</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Layer-21"><a href="#Layer-21"><span class="linenos">21</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Layer-22"><a href="#Layer-22"><span class="linenos">22</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="Layer-23"><a href="#Layer-23"><span class="linenos">23</span></a>        <span class="k">pass</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Abstract base class for all layers in a NeuralOperator.</p>
-</div>
-
-
-                            <div id="Layer.forward" class="classattr">
-                                        <input id="Layer.forward-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
-
-        <span class="def">def</span>
-        <span class="name">forward</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">x</span></span><span class="return-annotation">) -> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>:</span></span>
-
-                <label class="view-source-button" for="Layer.forward-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#Layer.forward"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Layer.forward-21"><a href="#Layer.forward-21"><span class="linenos">21</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Layer.forward-22"><a href="#Layer.forward-22"><span class="linenos">22</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="Layer.forward-23"><a href="#Layer.forward-23"><span class="linenos">23</span></a>        <span class="k">pass</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Define the computation performed at every call.</p>
-
-<p>Should be overridden by all subclasses.</p>
-
-<div class="alert note">
-
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code>Module</code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-
-</div>
-</div>
-
-
-                            </div>
-                </section>
                 <section id="NeuralOperator">
                             <input id="NeuralOperator-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr class">
@@ -372,112 +263,105 @@ registered hooks while the latter silently ignores them.</p>
 
     </div>
     <a class="headerlink" href="#NeuralOperator"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator-25"><a href="#NeuralOperator-25"><span class="linenos"> 25</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-</span><span id="NeuralOperator-26"><a href="#NeuralOperator-26"><span class="linenos"> 26</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-27"><a href="#NeuralOperator-27"><span class="linenos"> 27</span></a><span class="sd">    Abstract class for Neural Operators.</span>
-</span><span id="NeuralOperator-28"><a href="#NeuralOperator-28"><span class="linenos"> 28</span></a>
-</span><span id="NeuralOperator-29"><a href="#NeuralOperator-29"><span class="linenos"> 29</span></a><span class="sd">    Attributes: </span>
-</span><span id="NeuralOperator-30"><a href="#NeuralOperator-30"><span class="linenos"> 30</span></a><span class="sd">        readin (Layer):</span>
-</span><span id="NeuralOperator-31"><a href="#NeuralOperator-31"><span class="linenos"> 31</span></a><span class="sd">            Reads in input data and projects to higher dimensional space </span>
-</span><span id="NeuralOperator-32"><a href="#NeuralOperator-32"><span class="linenos"> 32</span></a><span class="sd">        kernel_integral (Layer):</span>
-</span><span id="NeuralOperator-33"><a href="#NeuralOperator-33"><span class="linenos"> 33</span></a><span class="sd">            The kernel integral operator that performs the main computation</span>
-</span><span id="NeuralOperator-34"><a href="#NeuralOperator-34"><span class="linenos"> 34</span></a><span class="sd">        readout (Layer):</span>
-</span><span id="NeuralOperator-35"><a href="#NeuralOperator-35"><span class="linenos"> 35</span></a><span class="sd">            Reads out data to lower dimensional space</span>
-</span><span id="NeuralOperator-36"><a href="#NeuralOperator-36"><span class="linenos"> 36</span></a><span class="sd">        optimizer (torch.optim.Optimizer):</span>
-</span><span id="NeuralOperator-37"><a href="#NeuralOperator-37"><span class="linenos"> 37</span></a><span class="sd">            Optimization algorithm to choose. Defaults to Adam(lr=1e-3)</span>
-</span><span id="NeuralOperator-38"><a href="#NeuralOperator-38"><span class="linenos"> 38</span></a><span class="sd">        activation_function (Callable[[Tensor], Tensor]):</span>
-</span><span id="NeuralOperator-39"><a href="#NeuralOperator-39"><span class="linenos"> 39</span></a><span class="sd">            Activation to introduce nonlinearity between kernel operations</span>
-</span><span id="NeuralOperator-40"><a href="#NeuralOperator-40"><span class="linenos"> 40</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-41"><a href="#NeuralOperator-41"><span class="linenos"> 41</span></a>
-</span><span id="NeuralOperator-42"><a href="#NeuralOperator-42"><span class="linenos"> 42</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-</span><span id="NeuralOperator-43"><a href="#NeuralOperator-43"><span class="linenos"> 43</span></a>                 <span class="n">readin</span><span class="p">:</span> <span class="n">Layer</span><span class="p">,</span>
-</span><span id="NeuralOperator-44"><a href="#NeuralOperator-44"><span class="linenos"> 44</span></a>                 <span class="n">kernel_integral</span><span class="p">:</span> <span class="n">Layer</span><span class="p">,</span>
-</span><span id="NeuralOperator-45"><a href="#NeuralOperator-45"><span class="linenos"> 45</span></a>                 <span class="n">readout</span><span class="p">:</span> <span class="n">Layer</span><span class="p">,</span>
-</span><span id="NeuralOperator-46"><a href="#NeuralOperator-46"><span class="linenos"> 46</span></a>                 <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="NeuralOperator-47"><a href="#NeuralOperator-47"><span class="linenos"> 47</span></a>                 <span class="n">activation_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span>
-</span><span id="NeuralOperator-48"><a href="#NeuralOperator-48"><span class="linenos"> 48</span></a>                 <span class="p">):</span>
-</span><span id="NeuralOperator-49"><a href="#NeuralOperator-49"><span class="linenos"> 49</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-50"><a href="#NeuralOperator-50"><span class="linenos"> 50</span></a><span class="sd">        __init__ method to initialize NeuralOperator</span>
-</span><span id="NeuralOperator-51"><a href="#NeuralOperator-51"><span class="linenos"> 51</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-52"><a href="#NeuralOperator-52"><span class="linenos"> 52</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator-16"><a href="#NeuralOperator-16"><span class="linenos"> 16</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+</span><span id="NeuralOperator-17"><a href="#NeuralOperator-17"><span class="linenos"> 17</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-18"><a href="#NeuralOperator-18"><span class="linenos"> 18</span></a><span class="sd">    Abstract class for Neural Operators.</span>
+</span><span id="NeuralOperator-19"><a href="#NeuralOperator-19"><span class="linenos"> 19</span></a>
+</span><span id="NeuralOperator-20"><a href="#NeuralOperator-20"><span class="linenos"> 20</span></a><span class="sd">    Attributes: </span>
+</span><span id="NeuralOperator-21"><a href="#NeuralOperator-21"><span class="linenos"> 21</span></a><span class="sd">        readin (torch.nn.Module):</span>
+</span><span id="NeuralOperator-22"><a href="#NeuralOperator-22"><span class="linenos"> 22</span></a><span class="sd">            Reads in input data and projects to higher dimensional space </span>
+</span><span id="NeuralOperator-23"><a href="#NeuralOperator-23"><span class="linenos"> 23</span></a><span class="sd">        kernel_integral (torch.nn.Module):</span>
+</span><span id="NeuralOperator-24"><a href="#NeuralOperator-24"><span class="linenos"> 24</span></a><span class="sd">            The kernel integral operator that performs the main computation</span>
+</span><span id="NeuralOperator-25"><a href="#NeuralOperator-25"><span class="linenos"> 25</span></a><span class="sd">        readout (torch.nn.Module):</span>
+</span><span id="NeuralOperator-26"><a href="#NeuralOperator-26"><span class="linenos"> 26</span></a><span class="sd">            Reads out data to lower dimensional space</span>
+</span><span id="NeuralOperator-27"><a href="#NeuralOperator-27"><span class="linenos"> 27</span></a><span class="sd">        optimizer (torch.optim.Optimizer):</span>
+</span><span id="NeuralOperator-28"><a href="#NeuralOperator-28"><span class="linenos"> 28</span></a><span class="sd">            Optimization algorithm to choose. Defaults to Adam(lr=1e-3)</span>
+</span><span id="NeuralOperator-29"><a href="#NeuralOperator-29"><span class="linenos"> 29</span></a><span class="sd">        activation_function (Callable[[Tensor], Tensor]):</span>
+</span><span id="NeuralOperator-30"><a href="#NeuralOperator-30"><span class="linenos"> 30</span></a><span class="sd">            Activation to introduce nonlinearity between kernel operations</span>
+</span><span id="NeuralOperator-31"><a href="#NeuralOperator-31"><span class="linenos"> 31</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-32"><a href="#NeuralOperator-32"><span class="linenos"> 32</span></a>
+</span><span id="NeuralOperator-33"><a href="#NeuralOperator-33"><span class="linenos"> 33</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+</span><span id="NeuralOperator-34"><a href="#NeuralOperator-34"><span class="linenos"> 34</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-35"><a href="#NeuralOperator-35"><span class="linenos"> 35</span></a><span class="sd">        __init__ method to initialize NeuralOperator</span>
+</span><span id="NeuralOperator-36"><a href="#NeuralOperator-36"><span class="linenos"> 36</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-37"><a href="#NeuralOperator-37"><span class="linenos"> 37</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="NeuralOperator-38"><a href="#NeuralOperator-38"><span class="linenos"> 38</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperator-39"><a href="#NeuralOperator-39"><span class="linenos"> 39</span></a>    
+</span><span id="NeuralOperator-40"><a href="#NeuralOperator-40"><span class="linenos"> 40</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperator-41"><a href="#NeuralOperator-41"><span class="linenos"> 41</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+</span><span id="NeuralOperator-42"><a href="#NeuralOperator-42"><span class="linenos"> 42</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-43"><a href="#NeuralOperator-43"><span class="linenos"> 43</span></a><span class="sd">        Forward pass to be implemented by subclasses.</span>
+</span><span id="NeuralOperator-44"><a href="#NeuralOperator-44"><span class="linenos"> 44</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-45"><a href="#NeuralOperator-45"><span class="linenos"> 45</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperator-46"><a href="#NeuralOperator-46"><span class="linenos"> 46</span></a>
+</span><span id="NeuralOperator-47"><a href="#NeuralOperator-47"><span class="linenos"> 47</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="NeuralOperator-48"><a href="#NeuralOperator-48"><span class="linenos"> 48</span></a>    <span class="c1"># def loss(self, prediction: Tensor, target: Tensor) -&gt; Tensor:</span>
+</span><span id="NeuralOperator-49"><a href="#NeuralOperator-49"><span class="linenos"> 49</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-50"><a href="#NeuralOperator-50"><span class="linenos"> 50</span></a>    <span class="c1">#     Loss function specific to the problem/operator.</span>
+</span><span id="NeuralOperator-51"><a href="#NeuralOperator-51"><span class="linenos"> 51</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-52"><a href="#NeuralOperator-52"><span class="linenos"> 52</span></a>    <span class="c1">#     pass</span>
 </span><span id="NeuralOperator-53"><a href="#NeuralOperator-53"><span class="linenos"> 53</span></a>
-</span><span id="NeuralOperator-54"><a href="#NeuralOperator-54"><span class="linenos"> 54</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span> <span class="ow">or</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
-</span><span id="NeuralOperator-55"><a href="#NeuralOperator-55"><span class="linenos"> 55</span></a>    
-</span><span id="NeuralOperator-56"><a href="#NeuralOperator-56"><span class="linenos"> 56</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator-57"><a href="#NeuralOperator-57"><span class="linenos"> 57</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="NeuralOperator-58"><a href="#NeuralOperator-58"><span class="linenos"> 58</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-59"><a href="#NeuralOperator-59"><span class="linenos"> 59</span></a><span class="sd">        Forward pass to be implemented by subclasses.</span>
-</span><span id="NeuralOperator-60"><a href="#NeuralOperator-60"><span class="linenos"> 60</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-61"><a href="#NeuralOperator-61"><span class="linenos"> 61</span></a>        <span class="k">pass</span>
-</span><span id="NeuralOperator-62"><a href="#NeuralOperator-62"><span class="linenos"> 62</span></a>
-</span><span id="NeuralOperator-63"><a href="#NeuralOperator-63"><span class="linenos"> 63</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator-64"><a href="#NeuralOperator-64"><span class="linenos"> 64</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prediction</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="NeuralOperator-65"><a href="#NeuralOperator-65"><span class="linenos"> 65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-66"><a href="#NeuralOperator-66"><span class="linenos"> 66</span></a><span class="sd">        Loss function specific to the problem/operator.</span>
-</span><span id="NeuralOperator-67"><a href="#NeuralOperator-67"><span class="linenos"> 67</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-68"><a href="#NeuralOperator-68"><span class="linenos"> 68</span></a>        <span class="k">pass</span>
-</span><span id="NeuralOperator-69"><a href="#NeuralOperator-69"><span class="linenos"> 69</span></a>
-</span><span id="NeuralOperator-70"><a href="#NeuralOperator-70"><span class="linenos"> 70</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator-71"><a href="#NeuralOperator-71"><span class="linenos"> 71</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">train_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="NeuralOperator-72"><a href="#NeuralOperator-72"><span class="linenos"> 72</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-73"><a href="#NeuralOperator-73"><span class="linenos"> 73</span></a><span class="sd">        One training step: forward + loss + backward + optimizer step.</span>
-</span><span id="NeuralOperator-74"><a href="#NeuralOperator-74"><span class="linenos"> 74</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-75"><a href="#NeuralOperator-75"><span class="linenos"> 75</span></a>        <span class="k">pass</span>
-</span><span id="NeuralOperator-76"><a href="#NeuralOperator-76"><span class="linenos"> 76</span></a>
-</span><span id="NeuralOperator-77"><a href="#NeuralOperator-77"><span class="linenos"> 77</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator-78"><a href="#NeuralOperator-78"><span class="linenos"> 78</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="NeuralOperator-79"><a href="#NeuralOperator-79"><span class="linenos"> 79</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-80"><a href="#NeuralOperator-80"><span class="linenos"> 80</span></a><span class="sd">        Evaluate model performance on validation/test data.</span>
-</span><span id="NeuralOperator-81"><a href="#NeuralOperator-81"><span class="linenos"> 81</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-82"><a href="#NeuralOperator-82"><span class="linenos"> 82</span></a>        <span class="k">pass</span>
-</span><span id="NeuralOperator-83"><a href="#NeuralOperator-83"><span class="linenos"> 83</span></a>
-</span><span id="NeuralOperator-84"><a href="#NeuralOperator-84"><span class="linenos"> 84</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator-85"><a href="#NeuralOperator-85"><span class="linenos"> 85</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span> 
-</span><span id="NeuralOperator-86"><a href="#NeuralOperator-86"><span class="linenos"> 86</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-87"><a href="#NeuralOperator-87"><span class="linenos"> 87</span></a><span class="sd">        Write model parameters to a file  </span>
-</span><span id="NeuralOperator-88"><a href="#NeuralOperator-88"><span class="linenos"> 88</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-89"><a href="#NeuralOperator-89"><span class="linenos"> 89</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperator-54"><a href="#NeuralOperator-54"><span class="linenos"> 54</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="NeuralOperator-55"><a href="#NeuralOperator-55"><span class="linenos"> 55</span></a>    <span class="c1"># def train_step(self, x: Tensor, y: Tensor) -&gt; Tensor:</span>
+</span><span id="NeuralOperator-56"><a href="#NeuralOperator-56"><span class="linenos"> 56</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-57"><a href="#NeuralOperator-57"><span class="linenos"> 57</span></a>    <span class="c1">#     One training step: forward + loss + backward + optimizer step.</span>
+</span><span id="NeuralOperator-58"><a href="#NeuralOperator-58"><span class="linenos"> 58</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-59"><a href="#NeuralOperator-59"><span class="linenos"> 59</span></a>    <span class="c1">#     pass</span>
+</span><span id="NeuralOperator-60"><a href="#NeuralOperator-60"><span class="linenos"> 60</span></a>
+</span><span id="NeuralOperator-61"><a href="#NeuralOperator-61"><span class="linenos"> 61</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="NeuralOperator-62"><a href="#NeuralOperator-62"><span class="linenos"> 62</span></a>    <span class="c1"># def evaluate(self, x: Tensor, y: Tensor) -&gt; float:</span>
+</span><span id="NeuralOperator-63"><a href="#NeuralOperator-63"><span class="linenos"> 63</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-64"><a href="#NeuralOperator-64"><span class="linenos"> 64</span></a>    <span class="c1">#     Evaluate model performance on validation/test data.</span>
+</span><span id="NeuralOperator-65"><a href="#NeuralOperator-65"><span class="linenos"> 65</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-66"><a href="#NeuralOperator-66"><span class="linenos"> 66</span></a>    <span class="c1">#     pass</span>
+</span><span id="NeuralOperator-67"><a href="#NeuralOperator-67"><span class="linenos"> 67</span></a>
+</span><span id="NeuralOperator-68"><a href="#NeuralOperator-68"><span class="linenos"> 68</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="NeuralOperator-69"><a href="#NeuralOperator-69"><span class="linenos"> 69</span></a>    <span class="c1"># def save(self, path: Path): </span>
+</span><span id="NeuralOperator-70"><a href="#NeuralOperator-70"><span class="linenos"> 70</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-71"><a href="#NeuralOperator-71"><span class="linenos"> 71</span></a>    <span class="c1">#     Write model parameters to a file  </span>
+</span><span id="NeuralOperator-72"><a href="#NeuralOperator-72"><span class="linenos"> 72</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-73"><a href="#NeuralOperator-73"><span class="linenos"> 73</span></a>    <span class="c1">#     pass</span>
+</span><span id="NeuralOperator-74"><a href="#NeuralOperator-74"><span class="linenos"> 74</span></a>
+</span><span id="NeuralOperator-75"><a href="#NeuralOperator-75"><span class="linenos"> 75</span></a>    <span class="c1"># @classmethod</span>
+</span><span id="NeuralOperator-76"><a href="#NeuralOperator-76"><span class="linenos"> 76</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="NeuralOperator-77"><a href="#NeuralOperator-77"><span class="linenos"> 77</span></a>    <span class="c1"># def load(cls, path: Path):</span>
+</span><span id="NeuralOperator-78"><a href="#NeuralOperator-78"><span class="linenos"> 78</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-79"><a href="#NeuralOperator-79"><span class="linenos"> 79</span></a>    <span class="c1">#     Load a neural operator from a file</span>
+</span><span id="NeuralOperator-80"><a href="#NeuralOperator-80"><span class="linenos"> 80</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-81"><a href="#NeuralOperator-81"><span class="linenos"> 81</span></a>    <span class="c1">#     pass</span>
+</span><span id="NeuralOperator-82"><a href="#NeuralOperator-82"><span class="linenos"> 82</span></a>
+</span><span id="NeuralOperator-83"><a href="#NeuralOperator-83"><span class="linenos"> 83</span></a>    <span class="c1"># def to_device(self, device: torch.device): </span>
+</span><span id="NeuralOperator-84"><a href="#NeuralOperator-84"><span class="linenos"> 84</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-85"><a href="#NeuralOperator-85"><span class="linenos"> 85</span></a>    <span class="c1">#     Send data to a Torch device </span>
+</span><span id="NeuralOperator-86"><a href="#NeuralOperator-86"><span class="linenos"> 86</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-87"><a href="#NeuralOperator-87"><span class="linenos"> 87</span></a>    <span class="c1">#     self.readin.to(device)</span>
+</span><span id="NeuralOperator-88"><a href="#NeuralOperator-88"><span class="linenos"> 88</span></a>    <span class="c1">#     self.kernel_integral.to(device)</span>
+</span><span id="NeuralOperator-89"><a href="#NeuralOperator-89"><span class="linenos"> 89</span></a>    <span class="c1">#     self.readout.to(device)</span>
 </span><span id="NeuralOperator-90"><a href="#NeuralOperator-90"><span class="linenos"> 90</span></a>
-</span><span id="NeuralOperator-91"><a href="#NeuralOperator-91"><span class="linenos"> 91</span></a>    <span class="nd">@classmethod</span>
-</span><span id="NeuralOperator-92"><a href="#NeuralOperator-92"><span class="linenos"> 92</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator-93"><a href="#NeuralOperator-93"><span class="linenos"> 93</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
-</span><span id="NeuralOperator-94"><a href="#NeuralOperator-94"><span class="linenos"> 94</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-95"><a href="#NeuralOperator-95"><span class="linenos"> 95</span></a><span class="sd">        Load a neural operator from a file</span>
-</span><span id="NeuralOperator-96"><a href="#NeuralOperator-96"><span class="linenos"> 96</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-97"><a href="#NeuralOperator-97"><span class="linenos"> 97</span></a>        <span class="k">pass</span>
-</span><span id="NeuralOperator-98"><a href="#NeuralOperator-98"><span class="linenos"> 98</span></a>
-</span><span id="NeuralOperator-99"><a href="#NeuralOperator-99"><span class="linenos"> 99</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">):</span> 
-</span><span id="NeuralOperator-100"><a href="#NeuralOperator-100"><span class="linenos">100</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-101"><a href="#NeuralOperator-101"><span class="linenos">101</span></a><span class="sd">        Send data to a Torch device </span>
-</span><span id="NeuralOperator-102"><a href="#NeuralOperator-102"><span class="linenos">102</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-103"><a href="#NeuralOperator-103"><span class="linenos">103</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">readin</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-</span><span id="NeuralOperator-104"><a href="#NeuralOperator-104"><span class="linenos">104</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">kernel_integral</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-</span><span id="NeuralOperator-105"><a href="#NeuralOperator-105"><span class="linenos">105</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-</span><span id="NeuralOperator-106"><a href="#NeuralOperator-106"><span class="linenos">106</span></a>
-</span><span id="NeuralOperator-107"><a href="#NeuralOperator-107"><span class="linenos">107</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator-108"><a href="#NeuralOperator-108"><span class="linenos">108</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ground_truth</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">predicted</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Metrics</span><span class="p">:</span> 
-</span><span id="NeuralOperator-109"><a href="#NeuralOperator-109"><span class="linenos">109</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-110"><a href="#NeuralOperator-110"><span class="linenos">110</span></a><span class="sd">        Compute the desired metrics and output a TypedDict </span>
-</span><span id="NeuralOperator-111"><a href="#NeuralOperator-111"><span class="linenos">111</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-112"><a href="#NeuralOperator-112"><span class="linenos">112</span></a>        <span class="k">pass</span>
-</span><span id="NeuralOperator-113"><a href="#NeuralOperator-113"><span class="linenos">113</span></a>
-</span><span id="NeuralOperator-114"><a href="#NeuralOperator-114"><span class="linenos">114</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator-115"><a href="#NeuralOperator-115"><span class="linenos">115</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="NeuralOperator-116"><a href="#NeuralOperator-116"><span class="linenos">116</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-117"><a href="#NeuralOperator-117"><span class="linenos">117</span></a><span class="sd">        Brief overview of the model architecture</span>
-</span><span id="NeuralOperator-118"><a href="#NeuralOperator-118"><span class="linenos">118</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-119"><a href="#NeuralOperator-119"><span class="linenos">119</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperator-91"><a href="#NeuralOperator-91"><span class="linenos"> 91</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="NeuralOperator-92"><a href="#NeuralOperator-92"><span class="linenos"> 92</span></a>    <span class="c1"># def calculate_metrics(self, ground_truth: Tensor, predicted: Tensor) -&gt; Metrics: </span>
+</span><span id="NeuralOperator-93"><a href="#NeuralOperator-93"><span class="linenos"> 93</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-94"><a href="#NeuralOperator-94"><span class="linenos"> 94</span></a>    <span class="c1">#     Compute the desired metrics and output a TypedDict </span>
+</span><span id="NeuralOperator-95"><a href="#NeuralOperator-95"><span class="linenos"> 95</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-96"><a href="#NeuralOperator-96"><span class="linenos"> 96</span></a>    <span class="c1">#     pass</span>
+</span><span id="NeuralOperator-97"><a href="#NeuralOperator-97"><span class="linenos"> 97</span></a>
+</span><span id="NeuralOperator-98"><a href="#NeuralOperator-98"><span class="linenos"> 98</span></a>    <span class="c1"># @abstractmethod</span>
+</span><span id="NeuralOperator-99"><a href="#NeuralOperator-99"><span class="linenos"> 99</span></a>    <span class="c1"># def __repr__(self) -&gt; str:</span>
+</span><span id="NeuralOperator-100"><a href="#NeuralOperator-100"><span class="linenos">100</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-101"><a href="#NeuralOperator-101"><span class="linenos">101</span></a>    <span class="c1">#     Brief overview of the model architecture</span>
+</span><span id="NeuralOperator-102"><a href="#NeuralOperator-102"><span class="linenos">102</span></a>    <span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-103"><a href="#NeuralOperator-103"><span class="linenos">103</span></a>    <span class="c1">#     pass</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Abstract class for Neural Operators.</p>
 
 <p>Attributes: 
-    readin (Layer):
+    readin (torch.nn.Module):
         Reads in input data and projects to higher dimensional space 
-    kernel_integral (Layer):
+    kernel_integral (torch.nn.Module):
         The kernel integral operator that performs the main computation
-    readout (Layer):
+    readout (torch.nn.Module):
         Reads out data to lower dimensional space
     optimizer (torch.optim.Optimizer):
         Optimization algorithm to choose. Defaults to Adam(lr=1e-3)
@@ -490,42 +374,24 @@ registered hooks while the latter silently ignores them.</p>
                                         <input id="NeuralOperator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">NeuralOperator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">readin</span><span class="p">:</span> <span class="n"><a href="#Layer">Layer</a></span>,</span><span class="param">	<span class="n">kernel_integral</span><span class="p">:</span> <span class="n"><a href="#Layer">Layer</a></span>,</span><span class="param">	<span class="n">readout</span><span class="p">:</span> <span class="n"><a href="#Layer">Layer</a></span>,</span><span class="param">	<span class="n">optimizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">activation_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">relu</span> <span class="n">of</span> <span class="nb">type</span> <span class="nb">object</span><span class="o">&gt;</span></span>)</span>
+        <span class="name">NeuralOperator</span><span class="signature pdoc-code condensed">()</span>
 
                 <label class="view-source-button" for="NeuralOperator.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#NeuralOperator.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.__init__-42"><a href="#NeuralOperator.__init__-42"><span class="linenos">42</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-</span><span id="NeuralOperator.__init__-43"><a href="#NeuralOperator.__init__-43"><span class="linenos">43</span></a>                 <span class="n">readin</span><span class="p">:</span> <span class="n">Layer</span><span class="p">,</span>
-</span><span id="NeuralOperator.__init__-44"><a href="#NeuralOperator.__init__-44"><span class="linenos">44</span></a>                 <span class="n">kernel_integral</span><span class="p">:</span> <span class="n">Layer</span><span class="p">,</span>
-</span><span id="NeuralOperator.__init__-45"><a href="#NeuralOperator.__init__-45"><span class="linenos">45</span></a>                 <span class="n">readout</span><span class="p">:</span> <span class="n">Layer</span><span class="p">,</span>
-</span><span id="NeuralOperator.__init__-46"><a href="#NeuralOperator.__init__-46"><span class="linenos">46</span></a>                 <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="NeuralOperator.__init__-47"><a href="#NeuralOperator.__init__-47"><span class="linenos">47</span></a>                 <span class="n">activation_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span>
-</span><span id="NeuralOperator.__init__-48"><a href="#NeuralOperator.__init__-48"><span class="linenos">48</span></a>                 <span class="p">):</span>
-</span><span id="NeuralOperator.__init__-49"><a href="#NeuralOperator.__init__-49"><span class="linenos">49</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.__init__-50"><a href="#NeuralOperator.__init__-50"><span class="linenos">50</span></a><span class="sd">        __init__ method to initialize NeuralOperator</span>
-</span><span id="NeuralOperator.__init__-51"><a href="#NeuralOperator.__init__-51"><span class="linenos">51</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.__init__-52"><a href="#NeuralOperator.__init__-52"><span class="linenos">52</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-</span><span id="NeuralOperator.__init__-53"><a href="#NeuralOperator.__init__-53"><span class="linenos">53</span></a>
-</span><span id="NeuralOperator.__init__-54"><a href="#NeuralOperator.__init__-54"><span class="linenos">54</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span> <span class="ow">or</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.__init__-33"><a href="#NeuralOperator.__init__-33"><span class="linenos">33</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+</span><span id="NeuralOperator.__init__-34"><a href="#NeuralOperator.__init__-34"><span class="linenos">34</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="NeuralOperator.__init__-35"><a href="#NeuralOperator.__init__-35"><span class="linenos">35</span></a><span class="sd">        __init__ method to initialize NeuralOperator</span>
+</span><span id="NeuralOperator.__init__-36"><a href="#NeuralOperator.__init__-36"><span class="linenos">36</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator.__init__-37"><a href="#NeuralOperator.__init__-37"><span class="linenos">37</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="NeuralOperator.__init__-38"><a href="#NeuralOperator.__init__-38"><span class="linenos">38</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>__init__ method to initialize NeuralOperator</p>
 </div>
 
-
-                            </div>
-                            <div id="NeuralOperator.optimizer" class="classattr">
-                                <div class="attr variable">
-            <span class="name">optimizer</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NeuralOperator.optimizer"></a>
-    
-    
 
                             </div>
                             <div id="NeuralOperator.forward" class="classattr">
@@ -540,200 +406,16 @@ registered hooks while the latter silently ignores them.</p>
 
     </div>
     <a class="headerlink" href="#NeuralOperator.forward"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.forward-56"><a href="#NeuralOperator.forward-56"><span class="linenos">56</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator.forward-57"><a href="#NeuralOperator.forward-57"><span class="linenos">57</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="NeuralOperator.forward-58"><a href="#NeuralOperator.forward-58"><span class="linenos">58</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.forward-59"><a href="#NeuralOperator.forward-59"><span class="linenos">59</span></a><span class="sd">        Forward pass to be implemented by subclasses.</span>
-</span><span id="NeuralOperator.forward-60"><a href="#NeuralOperator.forward-60"><span class="linenos">60</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.forward-61"><a href="#NeuralOperator.forward-61"><span class="linenos">61</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.forward-40"><a href="#NeuralOperator.forward-40"><span class="linenos">40</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperator.forward-41"><a href="#NeuralOperator.forward-41"><span class="linenos">41</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+</span><span id="NeuralOperator.forward-42"><a href="#NeuralOperator.forward-42"><span class="linenos">42</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="NeuralOperator.forward-43"><a href="#NeuralOperator.forward-43"><span class="linenos">43</span></a><span class="sd">        Forward pass to be implemented by subclasses.</span>
+</span><span id="NeuralOperator.forward-44"><a href="#NeuralOperator.forward-44"><span class="linenos">44</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="NeuralOperator.forward-45"><a href="#NeuralOperator.forward-45"><span class="linenos">45</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Forward pass to be implemented by subclasses.</p>
-</div>
-
-
-                            </div>
-                            <div id="NeuralOperator.loss" class="classattr">
-                                        <input id="NeuralOperator.loss-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
-
-        <span class="def">def</span>
-        <span class="name">loss</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">prediction</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>, </span><span class="param"><span class="n">target</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span></span><span class="return-annotation">) -> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>:</span></span>
-
-                <label class="view-source-button" for="NeuralOperator.loss-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#NeuralOperator.loss"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.loss-63"><a href="#NeuralOperator.loss-63"><span class="linenos">63</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator.loss-64"><a href="#NeuralOperator.loss-64"><span class="linenos">64</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prediction</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="NeuralOperator.loss-65"><a href="#NeuralOperator.loss-65"><span class="linenos">65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.loss-66"><a href="#NeuralOperator.loss-66"><span class="linenos">66</span></a><span class="sd">        Loss function specific to the problem/operator.</span>
-</span><span id="NeuralOperator.loss-67"><a href="#NeuralOperator.loss-67"><span class="linenos">67</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.loss-68"><a href="#NeuralOperator.loss-68"><span class="linenos">68</span></a>        <span class="k">pass</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Loss function specific to the problem/operator.</p>
-</div>
-
-
-                            </div>
-                            <div id="NeuralOperator.train_step" class="classattr">
-                                        <input id="NeuralOperator.train_step-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
-
-        <span class="def">def</span>
-        <span class="name">train_step</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>, </span><span class="param"><span class="n">y</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span></span><span class="return-annotation">) -> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>:</span></span>
-
-                <label class="view-source-button" for="NeuralOperator.train_step-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#NeuralOperator.train_step"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.train_step-70"><a href="#NeuralOperator.train_step-70"><span class="linenos">70</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator.train_step-71"><a href="#NeuralOperator.train_step-71"><span class="linenos">71</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">train_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="NeuralOperator.train_step-72"><a href="#NeuralOperator.train_step-72"><span class="linenos">72</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.train_step-73"><a href="#NeuralOperator.train_step-73"><span class="linenos">73</span></a><span class="sd">        One training step: forward + loss + backward + optimizer step.</span>
-</span><span id="NeuralOperator.train_step-74"><a href="#NeuralOperator.train_step-74"><span class="linenos">74</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.train_step-75"><a href="#NeuralOperator.train_step-75"><span class="linenos">75</span></a>        <span class="k">pass</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>One training step: forward + loss + backward + optimizer step.</p>
-</div>
-
-
-                            </div>
-                            <div id="NeuralOperator.evaluate" class="classattr">
-                                        <input id="NeuralOperator.evaluate-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
-
-        <span class="def">def</span>
-        <span class="name">evaluate</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>, </span><span class="param"><span class="n">y</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
-
-                <label class="view-source-button" for="NeuralOperator.evaluate-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#NeuralOperator.evaluate"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.evaluate-77"><a href="#NeuralOperator.evaluate-77"><span class="linenos">77</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator.evaluate-78"><a href="#NeuralOperator.evaluate-78"><span class="linenos">78</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="NeuralOperator.evaluate-79"><a href="#NeuralOperator.evaluate-79"><span class="linenos">79</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.evaluate-80"><a href="#NeuralOperator.evaluate-80"><span class="linenos">80</span></a><span class="sd">        Evaluate model performance on validation/test data.</span>
-</span><span id="NeuralOperator.evaluate-81"><a href="#NeuralOperator.evaluate-81"><span class="linenos">81</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.evaluate-82"><a href="#NeuralOperator.evaluate-82"><span class="linenos">82</span></a>        <span class="k">pass</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Evaluate model performance on validation/test data.</p>
-</div>
-
-
-                            </div>
-                            <div id="NeuralOperator.save" class="classattr">
-                                        <input id="NeuralOperator.save-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
-
-        <span class="def">def</span>
-        <span class="name">save</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="NeuralOperator.save-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#NeuralOperator.save"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.save-84"><a href="#NeuralOperator.save-84"><span class="linenos">84</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator.save-85"><a href="#NeuralOperator.save-85"><span class="linenos">85</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span> 
-</span><span id="NeuralOperator.save-86"><a href="#NeuralOperator.save-86"><span class="linenos">86</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.save-87"><a href="#NeuralOperator.save-87"><span class="linenos">87</span></a><span class="sd">        Write model parameters to a file  </span>
-</span><span id="NeuralOperator.save-88"><a href="#NeuralOperator.save-88"><span class="linenos">88</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.save-89"><a href="#NeuralOperator.save-89"><span class="linenos">89</span></a>        <span class="k">pass</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Write model parameters to a file</p>
-</div>
-
-
-                            </div>
-                            <div id="NeuralOperator.load" class="classattr">
-                                        <input id="NeuralOperator.load-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-                    <div class="decorator decorator-classmethod">@classmethod</div>
-        <div class="decorator decorator-abstractmethod">@abstractmethod</div>
-
-        <span class="def">def</span>
-        <span class="name">load</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">cls</span>, </span><span class="param"><span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="NeuralOperator.load-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#NeuralOperator.load"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.load-91"><a href="#NeuralOperator.load-91"><span class="linenos">91</span></a>    <span class="nd">@classmethod</span>
-</span><span id="NeuralOperator.load-92"><a href="#NeuralOperator.load-92"><span class="linenos">92</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator.load-93"><a href="#NeuralOperator.load-93"><span class="linenos">93</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
-</span><span id="NeuralOperator.load-94"><a href="#NeuralOperator.load-94"><span class="linenos">94</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.load-95"><a href="#NeuralOperator.load-95"><span class="linenos">95</span></a><span class="sd">        Load a neural operator from a file</span>
-</span><span id="NeuralOperator.load-96"><a href="#NeuralOperator.load-96"><span class="linenos">96</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.load-97"><a href="#NeuralOperator.load-97"><span class="linenos">97</span></a>        <span class="k">pass</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Load a neural operator from a file</p>
-</div>
-
-
-                            </div>
-                            <div id="NeuralOperator.to_device" class="classattr">
-                                        <input id="NeuralOperator.to_device-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_device</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="NeuralOperator.to_device-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#NeuralOperator.to_device"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.to_device-99"><a href="#NeuralOperator.to_device-99"><span class="linenos"> 99</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">):</span> 
-</span><span id="NeuralOperator.to_device-100"><a href="#NeuralOperator.to_device-100"><span class="linenos">100</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.to_device-101"><a href="#NeuralOperator.to_device-101"><span class="linenos">101</span></a><span class="sd">        Send data to a Torch device </span>
-</span><span id="NeuralOperator.to_device-102"><a href="#NeuralOperator.to_device-102"><span class="linenos">102</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.to_device-103"><a href="#NeuralOperator.to_device-103"><span class="linenos">103</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">readin</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-</span><span id="NeuralOperator.to_device-104"><a href="#NeuralOperator.to_device-104"><span class="linenos">104</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">kernel_integral</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-</span><span id="NeuralOperator.to_device-105"><a href="#NeuralOperator.to_device-105"><span class="linenos">105</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Send data to a Torch device</p>
-</div>
-
-
-                            </div>
-                            <div id="NeuralOperator.calculate_metrics" class="classattr">
-                                        <input id="NeuralOperator.calculate_metrics-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
-
-        <span class="def">def</span>
-        <span class="name">calculate_metrics</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">ground_truth</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>,</span><span class="param">	<span class="n">predicted</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span></span><span class="return-annotation">) -> <span class="n"><a href="#Metrics">Metrics</a></span>:</span></span>
-
-                <label class="view-source-button" for="NeuralOperator.calculate_metrics-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#NeuralOperator.calculate_metrics"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.calculate_metrics-107"><a href="#NeuralOperator.calculate_metrics-107"><span class="linenos">107</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator.calculate_metrics-108"><a href="#NeuralOperator.calculate_metrics-108"><span class="linenos">108</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ground_truth</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">predicted</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Metrics</span><span class="p">:</span> 
-</span><span id="NeuralOperator.calculate_metrics-109"><a href="#NeuralOperator.calculate_metrics-109"><span class="linenos">109</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.calculate_metrics-110"><a href="#NeuralOperator.calculate_metrics-110"><span class="linenos">110</span></a><span class="sd">        Compute the desired metrics and output a TypedDict </span>
-</span><span id="NeuralOperator.calculate_metrics-111"><a href="#NeuralOperator.calculate_metrics-111"><span class="linenos">111</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.calculate_metrics-112"><a href="#NeuralOperator.calculate_metrics-112"><span class="linenos">112</span></a>        <span class="k">pass</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Compute the desired metrics and output a TypedDict</p>
 </div>
 
 
