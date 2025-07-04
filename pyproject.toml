@@ -24,7 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "torch~=2.7.0",
+    "torch~=2.5.1",
     "opt-einsum~=3.4.0"
 ]
 
@@ -38,6 +38,10 @@ dev = [
     "ruff~=0.9.4",
     "mypy~=1.13.0",
     "pdoc~=15.0.4"
+]
+
+examples = [ 
+    "matplotlib~=3.10.3"
 ]
 
 [tool.hatch.version]
