@@ -1,6 +1,7 @@
 import torch
 
-from torch import Tensor
+from torch.types import Tensor
+from typing import Tuple, Optional
 
 
 class SpectralConv1DLayer(torch.nn.Module):
@@ -18,15 +19,21 @@ class SpectralConv1DLayer(torch.nn.Module):
     $$y_{b, o, k} = \sum_{c=0}^{C-1} W_{c, o, k} x_{b, c, k}$$
     where the contraction is along the features. Finally, the output is transformed back to the time domain using the inverse FFT:
     $$y = \mathcal{F}^{-1}[y]$$
-    
-    Args:
-        in_features (int): Number of input channels.
-        out_features (int): Number of output channels.
-        modes (int): Number of Fourier modes to consider.
-        init_scale (float): Initialization scale for weights.
     """
 
     def __init__(self, in_features: int, out_features: int, modes: int, init_scale: float = 1.0):
+        """
+        Initializes the SpectralConv1DLayer with the given parameters.
+
+        Args:
+            in_features (int): Number of input channels.
+            out_features (int): Number of output channels.
+            modes (int): Number of Fourier modes to consider.
+            init_scale (float): Initialization scale for weights.
+        
+        Returns:
+            None
+        """
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -86,6 +93,19 @@ class SpectralConv2DLayer(torch.nn.Module):
     """
 
     def __init__(self, in_features: int, out_features: int, mode_h: int, mode_w: int, init_scale: float = 1.0):
+        """
+        Initializes the SpectralConv2DLayer with the given parameters.
+        
+        Args:
+            in_features (int): Number of input channels.
+            out_features (int): Number of output channels.
+            mode_h (int): Number of Fourier modes in the height dimension.
+            mode_w (int): Number of Fourier modes in the width dimension.
+            init_scale (float): Initialization scale for weights.
+        
+        Returns:
+            None
+        """
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -147,6 +167,20 @@ class SpectralConv3DLayer(torch.nn.Module):
     """
 
     def __init__(self, in_features: int, out_features: int, mode_d: int, mode_h: int, mode_w: int, init_scale: float = 1.0):
+        """
+        Initializes the SpectralConv3DLayer with the given parameters.
+
+        Args:
+            in_features (int): Number of input channels.
+            out_features (int): Number of output channels.
+            mode_d (int): Number of Fourier modes in the depth dimension.
+            mode_h (int): Number of Fourier modes in the height dimension.
+            mode_w (int): Number of Fourier modes in the width dimension.
+            init_scale (float): Initialization scale for weights.
+        
+        Returns:
+            None
+        """
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -162,8 +196,10 @@ class SpectralConv3DLayer(torch.nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         """
         Forward pass for the Spectral Convolution 3D layer.
+
         Args:
             x (Tensor): Input tensor of shape (B, C, D, H, W)
+
         Returns:
             Tensor: Output tensor of shape (B, out_features, D, H, W)
         """
@@ -189,3 +225,4 @@ class SpectralConv3DLayer(torch.nn.Module):
         
         x_out = torch.fft.irfftn(out_ft, s=(d, h, w), dim=(2, 3, 4), norm='ortho')
         return x_out
+    

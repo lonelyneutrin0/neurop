@@ -24,6 +24,7 @@ class FourierOperator(NeuralOperator):
                  ):
         """
         Initializes the Fourier operator with the given parameters.
+
         Args:
             in_features (int): Number of input features.
             hidden_features (int): Number of hidden features.
@@ -32,6 +33,9 @@ class FourierOperator(NeuralOperator):
                                        If a tuple, it should contain the number of modes for each dimension.
             depth (int): Depth of the operator, i.e., number of spectral convolution layers.
             activation_function (Callable[[Tensor], Tensor]): Activation function to apply after each layer.
+        
+        Returns:
+            None
         """
         super().__init__()
         self.readin = ReadinLayer(in_features, hidden_features)
