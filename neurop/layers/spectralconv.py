@@ -40,6 +40,9 @@ class SpectralConv1DLayer(torch.nn.Module):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
+
+        if modes < 0:
+            raise ValueError("Number of modes must be non-negative.")
         self.modes = modes
         
         scale = init_scale / (in_features * out_features)
@@ -47,18 +50,31 @@ class SpectralConv1DLayer(torch.nn.Module):
             torch.randn(in_features, out_features, modes, dtype=torch.cfloat) * scale
         )
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: Tensor, output_dtype: torch.dtype = torch.cfloat) -> Tensor:
         """
         Forward pass for the spectral convolution layer.
         
         Args:
             x (Tensor): Input tensor of shape (B, C, L)
+            output_dtype (torch.dtype): Data type for the output tensor, default is torch.cfloat
         
         Returns:
             Tensor: Output tensor of shape (B, out_features, L)
         """
 
+        if not isinstance(x, Tensor):
+            try:
+                x = torch.as_tensor(x)
+            except Exception as e:
+                raise TypeError(f"Input must be a PyTorch tensor or convertible to one. Error: {e}")
+        
         batchsize, c, length = x.shape
+
+        if c != self.in_features:
+            raise ValueError(f"Input has {c} channels, but layer expects {self.in_features} channels.")
+        
+        if x.numel() == 0:
+            raise ValueError("Input tensor is empty.")
 
         if x.is_complex():
             x_ft = torch.fft.fft(x, dim=2, norm='ortho')
@@ -66,7 +82,7 @@ class SpectralConv1DLayer(torch.nn.Module):
             
             out_ft = torch.zeros(
                 batchsize, self.out_features, length, 
-                dtype=torch.cfloat, device=x.device
+                dtype=output_dtype, device=x.device
             )
 
             if modes > 0:
@@ -87,7 +103,7 @@ class SpectralConv1DLayer(torch.nn.Module):
         
         out_ft = torch.zeros(
             batchsize, self.out_features, x_ft.size(2), 
-            dtype=torch.cfloat, device=x.device
+            dtype=output_dtype, device=x.device
         )
         
         if modes > 0:
@@ -138,6 +154,10 @@ class SpectralConv2DLayer(torch.nn.Module):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
+
+        if mode_h < 0 or mode_w < 0:
+            raise ValueError("Number of modes must be non-negative.")
+        
         self.mode_h = mode_h
         self.mode_w = mode_w
         
@@ -146,18 +166,31 @@ class SpectralConv2DLayer(torch.nn.Module):
             torch.randn(in_features, out_features, mode_h, mode_w, dtype=torch.cfloat) * scale
         )
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: Tensor, output_dtype: torch.dtype = torch.cfloat) -> Tensor:
         """
         Forward pass for the Spectral Convolution 2D layer.
         
         Args:
             x (Tensor): Input tensor of shape (B, C, H, W) - PyTorch convention
+            output_dtype (torch.dtype): Data type for the output tensor, default is torch.cfloat
         
         Returns:
             Tensor: Output tensor of shape (B, out_features, H, W)
         """
 
+        if not isinstance(x, Tensor):
+            try:
+                x = torch.as_tensor(x)
+            except Exception as e:
+                raise TypeError(f"Input must be a PyTorch tensor or convertible to one. Error: {e}")
+            
         batchsize, c, h, w = x.shape
+
+        if c != self.in_features:
+            raise ValueError(f"Input has {c} channels, but layer expects {self.in_features} channels.")
+
+        if x.numel() == 0:
+            raise ValueError("Input tensor is empty.")
 
         if x.is_complex():
             x_ft = torch.fft.fft2(x, dim=(2, 3), norm='ortho')
@@ -166,7 +199,7 @@ class SpectralConv2DLayer(torch.nn.Module):
             
             out_ft = torch.zeros(
                 batchsize, self.out_features, h, w,
-                dtype=torch.cfloat, device=x.device
+                dtype=output_dtype, device=x.device
             )
             
             if mode_h > 0 and mode_w > 0:
@@ -186,7 +219,7 @@ class SpectralConv2DLayer(torch.nn.Module):
         
         out_ft = torch.zeros(
             batchsize, self.out_features, h, x_ft.size(3),
-            dtype=torch.cfloat, device=x.device
+            dtype=output_dtype, device=x.device
         )
         
         if mode_h > 0 and mode_w > 0:
@@ -241,6 +274,10 @@ class SpectralConv3DLayer(torch.nn.Module):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
+
+        if mode_d < 0 or mode_h < 0 or mode_w < 0:
+            raise ValueError("Number of modes must be non-negative.")
+    
         self.mode_d = mode_d
         self.mode_h = mode_h
         self.mode_w = mode_w
@@ -250,18 +287,31 @@ class SpectralConv3DLayer(torch.nn.Module):
             torch.randn(in_features, out_features, mode_d, mode_h, mode_w, dtype=torch.cfloat) * scale
         )
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: Tensor, output_dtype: torch.dtype = torch.cfloat) -> Tensor:
         """
         Forward pass for the Spectral Convolution 3D layer.
 
         Args:
             x (Tensor): Input tensor of shape (B, C, D, H, W)
+            output_dtype (torch.dtype): Data type for the output tensor, default is torch.cfloat
 
         Returns:
             Tensor: Output tensor of shape (B, out_features, D, H, W)
         """
 
+        if not isinstance(x, Tensor):
+            try:
+                x = torch.as_tensor(x)
+            except Exception as e:
+                raise TypeError(f"Input must be a PyTorch tensor or convertible to one. Error: {e}")
+        
         batchsize, c, d, h, w = x.shape
+
+        if c != self.in_features:
+            raise ValueError(f"Input has {c} channels, but layer expects {self.in_features} channels.")
+
+        if x.numel() == 0:
+            raise ValueError("Input tensor is empty.")
 
         if x.is_complex():
             x_ft = torch.fft.fftn(x, dim=(2, 3, 4), norm='ortho')
@@ -271,7 +321,7 @@ class SpectralConv3DLayer(torch.nn.Module):
 
             out_ft = torch.zeros(
                 batchsize, self.out_features, d, h, w,
-                dtype=torch.cfloat, device=x.device
+                dtype=output_dtype, device=x.device
             )
 
             if mode_d > 0 and mode_h > 0 and mode_w > 0:
@@ -292,7 +342,7 @@ class SpectralConv3DLayer(torch.nn.Module):
 
         out_ft = torch.zeros(
             batchsize, self.out_features, d, h, x_ft.size(4),
-            dtype=torch.cfloat, device=x.device
+            dtype=output_dtype, device=x.device
         )
 
         if mode_d > 0 and mode_h > 0 and mode_w > 0:
@@ -352,6 +402,10 @@ class SpectralConvNDLayer(torch.nn.Module):
         if not isinstance(modes, (list)): 
             raise TypeError("Modes must be a list of integers. For dimensions <=3, use the specific SpectralConv1DLayer, SpectralConv2DLayer, or SpectralConv3DLayer.")
         
+        for i in modes:
+            if i < 0:
+                raise ValueError("Number of modes must be non-negative.")
+            
         self.modes = list(modes)
         self.ndim = len(self.modes)
         
@@ -364,20 +418,34 @@ class SpectralConvNDLayer(torch.nn.Module):
         # Store spatial dimensions for forward pass
         self.spatial_dims = tuple(range(2, 2 + self.ndim))
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: Tensor, output_dtype: torch.dtype = torch.cfloat) -> Tensor:
         """
         Forward pass for the N-dimensional Spectral Convolution layer.
         
         Args:
             x (Tensor): Input tensor of shape (B, C, *spatial_dims)
+            output_dtype (torch.dtype): Data type for the output tensor, default is torch.cfloat
         
         Returns:
             Tensor: Output tensor of shape (B, out_features, *spatial_dims)
         """
 
+        if not isinstance(x, Tensor):
+            try:
+                x = torch.as_tensor(x)
+            except Exception as e:
+                raise TypeError(f"Input must be a PyTorch tensor or convertible to one. Error: {e}")
+
         batch_size = x.shape[0]
+        c = x.shape[1]
         spatial_shape = x.shape[2:]
+
+        if c != self.in_features:
+            raise ValueError(f"Input has {c} channels, but layer expects {self.in_features} channels.")
         
+        if x.numel() == 0:
+            raise ValueError("Input tensor is empty.")
+    
         if len(spatial_shape) != self.ndim:
             raise ValueError(f"Input has {len(spatial_shape)} spatial dimensions, "
                            f"but layer expects {self.ndim}")
@@ -388,7 +456,7 @@ class SpectralConvNDLayer(torch.nn.Module):
             effective_modes = [min(mode, dim_size) for mode, dim_size in zip(self.modes, spatial_shape)]
 
             out_ft_shape = [batch_size, self.out_features] + list(x_ft.shape[2:])
-            out_ft = torch.zeros(out_ft_shape, dtype=torch.cfloat, device=x.device)
+            out_ft = torch.zeros(out_ft_shape, dtype=output_dtype, device=x.device)
 
             if all(mode > 0 for mode in effective_modes):
                 # Set up [batchsize, channels, :modes, :modes, ...] slices for input and weight
@@ -430,7 +498,7 @@ class SpectralConvNDLayer(torch.nn.Module):
         x_ft = torch.fft.rfftn(x, dim=self.spatial_dims, norm='ortho')
         
         out_ft_shape = [batch_size, self.out_features] + list(x_ft.shape[2:])
-        out_ft = torch.zeros(out_ft_shape, dtype=torch.cfloat, device=x.device)
+        out_ft = torch.zeros(out_ft_shape, dtype=output_dtype, device=x.device)
         
         if all(mode > 0 for mode in effective_modes):
             
