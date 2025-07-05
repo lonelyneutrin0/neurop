@@ -4,12 +4,15 @@ class ReadinLayer(torch.nn.Module):
     """
     Reads in input data and projects it to a higher dimensional space.
     """
-    
+
+    linear: torch.nn.Linear
+    """Linear transformation layer that projects input data to a higher dimensional space."""
+
     def __init__(self, in_features: int, hidden_features: int):
         """
         Initializes the ReadinLayer with a linear transformation.
 
-        Args:   
+        Args:
             in_features (int): Number of features of input data.
             hidden_features (int): Number of hidden featuers of transformed data.
         
@@ -40,12 +43,15 @@ class ReadoutLayer(torch.nn.Module):
     """
     Reads out data to lower dimensional space.
     """
+
+    linear: torch.nn.Linear
+    """Linear transformation layer that projects input data to a lower dimensional space."""
     
     def __init__(self, hidden_features: int, output_features: int):
         """
         Initializes the ReadoutLayer with a linear transformation.
 
-        Args:   
+        Args:
             hidden_features (int): Dimension of the input data.
             output_features (int): Dimension of the output data after projection.
         
@@ -56,7 +62,7 @@ class ReadoutLayer(torch.nn.Module):
         self.linear = torch.nn.Linear(hidden_features, output_features)
     
     def forward(self, x: Tensor) -> Tensor:
-        """"
+        """
         Forward pass of the ReadoutLayer.
 
         Args:

@@ -35,6 +35,9 @@ jobs:
       - name: Type check with mypy
         run: >-
           mypy neurop/
+      - name: Run tests with pytest
+        run: >-
+          pytest
 
   build:
     if: github.event_name == 'release'

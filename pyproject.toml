@@ -51,3 +51,6 @@ path = "neurop/__init__.py"
 include = [
     "/neurop",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

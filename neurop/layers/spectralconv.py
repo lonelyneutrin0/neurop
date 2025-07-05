@@ -1,14 +1,14 @@
 import torch
 
 from torch.types import Tensor
-from typing import Tuple
+from typing import Tuple, List
 
 
 class SpectralConv1DLayer(torch.nn.Module):
     """
     Spectral Convolution 1 Dimensional Layer
 
-    The input is assumed to have shape (B, C, L) where:
+    The input is assumed to have shape (B, C, L) where:\n
         - B is the batch size,
         - C is the number of input channels,
         - L is the length of the signal,
@@ -20,19 +20,22 @@ class SpectralConv1DLayer(torch.nn.Module):
     where the contraction is along the features. Finally, the output is transformed back to the time domain using the inverse FFT:
     $$y = \mathcal{F}^{-1}[y]$$
     """
+    
+    in_features: int
+    """Number of input channels."""
+
+    out_features: int
+    """Number of output channels."""
+
+    modes: int
+    """Number of Fourier modes to consider."""
+    
+    weight: torch.nn.Parameter
+    """Learnable weights of the spectral convolution layer, initialized with a complex normal distribution."""
 
     def __init__(self, in_features: int, out_features: int, modes: int, init_scale: float = 1.0):
         """
         Initializes the SpectralConv1DLayer with the given parameters.
-
-        Args:
-            in_features (int): Number of input channels.
-            out_features (int): Number of output channels.
-            modes (int): Number of Fourier modes to consider.
-            init_scale (float): Initialization scale for weights.
-        
-        Returns:
-            None
         """
         super().__init__()
         self.in_features = in_features
@@ -79,7 +82,7 @@ class SpectralConv1DLayer(torch.nn.Module):
 class SpectralConv2DLayer(torch.nn.Module):
     """
     Spectral Convolution 2 Dimensional Layer    
-    The input is assumed to have shape (B, C, H, W) where:
+    The input is assumed to have shape (B, C, H, W) where:\n
         - B is the batch size,
         - C is the number of input channels,
         - H is the height of the signal,
@@ -92,19 +95,24 @@ class SpectralConv2DLayer(torch.nn.Module):
     $$y = \mathcal{F}^{-1}[y]$$
     """
 
+    in_features: int
+    """Number of input channels."""
+
+    out_features: int
+    """Number of output channels."""
+
+    mode_h: int
+    """Number of Fourier modes to consider in the height dimension."""
+    
+    mode_w: int
+    """Number of Fourier modes to consider in the width dimension."""
+
+    weight: torch.nn.Parameter
+    """Learnable weights of the spectral convolution layer, initialized with a complex normal distribution."""
+
     def __init__(self, in_features: int, out_features: int, mode_h: int, mode_w: int, init_scale: float = 1.0):
         """
         Initializes the SpectralConv2DLayer with the given parameters.
-        
-        Args:
-            in_features (int): Number of input channels.
-            out_features (int): Number of output channels.
-            mode_h (int): Number of Fourier modes in the height dimension.
-            mode_w (int): Number of Fourier modes in the width dimension.
-            init_scale (float): Initialization scale for weights.
-        
-        Returns:
-            None
         """
         super().__init__()
         self.in_features = in_features
@@ -152,7 +160,7 @@ class SpectralConv2DLayer(torch.nn.Module):
 class SpectralConv3DLayer(torch.nn.Module):
     """
     Spectral Convolution 3 Dimensional Layer
-    The input is assumed to have shape (B, C, D, H, W) where:
+    The input is assumed to have shape (B, C, D, H, W) where:\n
         - B is the batch size,
         - C is the number of input channels,
         - D is the depth of the signal,
@@ -166,20 +174,27 @@ class SpectralConv3DLayer(torch.nn.Module):
         $$y = \mathcal{F}^{-1}[y]$$
     """
 
+    in_features: int
+    """Number of input channels."""
+    
+    out_features: int
+    """Number of output channels."""
+
+    mode_d: int
+    """Number of Fourier modes to consider in the depth dimension."""
+
+    mode_h: int
+    """Number of Fourier modes to consider in the height dimension."""
+
+    mode_w: int
+    """Number of Fourier modes to consider in the width dimension."""
+
+    weight: torch.nn.Parameter
+    """Learnable weights of the spectral convolution layer, initialized with a complex normal distribution."""
+
     def __init__(self, in_features: int, out_features: int, mode_d: int, mode_h: int, mode_w: int, init_scale: float = 1.0):
         """
         Initializes the SpectralConv3DLayer with the given parameters.
-
-        Args:
-            in_features (int): Number of input channels.
-            out_features (int): Number of output channels.
-            mode_d (int): Number of Fourier modes in the depth dimension.
-            mode_h (int): Number of Fourier modes in the height dimension.
-            mode_w (int): Number of Fourier modes in the width dimension.
-            init_scale (float): Initialization scale for weights.
-        
-        Returns:
-            None
         """
         super().__init__()
         self.in_features = in_features
@@ -243,26 +258,35 @@ class SpectralConvNDLayer(torch.nn.Module):
         $$y = \mathcal{F}^{-1}[y]$$
     """
 
-    def __init__(self, in_features: int, out_features: int, modes: Tuple[int], init_scale: float = 1.0):
+    in_features: int
+    """Number of input channels."""
+
+    out_features: int
+    """Number of output channels."""
+
+    ndim: int
+    """Number of spatial dimensions"""
+
+    modes: List[int]
+    """List of integers representing the number of Fourier modes to consider in each spatial dimension."""
+
+    weight: torch.nn.Parameter
+    """Learnable weights of the spectral convolution layer, initialized with a complex normal distribution."""
+
+    spatial_dims: Tuple[int, ...]
+    """Tuple of integers representing the indices of the spatial dimensions in the input tensor."""
+
+    def __init__(self, in_features: int, out_features: int, modes: List[int], init_scale: float = 1.0):
         """
         Initializes the N-Dimensional Spectral Convolution Layer with the given parameters.
-
-        Args:
-            in_features (int): Number of input channels.
-            out_features (int): Number of output channels.
-            modes (Tuple[int]): A tuple of integers specifying the number of Fourier modes for each spatial dimension.
-            init_scale (float): Initialization scale for weights.
-        
-        Returns:
-            None
         """
 
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
         
-        if not isinstance(modes, (tuple)): 
-            raise TypeError("Modes must be a tuple of integers. For dimensions <=3, use the specific SpectralConv1DLayer, SpectralConv2DLayer, or SpectralConv3DLayer.")
+        if not isinstance(modes, (list)): 
+            raise TypeError("Modes must be a list of integers. For dimensions <=3, use the specific SpectralConv1DLayer, SpectralConv2DLayer, or SpectralConv3DLayer.")
         
         self.modes = list(modes)
         self.ndim = len(self.modes)
