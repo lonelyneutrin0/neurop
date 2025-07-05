@@ -1,7 +1,7 @@
 import torch
 
 from torch.types import Tensor
-from typing import Tuple, Optional
+from typing import Tuple
 
 
 class SpectralConv1DLayer(torch.nn.Module):
