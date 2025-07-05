@@ -51,6 +51,7 @@
     <li><a href="#usage">Usage</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#attribution">Attribution</a></li>
+    <li><a href="#contributing">Contributing</a></li>
   </ul></li>
 </ul>
 
@@ -113,6 +114,24 @@ neurop    </h1>
 
 <p>Karn Tiwari, N M Anoop Krishnan, Prathosh A P, "CoNO: Complex Neural Operator for Continuous Dynamical Systems," arXiv, 2023.<br />
 Inspired by the code from <a href="https://github.com/M3RG-IITD/Complex-Neural-Operator/tree/main">this repo</a>, but not based on or derived from it.</p>
+
+<h2 id="contributing">Contributing</h2>
+
+<p><code><a href="">neurop</a></code> is 100% open-source and welcomes contributions! Please open an issue to suggest new features (perhaps new operators 👀) or bug fixes. 
+<br/> <br/> 
+You can install developer dependencies using </p>
+
+<pre><code>pip install neurop[dev]
+</code></pre>
+
+<p>Type-checking, import checking and test cases can be executed using</p>
+
+<pre><code>mypy neurop/
+ruff check neurop/
+pytest tests/
+</code></pre>
+
+<p>within the root directory of the project. </p>
 </div>
 
                         <input id="mod-neurop-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
