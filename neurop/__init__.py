@@ -2,7 +2,7 @@ r"""
 .. include:: ../README.md
 """ 
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 __authors__ = [
     "Hrishikesh Belagali",
     "Aditya Narayan"
