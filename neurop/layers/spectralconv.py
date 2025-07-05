@@ -226,3 +226,114 @@ class SpectralConv3DLayer(torch.nn.Module):
         x_out = torch.fft.irfftn(out_ft, s=(d, h, w), dim=(2, 3, 4), norm='ortho')
         return x_out
     
+class SpectralConvNDLayer(torch.nn.Module):
+    """
+    N-Dimensional Spectral Convolution Layer
+    
+    The input is assumed to have shape (B, C, *spatial_dims) where:
+        - B is the batch size,
+        - C is the number of input channels,
+        - *spatial_dims are the spatial dimensions (D, H, W for 3D, H, W for 2D, etc.)
+    
+    The layer transforms the input to the frequency domain using an N-D FFT along the spatial dimensions,
+        $$x_f = \mathcal{F}[x]$$
+    Then, the layer applies a pointwise multiplication (which is equivalent to a convolution in the spatial domain) as follows:
+        $$y_{b, o, k_1, k_2, ..., k_N} = \sum_{c=0}^{C-1} W_{c, o, k_1, k_2, ..., k_N} x_{b, c, k_1, k_2, ..., k_N}$$
+    where the contraction is along the features. Finally, the output is transformed back to the spatial domain using the inverse FFT:
+        $$y = \mathcal{F}^{-1}[y]$$
+    """
+
+    def __init__(self, in_features: int, out_features: int, modes: Tuple[int], init_scale: float = 1.0):
+        """
+        Initializes the N-Dimensional Spectral Convolution Layer with the given parameters.
+
+        Args:
+            in_features (int): Number of input channels.
+            out_features (int): Number of output channels.
+            modes (Tuple[int]): A tuple of integers specifying the number of Fourier modes for each spatial dimension.
+            init_scale (float): Initialization scale for weights.
+        
+        Returns:
+            None
+        """
+
+        super().__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        
+        if not isinstance(modes, (tuple)): 
+            raise TypeError("Modes must be a tuple of integers. For dimensions <=3, use the specific SpectralConv1DLayer, SpectralConv2DLayer, or SpectralConv3DLayer.")
+        
+        self.modes = list(modes)
+        self.ndim = len(self.modes)
+        
+        scale = init_scale / (in_features * out_features)
+
+        self.weight = torch.nn.Parameter(
+            torch.randn(in_features, out_features, *self.modes, dtype=torch.cfloat) * scale
+        )
+        
+        # Store spatial dimensions for forward pass
+        self.spatial_dims = tuple(range(2, 2 + self.ndim))
+
+    def forward(self, x: Tensor) -> Tensor:
+        """
+        Forward pass for the N-dimensional Spectral Convolution layer.
+        
+        Args:
+            x (Tensor): Input tensor of shape (B, C, *spatial_dims)
+        
+        Returns:
+            Tensor: Output tensor of shape (B, out_features, *spatial_dims)
+        """
+        # Get input dimensions
+        batch_size = x.shape[0]
+        spatial_shape = x.shape[2:]
+        
+        if len(spatial_shape) != self.ndim:
+            raise ValueError(f"Input has {len(spatial_shape)} spatial dimensions, "
+                           f"but layer expects {self.ndim}")
+        
+        # Clamp to nonredundant modes
+        effective_modes = []
+        for i, (mode, dim_size) in enumerate(zip(self.modes, spatial_shape)):
+            if i == len(self.modes) - 1:  # Last dimension uses rfft
+                effective_modes.append(min(mode, dim_size // 2 + 1))
+            else:
+                effective_modes.append(min(mode, dim_size))
+        
+        x_ft = torch.fft.rfftn(x, dim=self.spatial_dims, norm='ortho')
+        
+        out_ft_shape = [batch_size, self.out_features] + list(x_ft.shape[2:])
+        out_ft = torch.zeros(out_ft_shape, dtype=torch.cfloat, device=x.device)
+        
+        if all(mode > 0 for mode in effective_modes):
+            
+            # Set up [batchsize, channels, :modes, :modes, ...] slices for input and weight
+            input_slices = [slice(None), slice(None)] 
+            weight_slices = [slice(None), slice(None)] 
+            
+            for i, mode in enumerate(effective_modes):
+                input_slices.append(slice(None, mode))
+                weight_slices.append(slice(None, mode))
+            
+            x_ft_truncated = x_ft[tuple(input_slices)]
+            weight_truncated = self.weight[tuple(weight_slices)]
+
+            spatial_chars = 'adefghijklmnopqrstuvwxyz'[:self.ndim] 
+            input_indices = 'bc' + spatial_chars
+            weight_indices = 'co' + spatial_chars
+            output_indices = 'bo' + spatial_chars
+            einsum_str = f"{input_indices},{weight_indices}->{output_indices}"
+            
+            result = torch.einsum(einsum_str, x_ft_truncated, weight_truncated)
+            
+            output_slices = [slice(None), slice(None)]
+            for mode in effective_modes:
+                output_slices.append(slice(None, mode))
+            
+            out_ft[tuple(output_slices)] = result
+        
+        x_out = torch.fft.irfftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm='ortho')
+        
+        return x_out
