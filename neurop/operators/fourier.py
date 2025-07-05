@@ -14,6 +14,22 @@ class FourierOperator(NeuralOperator):
     It learns a spectral kernel that can be used to approximate functions in the frequency domain.
     """
     
+    readin: ReadinLayer
+    """Layer that reads in input data and projects it to a higher dimensional space."""
+
+    kernel_integral: torch.nn.ModuleList
+    """List of spectral convolution layers that apply Fourier transforms to the input data."""
+
+    readout: ReadoutLayer
+    """Layer that reads out data to a lower dimensional space."""
+
+    depth: int
+    """Depth of the operator, i.e., number of spectral convolution layers."""
+
+    activation_function: Callable[[Tensor], Tensor]
+    """Activation function to apply after each layer."""
+
+    
     def __init__(self, 
                  in_features: int, 
                  hidden_features: int, 
