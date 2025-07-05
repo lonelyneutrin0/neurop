@@ -1,11 +1,11 @@
 from torch.types import Tensor
-from typing import Tuple, Union, Callable
+from typing import List, Union, Callable
 
 import torch
 
 from ..base import NeuralOperator
 from ..layers.iolayers import ReadinLayer, ReadoutLayer
-from ..layers.spectralconv import SpectralConv1DLayer, SpectralConv2DLayer, SpectralConv3DLayer
+from ..layers.spectralconv import SpectralConv1DLayer, SpectralConv2DLayer, SpectralConv3DLayer, SpectralConvNDLayer
 
 
 class FourierOperator(NeuralOperator):
@@ -28,13 +28,11 @@ class FourierOperator(NeuralOperator):
 
     activation_function: Callable[[Tensor], Tensor]
     """Activation function to apply after each layer."""
-
-    
     def __init__(self, 
                  in_features: int, 
                  hidden_features: int, 
                  out_features: int,
-                 modes: Union[int, Tuple], 
+                 modes: Union[int, List], 
                  depth: int = 3,
                  activation_function: Callable[[Tensor], Tensor] = torch.relu
                  ):
@@ -45,8 +43,8 @@ class FourierOperator(NeuralOperator):
             in_features (int): Number of input features.
             hidden_features (int): Number of hidden features.
             out_features (int): Number of output features.
-            modes (Union[int, Tuple]): Number of Fourier modes to consider. 
-                                       If a tuple, it should contain the number of modes for each dimension.
+            modes (Union[int, List]): Number of Fourier modes to consider. 
+                                       If a list, it should contain the number of modes for each dimension.
             depth (int): Depth of the operator, i.e., number of spectral convolution layers.
             activation_function (Callable[[Tensor], Tensor]): Activation function to apply after each layer.
         
@@ -56,7 +54,7 @@ class FourierOperator(NeuralOperator):
         super().__init__()
         self.readin = ReadinLayer(in_features, hidden_features)
 
-        if isinstance(modes, tuple) and len(modes) > 3: 
+        if isinstance(modes, list) and len(modes) > 3: 
             raise NotImplementedError("FourierOperator currently supports up to 3D inputs.")
         
         if isinstance(modes, int):
@@ -72,6 +70,11 @@ class FourierOperator(NeuralOperator):
                 SpectralConv3DLayer(hidden_features, hidden_features, mode_d = modes[0], mode_h = modes[1], mode_w = modes[2]) for _ in range(depth)
             ])
         
+        else:
+            self.kernel_integral = torch.nn.ModuleList([
+                SpectralConvNDLayer(hidden_features, hidden_features, modes = modes) for _ in range(depth)
+            ])
+            
         self.readout = ReadoutLayer(hidden_features, out_features)
         self.depth = depth
         self.activation_function = activation_function

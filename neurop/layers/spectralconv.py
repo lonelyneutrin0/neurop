@@ -268,7 +268,7 @@ class SpectralConvNDLayer(torch.nn.Module):
     """Number of spatial dimensions"""
 
     modes: List[int]
-    """Tuple of integers representing the number of Fourier modes to consider in each spatial dimension."""
+    """List of integers representing the number of Fourier modes to consider in each spatial dimension."""
 
     weight: torch.nn.Parameter
     """Learnable weights of the spectral convolution layer, initialized with a complex normal distribution."""
@@ -276,7 +276,7 @@ class SpectralConvNDLayer(torch.nn.Module):
     spatial_dims: Tuple[int, ...]
     """Tuple of integers representing the indices of the spatial dimensions in the input tensor."""
 
-    def __init__(self, in_features: int, out_features: int, modes: Tuple[int], init_scale: float = 1.0):
+    def __init__(self, in_features: int, out_features: int, modes: List[int], init_scale: float = 1.0):
         """
         Initializes the N-Dimensional Spectral Convolution Layer with the given parameters.
         """
@@ -285,8 +285,8 @@ class SpectralConvNDLayer(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
         
-        if not isinstance(modes, (tuple)): 
-            raise TypeError("Modes must be a tuple of integers. For dimensions <=3, use the specific SpectralConv1DLayer, SpectralConv2DLayer, or SpectralConv3DLayer.")
+        if not isinstance(modes, (list)): 
+            raise TypeError("Modes must be a list of integers. For dimensions <=3, use the specific SpectralConv1DLayer, SpectralConv2DLayer, or SpectralConv3DLayer.")
         
         self.modes = list(modes)
         self.ndim = len(self.modes)
