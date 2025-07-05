@@ -25,3 +25,17 @@ This project contains an independent implementation of the technique described i
 Karn Tiwari, N M Anoop Krishnan, Prathosh A P, "CoNO: Complex Neural Operator for Continuous Dynamical Systems," arXiv, 2023.  
 Inspired by the code from [this repo](https://github.com/M3RG-IITD/Complex-Neural-Operator/tree/main), but not based on or derived from it.
 
+## Contributing
+`neurop` is 100% open-source and welcomes contributions! Please open an issue to suggest new features (perhaps new operators 👀) or bug fixes. 
+<br/> <br/> 
+You can install developer dependencies using 
+```
+pip install neurop[dev]
+```
+Type-checking, import checking and test cases can be executed using
+```
+mypy neurop/
+ruff check neurop/
+pytest tests/
+```
+within the root directory of the project. 
