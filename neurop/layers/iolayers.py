@@ -7,17 +7,27 @@ class ReadinLayer(torch.nn.Module):
     
     def __init__(self, in_features: int, hidden_features: int):
         """
+        Initializes the ReadinLayer with a linear transformation.
+
         Args:   
             in_features (int): Number of features of input data.
             hidden_features (int): Number of hidden featuers of transformed data.
+        
+        Returns:
+            None
         """
         super().__init__()
         self.linear = torch.nn.Linear(in_features, hidden_features)
     
     def forward(self, x: Tensor) -> Tensor:
         """
+        Forward pass of the ReadinLayer.
+
         Args:
             x (Tensor): Input data of shape (batch_size, in_features, d_1, d_2, .... d_n).
+        
+        Returns:
+            Tensor: Transformed data of shape (batch_size, hidden_features, d_1, d_2, .... d_n).
         """ 
 
         # Reshape input to (batch_size, d_1, d_2, .... d_n, in_features) 
@@ -33,17 +43,27 @@ class ReadoutLayer(torch.nn.Module):
     
     def __init__(self, hidden_features: int, output_features: int):
         """
+        Initializes the ReadoutLayer with a linear transformation.
+
         Args:   
             hidden_features (int): Dimension of the input data.
             output_features (int): Dimension of the output data after projection.
+        
+        Returns:
+            None
         """
         super().__init__()
         self.linear = torch.nn.Linear(hidden_features, output_features)
     
     def forward(self, x: Tensor) -> Tensor:
         """"
+        Forward pass of the ReadoutLayer.
+
         Args:
             x (Tensor): Input data of shape (batch_size, hidden_features, d_1, d_2, .... d_n).
+        
+        Returns:
+            Tensor: Transformed data of shape (batch_size, output_features, d_1, d_2, .... d_n).
         """
 
         # Reshape input to (batch_size, d_1, d_2, .... d_n, hidden_features)
