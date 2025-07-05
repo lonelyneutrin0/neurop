@@ -54,9 +54,6 @@ class FourierOperator(NeuralOperator):
         super().__init__()
         self.readin = ReadinLayer(in_features, hidden_features)
 
-        if isinstance(modes, list) and len(modes) > 3: 
-            raise NotImplementedError("FourierOperator currently supports up to 3D inputs.")
-        
         if isinstance(modes, int):
             self.kernel_integral = torch.nn.ModuleList([
                 SpectralConv1DLayer(hidden_features, hidden_features, modes = modes) for _ in range(depth)
@@ -74,7 +71,7 @@ class FourierOperator(NeuralOperator):
             self.kernel_integral = torch.nn.ModuleList([
                 SpectralConvNDLayer(hidden_features, hidden_features, modes = modes) for _ in range(depth)
             ])
-            
+
         self.readout = ReadoutLayer(hidden_features, out_features)
         self.depth = depth
         self.activation_function = activation_function
