@@ -57,8 +57,29 @@ class SpectralConv1DLayer(torch.nn.Module):
         Returns:
             Tensor: Output tensor of shape (B, out_features, L)
         """
+
         batchsize, c, length = x.shape
-        
+
+        if x.is_complex():
+            x_ft = torch.fft.fft(x, dim=2, norm='ortho')
+            modes = min(self.modes, length)
+            
+            out_ft = torch.zeros(
+                batchsize, self.out_features, length, 
+                dtype=torch.cfloat, device=x.device
+            )
+
+            if modes > 0:
+                out_ft[:, :, :modes] = torch.einsum(
+                    "bck,cok->bok", 
+                    x_ft[:, :, :modes], 
+                    self.weight[:, :, :modes]
+                )
+            
+            x_out = torch.fft.ifft(out_ft, dim=2, norm='ortho')
+            return x_out 
+
+
         # FFTs only produce n//2 + 1 nonredundant modes for real inputs
         modes = min(self.modes, length // 2 + 1)  
         
@@ -135,7 +156,28 @@ class SpectralConv2DLayer(torch.nn.Module):
         Returns:
             Tensor: Output tensor of shape (B, out_features, H, W)
         """
+
         batchsize, c, h, w = x.shape
+
+        if x.is_complex():
+            x_ft = torch.fft.fft2(x, dim=(2, 3), norm='ortho')
+            mode_h = min(self.mode_h, h)
+            mode_w = min(self.mode_w, w)
+            
+            out_ft = torch.zeros(
+                batchsize, self.out_features, h, w,
+                dtype=torch.cfloat, device=x.device
+            )
+            
+            if mode_h > 0 and mode_w > 0:
+                out_ft[:, :, :mode_h, :mode_w] = torch.einsum(
+                    "bchw,cohw->bohw", 
+                    x_ft[:, :, :mode_h, :mode_w], 
+                    self.weight[:, :, :mode_h, :mode_w]
+                )
+            
+            x_out = torch.fft.ifft2(out_ft, dim=(2, 3), norm='ortho')
+            return x_out
         
         mode_h = min(self.mode_h, h)
         mode_w = min(self.mode_w, w // 2 + 1) 
@@ -218,7 +260,29 @@ class SpectralConv3DLayer(torch.nn.Module):
         Returns:
             Tensor: Output tensor of shape (B, out_features, D, H, W)
         """
+
         batchsize, c, d, h, w = x.shape
+
+        if x.is_complex():
+            x_ft = torch.fft.fftn(x, dim=(2, 3, 4), norm='ortho')
+            mode_d = min(self.mode_d, d)
+            mode_h = min(self.mode_h, h)
+            mode_w = min(self.mode_w, w)
+
+            out_ft = torch.zeros(
+                batchsize, self.out_features, d, h, w,
+                dtype=torch.cfloat, device=x.device
+            )
+
+            if mode_d > 0 and mode_h > 0 and mode_w > 0:
+                out_ft[:, :, :mode_d, :mode_h, :mode_w] = torch.einsum(
+                    "bcdhw,codhw->bodhw", 
+                    x_ft[:, :, :mode_d, :mode_h, :mode_w], 
+                    self.weight[:, :, :mode_d, :mode_h, :mode_w]
+                )
+
+            x_out = torch.fft.ifftn(out_ft, dim=(2, 3, 4), norm='ortho')
+            return x_out
         
         mode_d = min(self.mode_d, d)
         mode_h = min(self.mode_h, h)
@@ -233,7 +297,7 @@ class SpectralConv3DLayer(torch.nn.Module):
 
         if mode_d > 0 and mode_h > 0 and mode_w > 0:
             out_ft[:, :, :mode_d, :mode_h, :mode_w] = torch.einsum(
-                "bcdhw,codhw->bohdw", 
+                "bcdhw,codhw->bodhw", 
                 x_ft[:, :, :mode_d, :mode_h, :mode_w], 
                 self.weight[:, :, :mode_d, :mode_h, :mode_w]
             )
@@ -310,13 +374,50 @@ class SpectralConvNDLayer(torch.nn.Module):
         Returns:
             Tensor: Output tensor of shape (B, out_features, *spatial_dims)
         """
-        # Get input dimensions
+
         batch_size = x.shape[0]
         spatial_shape = x.shape[2:]
         
         if len(spatial_shape) != self.ndim:
             raise ValueError(f"Input has {len(spatial_shape)} spatial dimensions, "
                            f"but layer expects {self.ndim}")
+        
+        if x.is_complex():
+            
+            x_ft = torch.fft.fftn(x, dim=self.spatial_dims, norm='ortho')
+            effective_modes = [min(mode, dim_size) for mode, dim_size in zip(self.modes, spatial_shape)]
+
+            out_ft_shape = [batch_size, self.out_features] + list(x_ft.shape[2:])
+            out_ft = torch.zeros(out_ft_shape, dtype=torch.cfloat, device=x.device)
+
+            if all(mode > 0 for mode in effective_modes):
+                # Set up [batchsize, channels, :modes, :modes, ...] slices for input and weight
+                input_slices = [slice(None), slice(None)] 
+                weight_slices = [slice(None), slice(None)] 
+                
+                for i, mode in enumerate(effective_modes):
+                    input_slices.append(slice(None, mode))
+                    weight_slices.append(slice(None, mode))
+                
+                x_ft_truncated = x_ft[tuple(input_slices)]
+                weight_truncated = self.weight[tuple(weight_slices)]
+
+                spatial_chars = 'adefghijklmnopqrstuvwxyz'[:self.ndim] 
+                input_indices = 'bc' + spatial_chars
+                weight_indices = 'co' + spatial_chars
+                output_indices = 'bo' + spatial_chars
+                einsum_str = f"{input_indices},{weight_indices}->{output_indices}"
+                
+                result = torch.einsum(einsum_str, x_ft_truncated, weight_truncated)
+                
+                output_slices = [slice(None), slice(None)]
+                for mode in effective_modes:
+                    output_slices.append(slice(None, mode))
+                
+                out_ft[tuple(output_slices)] = result
+
+            x_out = torch.fft.ifftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm='ortho')
+            return x_out
         
         # Clamp to nonredundant modes
         effective_modes = []
