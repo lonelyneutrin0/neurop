@@ -276,7 +276,7 @@ class SpectralConv3DLayer(torch.nn.Module):
 
             if mode_d > 0 and mode_h > 0 and mode_w > 0:
                 out_ft[:, :, :mode_d, :mode_h, :mode_w] = torch.einsum(
-                    "bcdhw,codhw->bohdw", 
+                    "bcdhw,codhw->bodhw", 
                     x_ft[:, :, :mode_d, :mode_h, :mode_w], 
                     self.weight[:, :, :mode_d, :mode_h, :mode_w]
                 )
