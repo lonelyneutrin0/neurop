@@ -157,11 +157,9 @@ def test_spectral_conv1d_layer_invalid_modes():
     in_features = 5
     out_features = 10
     modes = -1  # Invalid mode
-    batch_size = 2
-    spatial_dims = (4,)
 
     try:
-        layer = SpectralConv1DLayer(in_features, out_features, modes)
+        SpectralConv1DLayer(in_features, out_features, modes)
         assert False, "Expected ValueError for invalid modes in SpectralConv1DLayer"
     except ValueError:
         pass  # Expected
@@ -174,11 +172,9 @@ def test_spectral_conv2d_layer_invalid_modes():
     out_features = 10
     mode_h = -1  # Invalid mode
     mode_w = 4
-    batch_size = 2
-    spatial_dims = (4, 4)
 
     try:
-        layer = SpectralConv2DLayer(in_features, out_features, mode_h, mode_w)
+        SpectralConv2DLayer(in_features, out_features, mode_h, mode_w)
         assert False, "Expected ValueError for invalid modes in SpectralConv2DLayer"
     except ValueError:
         pass  # Expected
@@ -192,10 +188,9 @@ def test_spectral_conv3d_layer_invalid_modes():
     mode_d = -1  # Invalid mode
     mode_h = 4
     mode_w = 5
-    batch_size = 2
 
     try:
-        layer = SpectralConv3DLayer(in_features, out_features, mode_d, mode_h, mode_w)
+        SpectralConv3DLayer(in_features, out_features, mode_d, mode_h, mode_w)
         assert False, "Expected ValueError for invalid modes in SpectralConv3DLayer"
     except ValueError:
         pass  # Expected
@@ -207,11 +202,9 @@ def test_spectral_conv_nd_layer_invalid_modes():
     in_features = 5
     out_features = 10
     modes = [-1, 4, 5]  # Invalid mode
-    batch_size = 2
-    spatial_dims = (4, 4, 4)
 
     try:
-        layer = SpectralConvNDLayer(in_features, out_features, modes)
+        SpectralConvNDLayer(in_features, out_features, modes)
         assert False, "Expected ValueError for invalid modes in SpectralConvNDLayer"
     except ValueError:
         pass  # Expected
@@ -300,7 +293,7 @@ def test_spectral_conv1d_layer_invalid_input_shape():
     x = torch.randn(batch_size, in_features + 1, *spatial_dims)  # Invalid input shape
 
     try:
-        y = layer(x)
+        layer(x)
         assert False, "Expected ValueError for invalid input shape in SpectralConv1DLayer"
     except ValueError:
         pass  # Expected
@@ -320,7 +313,7 @@ def test_spectral_conv2d_layer_invalid_input_shape():
     x = torch.randn(batch_size, in_features + 1, *spatial_dims)  # Invalid input shape
 
     try:
-        y = layer(x)
+        layer(x)
         assert False, "Expected ValueError for invalid input shape in SpectralConv2DLayer"
     except ValueError:
         pass  # Expected
@@ -340,7 +333,7 @@ def test_spectral_conv3d_layer_invalid_input_shape():
     x = torch.randn(batch_size, in_features + 1, 3, 3, 3)  # Invalid input shape
 
     try:
-        y = layer(x)
+        layer(x)
         assert False, "Expected ValueError for invalid input shape in SpectralConv3DLayer"
     except ValueError:
         pass  # Expected
@@ -359,7 +352,7 @@ def test_spectral_conv_nd_layer_invalid_input_shape():
     x = torch.randn(batch_size, in_features + 1, *spatial_dims)  # Invalid input shape
 
     try:
-        y = layer(x)
+        layer(x)
         assert False, "Expected ValueError for invalid input shape in SpectralConvNDLayer"
     except ValueError:
         pass  # Expected
@@ -378,7 +371,7 @@ def test_spectral_conv1d_layer_empty_input():
     x = torch.randn(batch_size, in_features, *spatial_dims)
 
     try:
-        y = layer(x)
+        layer(x)
         assert False, "Expected ValueError for empty input in SpectralConv1DLayer"
     except ValueError:
         pass  # Expected
@@ -398,7 +391,7 @@ def test_spectral_conv2d_layer_empty_input():
     x = torch.randn(batch_size, in_features, *spatial_dims)
 
     try:
-        y = layer(x)
+        layer(x)
         assert False, "Expected ValueError for empty input in SpectralConv2DLayer"
     except ValueError:
         pass  # Expected
@@ -418,7 +411,7 @@ def test_spectral_conv3d_layer_empty_input():
     x = torch.randn(batch_size, in_features, 0, 0, 0)  # Empty spatial dimensions
 
     try:
-        y = layer(x)
+        layer(x)
         assert False, "Expected ValueError for empty input in SpectralConv3DLayer"
     except ValueError:
         pass  # Expected
@@ -437,7 +430,7 @@ def test_spectral_conv_nd_layer_empty_input():
     x = torch.randn(batch_size, in_features, *spatial_dims)
 
     try:
-        y = layer(x)
+        layer(x)
         assert False, "Expected ValueError for empty input in SpectralConvNDLayer"
     except ValueError:
         pass  # Expected
@@ -449,13 +442,11 @@ def test_spectral_conv1d_layer_non_tensor_input():
     in_features = 5
     out_features = 10
     modes = 3
-    batch_size = 2
-    spatial_dims = (4,)
 
     layer = SpectralConv1DLayer(in_features, out_features, modes)
     
     try:
-        y = layer("invalid input")  # Non-tensor input
+        layer("invalid input")  # Non-tensor input
         assert False, "Expected TypeError for non-tensor input in SpectralConv1DLayer"
     except TypeError:
         pass  # Expected
@@ -468,13 +459,11 @@ def test_spectral_conv2d_layer_non_tensor_input():
     out_features = 10
     mode_h = 3
     mode_w = 4
-    batch_size = 2
-    spatial_dims = (4, 4)
 
     layer = SpectralConv2DLayer(in_features, out_features, mode_h, mode_w)
     
     try:
-        y = layer("invalid input")  # Non-tensor input
+        layer("invalid input")  # Non-tensor input
         assert False, "Expected TypeError for non-tensor input in SpectralConv2DLayer"
     except TypeError:
         pass  # Expected
@@ -488,12 +477,11 @@ def test_spectral_conv3d_layer_non_tensor_input():
     mode_d = 3
     mode_h = 4
     mode_w = 5
-    batch_size = 2
 
     layer = SpectralConv3DLayer(in_features, out_features, mode_d, mode_h, mode_w)
     
     try:
-        y = layer("invalid input")  # Non-tensor input
+        layer("invalid input")  # Non-tensor input
         assert False, "Expected TypeError for non-tensor input in SpectralConv3DLayer"
     except TypeError:
         pass  # Expected
@@ -505,13 +493,11 @@ def test_spectral_conv_nd_layer_non_tensor_input():
     in_features = 5
     out_features = 10
     modes = [3, 4, 5]  # Example for a 3D case
-    batch_size = 2
-    spatial_dims = (4, 4, 4)
 
     layer = SpectralConvNDLayer(in_features, out_features, modes)
     
     try:
-        y = layer("invalid input")  # Non-tensor input
+        layer("invalid input")  # Non-tensor input
         assert False, "Expected TypeError for non-tensor input in SpectralConvNDLayer"
     except TypeError:
         pass  # Expected
