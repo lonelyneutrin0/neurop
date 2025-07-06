@@ -17,7 +17,7 @@ class NeuralOperator(torch.nn.Module, ABC):
     Abstract class for Neural Operators.
     """
 
-    def __init__(self,):
+    def __init__(self, *args, **kwargs):
         """
         __init__ method to initialize NeuralOperator
         """
@@ -25,7 +25,7 @@ class NeuralOperator(torch.nn.Module, ABC):
         pass
     
     @abstractmethod
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, *args, **kwargs) -> Tensor:
         """
         Forward pass to be implemented by subclasses.
         """
