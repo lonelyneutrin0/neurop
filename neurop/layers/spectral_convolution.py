@@ -1,361 +1,8 @@
 import torch
 
 from torch.types import Tensor
-from typing import Tuple, List
-
-
-class SpectralConv1DLayer(torch.nn.Module):
-    """
-    Spectral Convolution 1 Dimensional Layer
-
-    The input is assumed to have shape (B, C, L) where:\n
-        - B is the batch size,
-        - C is the number of input channels,
-        - L is the length of the signal,
-    
-    The layer transforms the input to the frequency domain using a 1D FFT along the last dimension,
-    $$x_f = \mathcal{F}[x]$$ 
-    Then, the layer applies a pointwise multiplication (which is equivalent to a convolution in the time domain) as follows: 
-    $$y_{b, o, k} = \sum_{c=0}^{C-1} W_{c, o, k} x_{b, c, k}$$
-    where the contraction is along the features. Finally, the output is transformed back to the time domain using the inverse FFT:
-    $$y = \mathcal{F}^{-1}[y]$$
-    """
-    
-    in_features: int
-    """Number of input channels."""
-
-    out_features: int
-    """Number of output channels."""
-
-    modes: int
-    """Number of Fourier modes to consider."""
-    
-    weight: torch.nn.Parameter
-    """Learnable weights of the spectral convolution layer, initialized with a complex normal distribution."""
-
-    def __init__(self, in_features: int, out_features: int, modes: int, init_scale: float = 1.0):
-        """
-        Initializes the SpectralConv1DLayer with the given parameters.
-        """
-        super().__init__()
-        self.in_features = in_features
-        self.out_features = out_features
-
-        if modes < 0:
-            raise ValueError("Number of modes must be non-negative.")
-        self.modes = modes
-        
-        scale = init_scale / (in_features * out_features)
-        self.weight = torch.nn.Parameter(
-            torch.randn(in_features, out_features, modes, dtype=torch.cfloat) * scale
-        )
-
-    def forward(self, x: Tensor, output_dtype: torch.dtype = torch.cfloat) -> Tensor:
-        """
-        Forward pass for the spectral convolution layer.
-        
-        Args:
-            x (Tensor): Input tensor of shape (B, C, L)
-            output_dtype (torch.dtype): Data type for the output tensor, default is torch.cfloat
-        
-        Returns:
-            Tensor: Output tensor of shape (B, out_features, L)
-        """
-
-        if not isinstance(x, Tensor):
-            try:
-                x = torch.as_tensor(x)
-            except Exception as e:
-                raise TypeError(f"Input must be a PyTorch tensor or convertible to one. Error: {e}")
-        
-        batchsize, c, length = x.shape
-
-        if c != self.in_features:
-            raise ValueError(f"Input has {c} channels, but layer expects {self.in_features} channels.")
-        
-        if x.numel() == 0:
-            raise ValueError("Input tensor is empty.")
-
-        if x.is_complex():
-            x_ft = torch.fft.fft(x, dim=2, norm='ortho')
-            modes = min(self.modes, length)
-            
-            out_ft = torch.zeros(
-                batchsize, self.out_features, length, 
-                dtype=output_dtype, device=x.device
-            )
-
-            if modes > 0:
-                out_ft[:, :, :modes] = torch.einsum(
-                    "bck,cok->bok", 
-                    x_ft[:, :, :modes], 
-                    self.weight[:, :, :modes]
-                )
-            
-            x_out = torch.fft.ifft(out_ft, dim=2, norm='ortho')
-            return x_out 
-
-
-        # FFTs only produce n//2 + 1 nonredundant modes for real inputs
-        modes = min(self.modes, length // 2 + 1)  
-        
-        x_ft = torch.fft.rfft(x, dim=2, norm='ortho')
-        
-        out_ft = torch.zeros(
-            batchsize, self.out_features, x_ft.size(2), 
-            dtype=output_dtype, device=x.device
-        )
-        
-        if modes > 0:
-            out_ft[:, :, :modes] = torch.einsum(
-                "bck,cok->bok", 
-                x_ft[:, :, :modes], 
-                self.weight[:, :, :modes]
-            )
-        
-        x_out = torch.fft.irfft(out_ft, n=length, dim=2, norm='ortho')
-        return x_out
-
-class SpectralConv2DLayer(torch.nn.Module):
-    """
-    Spectral Convolution 2 Dimensional Layer    
-    The input is assumed to have shape (B, C, H, W) where:\n
-        - B is the batch size,
-        - C is the number of input channels,
-        - H is the height of the signal,
-        - W is the width of the signal,
-    The layer transforms the input to the frequency domain using a 2D FFT along the last two dimensions,
-    $$x_f = \mathcal{F}[x]$$
-    Then, the layer applies a pointwise multiplication (which is equivalent to a convolution in the time domain) as follows:
-    $$y_{b, o, k_h, k_w} = \sum_{c=0}^{C-1} W_{c, o, k_h, k_w} x_{b, c, k_h, k_w}$$
-    where the contraction is along the features. Finally, the output is transformed back to the time domain using the inverse FFT:
-    $$y = \mathcal{F}^{-1}[y]$$
-    """
-
-    in_features: int
-    """Number of input channels."""
-
-    out_features: int
-    """Number of output channels."""
-
-    mode_h: int
-    """Number of Fourier modes to consider in the height dimension."""
-    
-    mode_w: int
-    """Number of Fourier modes to consider in the width dimension."""
-
-    weight: torch.nn.Parameter
-    """Learnable weights of the spectral convolution layer, initialized with a complex normal distribution."""
-
-    def __init__(self, in_features: int, out_features: int, mode_h: int, mode_w: int, init_scale: float = 1.0):
-        """
-        Initializes the SpectralConv2DLayer with the given parameters.
-        """
-        super().__init__()
-        self.in_features = in_features
-        self.out_features = out_features
-
-        if mode_h < 0 or mode_w < 0:
-            raise ValueError("Number of modes must be non-negative.")
-        
-        self.mode_h = mode_h
-        self.mode_w = mode_w
-        
-        scale = init_scale / (in_features * out_features)
-        self.weight = torch.nn.Parameter(
-            torch.randn(in_features, out_features, mode_h, mode_w, dtype=torch.cfloat) * scale
-        )
-
-    def forward(self, x: Tensor, output_dtype: torch.dtype = torch.cfloat) -> Tensor:
-        """
-        Forward pass for the Spectral Convolution 2D layer.
-        
-        Args:
-            x (Tensor): Input tensor of shape (B, C, H, W) - PyTorch convention
-            output_dtype (torch.dtype): Data type for the output tensor, default is torch.cfloat
-        
-        Returns:
-            Tensor: Output tensor of shape (B, out_features, H, W)
-        """
-
-        if not isinstance(x, Tensor):
-            try:
-                x = torch.as_tensor(x)
-            except Exception as e:
-                raise TypeError(f"Input must be a PyTorch tensor or convertible to one. Error: {e}")
-            
-        batchsize, c, h, w = x.shape
-
-        if c != self.in_features:
-            raise ValueError(f"Input has {c} channels, but layer expects {self.in_features} channels.")
-
-        if x.numel() == 0:
-            raise ValueError("Input tensor is empty.")
-
-        if x.is_complex():
-            x_ft = torch.fft.fft2(x, dim=(2, 3), norm='ortho')
-            mode_h = min(self.mode_h, h)
-            mode_w = min(self.mode_w, w)
-            
-            out_ft = torch.zeros(
-                batchsize, self.out_features, h, w,
-                dtype=output_dtype, device=x.device
-            )
-            
-            if mode_h > 0 and mode_w > 0:
-                out_ft[:, :, :mode_h, :mode_w] = torch.einsum(
-                    "bchw,cohw->bohw", 
-                    x_ft[:, :, :mode_h, :mode_w], 
-                    self.weight[:, :, :mode_h, :mode_w]
-                )
-            
-            x_out = torch.fft.ifft2(out_ft, dim=(2, 3), norm='ortho')
-            return x_out
-        
-        mode_h = min(self.mode_h, h)
-        mode_w = min(self.mode_w, w // 2 + 1) 
-        
-        x_ft = torch.fft.rfft2(x, dim=(2, 3), norm='ortho')
-        
-        out_ft = torch.zeros(
-            batchsize, self.out_features, h, x_ft.size(3),
-            dtype=output_dtype, device=x.device
-        )
-        
-        if mode_h > 0 and mode_w > 0:
-            out_ft[:, :, :mode_h, :mode_w] = torch.einsum(
-                "bchw,cohw->bohw", 
-                x_ft[:, :, :mode_h, :mode_w], 
-                self.weight[:, :, :mode_h, :mode_w]
-            )
-        
-        x_out = torch.fft.irfft2(out_ft, s=(h, w), dim=(2, 3), norm='ortho')
-        return x_out
-
-class SpectralConv3DLayer(torch.nn.Module):
-    """
-    Spectral Convolution 3 Dimensional Layer
-    The input is assumed to have shape (B, C, D, H, W) where:\n
-        - B is the batch size,
-        - C is the number of input channels,
-        - D is the depth of the signal,
-        - H is the height of the signal,
-        - W is the width of the signal,
-    The layer transforms the input to the frequency domain using a 3D FFT along the last three dimensions,
-        $$x_f = \mathcal{F}[x]$$
-    Then, the layer applies a pointwise multiplication (which is equivalent to a convolution in the time domain) as follows:
-        $$y_{b, o, k_d, k_h, k_w} = \sum_{c=0}^{C-1} W_{c, o, k_d, k_h, k_w} x_{b, c, k_d, k_h, k_w}$$
-    where the contraction is along the features. Finally, the output is transformed back to the time domain using the inverse FFT:
-        $$y = \mathcal{F}^{-1}[y]$$
-    """
-
-    in_features: int
-    """Number of input channels."""
-    
-    out_features: int
-    """Number of output channels."""
-
-    mode_d: int
-    """Number of Fourier modes to consider in the depth dimension."""
-
-    mode_h: int
-    """Number of Fourier modes to consider in the height dimension."""
-
-    mode_w: int
-    """Number of Fourier modes to consider in the width dimension."""
-
-    weight: torch.nn.Parameter
-    """Learnable weights of the spectral convolution layer, initialized with a complex normal distribution."""
-
-    def __init__(self, in_features: int, out_features: int, mode_d: int, mode_h: int, mode_w: int, init_scale: float = 1.0):
-        """
-        Initializes the SpectralConv3DLayer with the given parameters.
-        """
-        super().__init__()
-        self.in_features = in_features
-        self.out_features = out_features
-
-        if mode_d < 0 or mode_h < 0 or mode_w < 0:
-            raise ValueError("Number of modes must be non-negative.")
-    
-        self.mode_d = mode_d
-        self.mode_h = mode_h
-        self.mode_w = mode_w
-        
-        scale = init_scale / (in_features * out_features)
-        self.weight = torch.nn.Parameter(
-            torch.randn(in_features, out_features, mode_d, mode_h, mode_w, dtype=torch.cfloat) * scale
-        )
-
-    def forward(self, x: Tensor, output_dtype: torch.dtype = torch.cfloat) -> Tensor:
-        """
-        Forward pass for the Spectral Convolution 3D layer.
-
-        Args:
-            x (Tensor): Input tensor of shape (B, C, D, H, W)
-            output_dtype (torch.dtype): Data type for the output tensor, default is torch.cfloat
-
-        Returns:
-            Tensor: Output tensor of shape (B, out_features, D, H, W)
-        """
-
-        if not isinstance(x, Tensor):
-            try:
-                x = torch.as_tensor(x)
-            except Exception as e:
-                raise TypeError(f"Input must be a PyTorch tensor or convertible to one. Error: {e}")
-        
-        batchsize, c, d, h, w = x.shape
-
-        if c != self.in_features:
-            raise ValueError(f"Input has {c} channels, but layer expects {self.in_features} channels.")
-
-        if x.numel() == 0:
-            raise ValueError("Input tensor is empty.")
-
-        if x.is_complex():
-            x_ft = torch.fft.fftn(x, dim=(2, 3, 4), norm='ortho')
-            mode_d = min(self.mode_d, d)
-            mode_h = min(self.mode_h, h)
-            mode_w = min(self.mode_w, w)
-
-            out_ft = torch.zeros(
-                batchsize, self.out_features, d, h, w,
-                dtype=output_dtype, device=x.device
-            )
-
-            if mode_d > 0 and mode_h > 0 and mode_w > 0:
-                out_ft[:, :, :mode_d, :mode_h, :mode_w] = torch.einsum(
-                    "bcdhw,codhw->bodhw", 
-                    x_ft[:, :, :mode_d, :mode_h, :mode_w], 
-                    self.weight[:, :, :mode_d, :mode_h, :mode_w]
-                )
-
-            x_out = torch.fft.ifftn(out_ft, dim=(2, 3, 4), norm='ortho')
-            return x_out
-        
-        mode_d = min(self.mode_d, d)
-        mode_h = min(self.mode_h, h)
-        mode_w = min(self.mode_w, w // 2 + 1)
-
-        x_ft = torch.fft.rfftn(x, dim=(2, 3, 4), norm='ortho')
-
-        out_ft = torch.zeros(
-            batchsize, self.out_features, d, h, x_ft.size(4),
-            dtype=output_dtype, device=x.device
-        )
-
-        if mode_d > 0 and mode_h > 0 and mode_w > 0:
-            out_ft[:, :, :mode_d, :mode_h, :mode_w] = torch.einsum(
-                "bcdhw,codhw->bodhw", 
-                x_ft[:, :, :mode_d, :mode_h, :mode_w], 
-                self.weight[:, :, :mode_d, :mode_h, :mode_w]
-            )
-        
-        x_out = torch.fft.irfftn(out_ft, s=(d, h, w), dim=(2, 3, 4), norm='ortho')
-        return x_out
-    
-class SpectralConvNDLayer(torch.nn.Module):
+from typing import Tuple, List, Union
+class SpectralConv(torch.nn.Module):
     """
     N-Dimensional Spectral Convolution Layer
     
@@ -390,7 +37,12 @@ class SpectralConvNDLayer(torch.nn.Module):
     spatial_dims: Tuple[int, ...]
     """Tuple of integers representing the indices of the spatial dimensions in the input tensor."""
 
-    def __init__(self, in_features: int, out_features: int, modes: List[int], init_scale: float = 1.0):
+    def __init__(self,
+                in_features: int, 
+                out_features: int, 
+                modes: Union[int, List[int]], 
+                init_scale: float = 1.0,
+                dtype: torch.dtype = torch.cfloat):
         """
         Initializes the N-Dimensional Spectral Convolution Layer with the given parameters.
         """
@@ -398,15 +50,19 @@ class SpectralConvNDLayer(torch.nn.Module):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
-        
-        if not isinstance(modes, (list)): 
-            raise TypeError("Modes must be a list of integers. For dimensions <=3, use the specific SpectralConv1DLayer, SpectralConv2DLayer, or SpectralConv3DLayer.")
-        
-        for i in modes:
-            if i < 0:
-                raise ValueError("Number of modes must be non-negative.")
+        self.dtype = dtype
             
-        self.modes = list(modes)
+        if isinstance(modes, int): 
+            if modes < 0:
+                raise ValueError("Number of modes must be non-negative.")
+            self.modes = [modes]
+        else:
+            self.modes = modes
+
+            for i in modes:
+                if i < 0:
+                    raise ValueError("Number of modes must be non-negative.")
+                
         self.ndim = len(self.modes)
         
         scale = init_scale / (in_features * out_features)
@@ -417,14 +73,15 @@ class SpectralConvNDLayer(torch.nn.Module):
         
         # Store spatial dimensions for forward pass
         self.spatial_dims = tuple(range(2, 2 + self.ndim))
+        self.einsum_eq = self._einsum_eq()
 
-    def forward(self, x: Tensor, output_dtype: torch.dtype = torch.cfloat) -> Tensor:
+    def forward(self, x: Tensor, dtype: torch.dtype = torch.cfloat) -> Tensor:
         """
         Forward pass for the N-dimensional Spectral Convolution layer.
         
         Args:
             x (Tensor): Input tensor of shape (B, C, *spatial_dims)
-            output_dtype (torch.dtype): Data type for the output tensor, default is torch.cfloat
+            dtype (torch.dtype): Data type for the output tensor, default is torch.cfloat
         
         Returns:
             Tensor: Output tensor of shape (B, out_features, *spatial_dims)
@@ -450,83 +107,97 @@ class SpectralConvNDLayer(torch.nn.Module):
             raise ValueError(f"Input has {len(spatial_shape)} spatial dimensions, "
                            f"but layer expects {self.ndim}")
         
-        if x.is_complex():
-            
-            x_ft = torch.fft.fftn(x, dim=self.spatial_dims, norm='ortho')
-            effective_modes = [min(mode, dim_size) for mode, dim_size in zip(self.modes, spatial_shape)]
-
-            out_ft_shape = [batch_size, self.out_features] + list(x_ft.shape[2:])
-            out_ft = torch.zeros(out_ft_shape, dtype=output_dtype, device=x.device)
-
-            if all(mode > 0 for mode in effective_modes):
-                # Set up [batchsize, channels, :modes, :modes, ...] slices for input and weight
-                input_slices = [slice(None), slice(None)] 
-                weight_slices = [slice(None), slice(None)] 
-                
-                for i, mode in enumerate(effective_modes):
-                    input_slices.append(slice(None, mode))
-                    weight_slices.append(slice(None, mode))
-                
-                x_ft_truncated = x_ft[tuple(input_slices)]
-                weight_truncated = self.weight[tuple(weight_slices)]
-
-                spatial_chars = 'adefghijklmnopqrstuvwxyz'[:self.ndim] 
-                input_indices = 'bc' + spatial_chars
-                weight_indices = 'co' + spatial_chars
-                output_indices = 'bo' + spatial_chars
-                einsum_str = f"{input_indices},{weight_indices}->{output_indices}"
-                
-                result = torch.einsum(einsum_str, x_ft_truncated, weight_truncated)
-                
-                output_slices = [slice(None), slice(None)]
-                for mode in effective_modes:
-                    output_slices.append(slice(None, mode))
-                
-                out_ft[tuple(output_slices)] = result
-
-            x_out = torch.fft.ifftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm='ortho')
-            return x_out
+        if dtype is None:
+            dtype = self.dtype
         
-        # Clamp to nonredundant modes
+        is_complex = x.is_complex()
+        effective_modes =  self._get_modes(spatial_shape, is_complex)
+
+        if is_complex:
+            x_ft = torch.fft.fftn(x, dim=self.spatial_dims, norm='ortho')
+
+        else: 
+            x_ft = torch.fft.rfftn(x, dim=self.spatial_dims, norm='ortho')
+        
+        out_ft = self._apply_spectral_convolution(x=x_ft, effective_modes=effective_modes, dtype=dtype)
+
+        if is_complex:
+            x_out = torch.fft.ifftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm='ortho')
+        
+        else:
+            x_out = torch.fft.irfftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm='ortho')
+        
+        return x_out
+
+    def _get_modes(self, shape: Tuple[int, ...], is_complex: bool) -> List[int]: 
+        """
+        Calculate effective modes based on input shape and data type. 
+        
+        For real inputs, the last dimension uses rfft, which has size (N//2 + 1).
+        For complex inputs, all dimensions use full fft.
+        """
+
         effective_modes = []
-        for i, (mode, dim_size) in enumerate(zip(self.modes, spatial_shape)):
-            if i == len(self.modes) - 1:  # Last dimension uses rfft
+
+        for i, (mode, dim_size) in enumerate(zip(self.modes, shape)): 
+
+            if not is_complex and i == len(self.modes) - 1:
                 effective_modes.append(min(mode, dim_size // 2 + 1))
+            
             else:
                 effective_modes.append(min(mode, dim_size))
         
-        x_ft = torch.fft.rfftn(x, dim=self.spatial_dims, norm='ortho')
-        
-        out_ft_shape = [batch_size, self.out_features] + list(x_ft.shape[2:])
-        out_ft = torch.zeros(out_ft_shape, dtype=output_dtype, device=x.device)
-        
-        if all(mode > 0 for mode in effective_modes):
-            
-            # Set up [batchsize, channels, :modes, :modes, ...] slices for input and weight
-            input_slices = [slice(None), slice(None)] 
-            weight_slices = [slice(None), slice(None)] 
-            
-            for i, mode in enumerate(effective_modes):
-                input_slices.append(slice(None, mode))
-                weight_slices.append(slice(None, mode))
-            
-            x_ft_truncated = x_ft[tuple(input_slices)]
-            weight_truncated = self.weight[tuple(weight_slices)]
+        return effective_modes
 
-            spatial_chars = 'adefghijklmnopqrstuvwxyz'[:self.ndim] 
+    def _einsum_eq(self) -> str:
+            """ 
+            Returns the einsum equation string for the spectral convolution operation.
+            """
+            spatial_chars = 'adefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.ndim] 
             input_indices = 'bc' + spatial_chars
             weight_indices = 'co' + spatial_chars
             output_indices = 'bo' + spatial_chars
-            einsum_str = f"{input_indices},{weight_indices}->{output_indices}"
-            
-            result = torch.einsum(einsum_str, x_ft_truncated, weight_truncated)
-            
-            output_slices = [slice(None), slice(None)]
-            for mode in effective_modes:
-                output_slices.append(slice(None, mode))
-            
-            out_ft[tuple(output_slices)] = result
+            return f"{input_indices},{weight_indices}->{output_indices}"
+
+    def _apply_spectral_convolution(self, x: torch.Tensor, effective_modes: List[int], dtype: torch.dtype) -> torch.Tensor:
+        """
+        Apply the spectral convolution operation to the input tensor.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (B, C, *spatial_dims)
+            effective_modes (List[int]): List of effective modes for each spatial dimension.
+            dtype (torch.dtype): Data type for the output tensor, default is torch.cfloat
         
-        x_out = torch.fft.irfftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm='ortho')
+        Returns:
+            torch.Tensor: Output tensor of shape (B, out_features, *spatial_dims)
+        """
+
+        batch_size = x.shape[0]
         
-        return x_out
+        # Create output tensor
+        out_ft_shape = [batch_size, self.out_features] + list(x.shape[2:])
+        out_ft = torch.zeros(out_ft_shape, dtype=dtype, device=x.device)
+        
+        # Skip computation if any effective mode is zero
+        if not all(mode > 0 for mode in effective_modes):
+            return out_ft
+        
+        input_slices = [slice(None), slice(None)] 
+        weight_slices = [slice(None), slice(None)]  
+        
+        for mode in effective_modes:
+            input_slices.append(slice(None, mode))
+            weight_slices.append(slice(None, mode))
+        
+        x_ft_truncated = x[tuple(input_slices)]
+        weight_truncated = self.weight[tuple(weight_slices)]
+        
+        result = torch.einsum(self.einsum_eq, x_ft_truncated, weight_truncated)
+        
+        output_slices = [slice(None), slice(None)]
+        for mode in effective_modes:
+            output_slices.append(slice(None, mode))
+        
+        out_ft[tuple(output_slices)] = result
+        
+        return out_ft
