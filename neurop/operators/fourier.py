@@ -1,13 +1,13 @@
 from torch.types import Tensor
-from typing import List, Union, Callable
+from typing import List, Union, Literal, Type
 
 import torch
 
 from ..base import NeuralOperator
-from ..layers.iolayers import ReadinLayer, ReadoutLayer
-from ..layers.spectralconv import SpectralConv1DLayer, SpectralConv2DLayer, SpectralConv3DLayer, SpectralConvNDLayer
+from ..layers.io_layers import ReadinLayer, ReadoutLayer
+from ..layers.spectral_convolution import SpectralConv1DLayer, SpectralConv2DLayer, SpectralConv3DLayer, SpectralConvNDLayer
 
-
+Connection = Literal['identity', 'linear', 'soft-gating']
 class FourierOperator(NeuralOperator):
     """
     Fourier Neural Operator. 
@@ -26,15 +26,21 @@ class FourierOperator(NeuralOperator):
     depth: int
     """Depth of the operator, i.e., number of spectral convolution layers."""
 
-    activation_function: Callable[[Tensor], Tensor]
+    activation_function: Type[torch.nn.Module]
     """Activation function to apply after each layer."""
+
+    skip_connection: Connection
+    """Skip connection type - identity, linear, soft-gating"""
+
     def __init__(self, 
                  in_features: int, 
                  hidden_features: int, 
                  out_features: int,
                  modes: Union[int, List], 
                  depth: int = 3,
-                 activation_function: Callable[[Tensor], Tensor] = torch.relu
+                 *,
+                 activation_function: Type[torch.nn.Module] = torch.nn.ReLU,
+                 skip_connection: Connection = 'soft-gating'
                  ):
         """
         Initializes the Fourier operator with the given parameters.
@@ -75,6 +81,7 @@ class FourierOperator(NeuralOperator):
         self.readout = ReadoutLayer(hidden_features, out_features)
         self.depth = depth
         self.activation_function = activation_function
+        self.skip_connection = skip_connection
 
     def forward(self, x) -> Tensor:
         """
@@ -91,6 +98,7 @@ class FourierOperator(NeuralOperator):
 
         for layer in self.kernel_integral:
             x = layer(x)
+            
             x = self.activation_function(x)
 
         x = self.readout(x)
