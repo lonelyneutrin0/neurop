@@ -43,6 +43,18 @@
             <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
                    pattern=".+" required>
 
+            <h2>Contents</h2>
+            <ul>
+  <li><a href="#neurop">neurop</a>
+  <ul>
+    <li><a href="#about-neurop">About neurop</a></li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#attribution">Attribution</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+  </ul></li>
+</ul>
+
 
             <h2>Submodules</h2>
             <ul>
@@ -70,31 +82,84 @@
                     <h1 class="modulename">
 neurop    </h1>
 
-                        <div class="docstring"><p></p>
+                        <div class="docstring"><h1 id="neurop">neurop</h1>
+
+<p><a href="https://lonelyneutrin0.github.io/neurop/"><img src="https://img.shields.io/badge/docs-brightgreen?logo=github&logoColor=green&label=gh-pages" alt="Custom shields.io" /></a>
+<a href="https://pypi.python.org/pypi/neurop/"><img src="https://img.shields.io/pypi/v/neurop.svg" alt="PyPI version shields.io" /></a>
+<a href="https://pypi.python.org/pypi/neurop/"><img src="https://img.shields.io/pypi/pyversions/neurop.svg" alt="PyPI pyversions shields.io" /></a></p>
+
+<h2 id="about-neurop">About neurop</h2>
+
+<p><code><a href="">neurop</a></code> is a Python package implementing <a href="https://en.wikipedia.org/wiki/Neural_operators#:~:text=Neural%20operators%20directly%20learn%20operators,be%20evaluated%20at%20any%20discretization.">Neural Operators</a>, which are a class of operating learning models. The package currently supports the following operator architectures -</p>
+
+<ul>
+<li>Fourier Neural Operator (FNO)</li>
+<li>Deep Operator Network (DeepONet)</li>
+<li>Complex Neural Operator (CoNO)</li>
+</ul>
+
+<h2 id="usage">Usage</h2>
+
+<p><code><a href="">neurop</a></code> is published on <a href="https://pypi.python.org/pypi/neurop/">PyPi</a> and can be installed using <code>pip</code> - </p>
+
+<pre><code>pip install neurop
+</code></pre>
+
+<h2 id="license">License</h2>
+
+<p><code><a href="">neurop</a></code> is available under the MIT License.</p>
+
+<h2 id="attribution">Attribution</h2>
+
+<p>This project contains an independent implementation of the technique described in:</p>
+
+<p>Karn Tiwari, N M Anoop Krishnan, Prathosh A P, "CoNO: Complex Neural Operator for Continuous Dynamical Systems," arXiv, 2023.<br />
+Inspired by the code from <a href="https://github.com/M3RG-IITD/Complex-Neural-Operator/tree/main">this repo</a>, but not based on or derived from it.</p>
+
+<h2 id="contributing">Contributing</h2>
+
+<p><code><a href="">neurop</a></code> is 100% open-source and welcomes contributions! Please open an issue to suggest new features (perhaps new operators 👀) or bug fixes. 
+<br/> <br/> 
+You can install developer dependencies using </p>
+
+<pre><code>pip install neurop[dev]
+</code></pre>
+
+<p>Type-checking, import checking, docstring checking, and test cases can be executed using</p>
+
+<pre><code>mypy neurop/
+ruff check --select D neurop/
+pytest tests/
+</code></pre>
+
+<p>within the root directory of the project. </p>
 </div>
 
                         <input id="mod-neurop-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-neurop-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sa">r</span><span class="sd">&quot;&quot;&quot;.. include:: ../README.md.&quot;&quot;&quot;</span> 
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.0.6&quot;</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="n">__authors__</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="s2">&quot;Hrishikesh Belagali&quot;</span><span class="p">,</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="s2">&quot;Aditya Narayan&quot;</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="p">]</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__author_emails__</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="s2">&quot;belagal1@msu.edu&quot;</span><span class="p">,</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="s2">&quot;ma24btech11001@iith.ac.in&quot;</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="p">]</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="n">__url__</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/lonelyneutrin0/neurop&quot;</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeuralOperator</span> <span class="k">as</span> <span class="n">NeuralOperator</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">operators</span> <span class="k">as</span> <span class="n">operators</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">layers</span> <span class="k">as</span> <span class="n">layers</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1"># ruff: noqa</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sa">r</span><span class="sd">&quot;&quot;&quot; </span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">.. include:: ../README.md</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="sd">&quot;&quot;&quot;</span> 
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.0.6&quot;</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="n">__authors__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="s2">&quot;Hrishikesh Belagali&quot;</span><span class="p">,</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="s2">&quot;Aditya Narayan&quot;</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="p">]</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="n">__author_emails__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="s2">&quot;belagal1@msu.edu&quot;</span><span class="p">,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="s2">&quot;ma24btech11001@iith.ac.in&quot;</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="p">]</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="n">__url__</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/lonelyneutrin0/neurop&quot;</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeuralOperator</span> <span class="k">as</span> <span class="n">NeuralOperator</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">operators</span> <span class="k">as</span> <span class="n">operators</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">layers</span> <span class="k">as</span> <span class="n">layers</span>
 </span></pre></div>
 
 
