@@ -97,7 +97,7 @@ class FNOUnit(nn.Module):
                 out_features=out_features,
                 depth=feature_mlp_depth,
                 n_dim=n_dim,
-                activation_function=activation_function,
+                activation_function=activation_function if activation_function is not None else torch.nn.ReLU,
             )
 
             self.feature_mlp_skip_connection = create_skip_connection(
