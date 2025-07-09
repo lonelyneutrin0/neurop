@@ -1,17 +1,17 @@
+"""Spectral Convolution Layer Implementation."""
 import torch
 
 from torch.types import Tensor
 from typing import Tuple, List, Union
 class SpectralConv(torch.nn.Module):
-    """
-    N-Dimensional Spectral Convolution Layer
+    r"""N-Dimensional Spectral Convolution Layer.
     
     The input is assumed to have shape (B, C, *spatial_dims) where:
         - B is the batch size,
         - C is the number of input channels,
         - *spatial_dims are the spatial dimensions (D, H, W for 3D, H, W for 2D, etc.)
     
-    The layer transforms the input to the frequency domain using an N-D FFT along the spatial dimensions,
+    The layer transforms the input to the frequency domain using an N-D FFT along the spatial dimensions:
         $$x_f = \mathcal{F}[x]$$
     Then, the layer applies a pointwise multiplication (which is equivalent to a convolution in the spatial domain) as follows:
         $$y_{b, o, k_1, k_2, ..., k_N} = \sum_{c=0}^{C-1} W_{c, o, k_1, k_2, ..., k_N} x_{b, c, k_1, k_2, ..., k_N}$$
@@ -26,7 +26,7 @@ class SpectralConv(torch.nn.Module):
     """Number of output channels."""
 
     ndim: int
-    """Number of spatial dimensions"""
+    """Number of spatial dimensions."""
 
     modes: List[int]
     """List of integers representing the number of Fourier modes to consider in each spatial dimension."""
@@ -43,10 +43,7 @@ class SpectralConv(torch.nn.Module):
                 modes: Union[int, List[int]], 
                 init_scale: float = 1.0,
                 dtype: torch.dtype = torch.cfloat):
-        """
-        Initializes the N-Dimensional Spectral Convolution Layer with the given parameters.
-        """
-
+        """Initialize the N-Dimensional Spectral Convolution Layer with the given parameters."""
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -76,8 +73,7 @@ class SpectralConv(torch.nn.Module):
         self.einsum_eq = self._einsum_eq()
 
     def forward(self, x: Tensor, dtype: torch.dtype = torch.cfloat) -> Tensor:
-        """
-        Forward pass for the N-dimensional Spectral Convolution layer.
+        """Forward pass for the N-dimensional Spectral Convolution layer.
         
         Args:
             x (Tensor): Input tensor of shape (B, C, *spatial_dims)
@@ -85,15 +81,14 @@ class SpectralConv(torch.nn.Module):
         
         Returns:
             Tensor: Output tensor of shape (B, out_features, *spatial_dims)
-        """
 
+        """
         if not isinstance(x, Tensor):
             try:
                 x = torch.as_tensor(x)
             except Exception as e:
                 raise TypeError(f"Input must be a PyTorch tensor or convertible to one. Error: {e}")
 
-        batch_size = x.shape[0]
         c = x.shape[1]
         spatial_shape = x.shape[2:]
 
@@ -130,13 +125,11 @@ class SpectralConv(torch.nn.Module):
         return x_out
 
     def _get_modes(self, shape: Tuple[int, ...], is_complex: bool) -> List[int]: 
-        """
-        Calculate effective modes based on input shape and data type. 
+        """Calculate effective modes based on input shape and data type.
         
         For real inputs, the last dimension uses rfft, which has size (N//2 + 1).
         For complex inputs, all dimensions use full fft.
         """
-
         effective_modes = []
 
         for i, (mode, dim_size) in enumerate(zip(self.modes, shape)): 
@@ -150,9 +143,7 @@ class SpectralConv(torch.nn.Module):
         return effective_modes
 
     def _einsum_eq(self) -> str:
-            """ 
-            Returns the einsum equation string for the spectral convolution operation.
-            """
+            """Return the einsum equation string for the spectral convolution operation."""
             spatial_chars = 'adefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.ndim] 
             input_indices = 'bc' + spatial_chars
             weight_indices = 'co' + spatial_chars
@@ -160,8 +151,7 @@ class SpectralConv(torch.nn.Module):
             return f"{input_indices},{weight_indices}->{output_indices}"
 
     def _apply_spectral_convolution(self, x: torch.Tensor, effective_modes: List[int], dtype: torch.dtype) -> torch.Tensor:
-        """
-        Apply the spectral convolution operation to the input tensor.
+        """Apply the spectral convolution operation to the input tensor.
 
         Args:
             x (torch.Tensor): Input tensor of shape (B, C, *spatial_dims)
@@ -170,8 +160,8 @@ class SpectralConv(torch.nn.Module):
         
         Returns:
             torch.Tensor: Output tensor of shape (B, out_features, *spatial_dims)
-        """
 
+        """
         batch_size = x.shape[0]
         
         # Create output tensor

@@ -1,6 +1,7 @@
+"""Fourier Neural Operator (FNO) implementation for learning mappings between functions in the Fourier domain."""
 from torch.types import Tensor
-from typing import List, Union, Literal, Type
-from ..layers.skip_connections import Connection, ConnectionType
+from typing import List, Union, Type
+from ..layers.skip_connections import ConnectionType
 import torch
 
 from ..base import NeuralOperator
@@ -10,6 +11,7 @@ from ..layers.fno_unit import FNOUnit
 class FourierOperator(NeuralOperator):
     """ 
     Fourier Neural Operator (FNO) for learning mappings between functions in the Fourier domain.
+
     This operator uses spectral convolutions to learn the mapping between input and output functions.
     """
 
@@ -35,8 +37,7 @@ class FourierOperator(NeuralOperator):
                  bias: bool = True,
                  init_scale: float = 1.0,
                  dtype: torch.dtype = torch.cfloat):
-        """
-        Initializes the FourierOperator with the given parameters.
+        """Initialize the FourierOperator with the given parameters.
 
         Args:
             in_features (int): Number of input features (channels).
@@ -51,6 +52,7 @@ class FourierOperator(NeuralOperator):
             bias (bool): Whether to include bias parameters in the skip connection.
             init_scale (float): Scale for initializing the weights of the spectral convolution layer.
             dtype (torch.dtype): Data type for the spectral convolution layer output, typically complex (torch.cfloat).
+
         """
         super().__init__()
 
@@ -77,14 +79,14 @@ class FourierOperator(NeuralOperator):
         self.readout = ReadoutLayer(hidden_features, out_features)
 
     def forward(self, x: Tensor) -> Tensor:
-        """
-        Forward pass of the Fourier Operator.
+        """Forward pass of the Fourier Operator.
         
         Args:
             x (Tensor): Input tensor of shape (B, in_features, *spatial_dims).
         
         Returns:
             Tensor: Output tensor of shape (B, out_features, *spatial_dims).
+
         """
         x = self.readin(x)
         

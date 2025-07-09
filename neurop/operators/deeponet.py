@@ -1,3 +1,4 @@
+"""DeepONet Operator Implementation."""
 import torch
 from ..base import NeuralOperator
 
@@ -5,13 +6,12 @@ from torch.types import Tensor
 from typing import List, Type
 
 class DeepONet(NeuralOperator):
-    """
-    DeepONet is a neural operator that approximates a mapping from functions to functions.
+    """DeepONet is a neural operator that approximates a mapping from functions to functions.
+
     It consists of a trunk network and a branch network. 
     The trunk network processes the input coordinates to determine basis functions,
     while the branch network processes the input function values to determine coefficients. 
     The output is a weighted sum of the basis functions, where the weights are determined by the coefficients.
-
     """
 
     branch_layers: torch.nn.Sequential
@@ -37,10 +37,17 @@ class DeepONet(NeuralOperator):
                  depth: int = 3,
                  activation_function: Type[torch.nn.Module] = torch.nn.ReLU
     ):
-        """
-        Initializes the DeepONet operator.
-        """ 
+        """Initialize the DeepONet operator.
         
+        Args:
+            branch_input_dim (int): Dimension of the input to the branch network.
+            trunk_input_dim (int): Dimension of the input to the trunk network.
+            latent_dim (int): Dimension of the output space (number of basis functions).
+            hidden_dim (int, optional): Number of hidden units in each layer. Defaults to 64.
+            depth (int, optional): Number of layers in each network. Defaults to 3.
+            activation_function (Type[torch.nn.Module], optional): Activation function to use in the networks. Defaults to torch.nn.ReLU.
+
+        """ 
         super().__init__()
 
         branch_layers: List[torch.nn.Module] = []
@@ -74,8 +81,7 @@ class DeepONet(NeuralOperator):
         self.bias = torch.nn.Parameter(torch.zeros(1))
 
     def forward(self, x: Tensor, y: Tensor) -> Tensor:
-        """
-        Forward pass of the DeepONet operator. Handles both single point and multi-point evaluation.
+        """Forward pass of the DeepONet operator. Handles both single point and multi-point evaluation.
         
         Args:
             x (Tensor): Input tensor for the branch network, typically representing function values. (batch_size, branch_input_dim)
@@ -83,8 +89,8 @@ class DeepONet(NeuralOperator):
         
         Returns:
             Tensor: Output tensor representing the weighted sum of basis functions, where weights are determined by the branch network.
-        """
 
+        """
         if y.dim() == 2: # If y is 2D, we assume it is a single point for each batch
             y = y.unsqueeze(1)
 

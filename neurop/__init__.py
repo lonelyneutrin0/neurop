@@ -1,6 +1,4 @@
-r""" 
-.. include:: ../README.md
-""" 
+r""".. include:: ../README.md.""" 
 
 __version__ = "0.0.6"
 

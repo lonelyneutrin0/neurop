@@ -1,3 +1,4 @@
+"""neurop layers module."""
 from .io_layers import ReadinLayer as ReadinLayer
 from .io_layers import ReadoutLayer as ReadoutLayer
 

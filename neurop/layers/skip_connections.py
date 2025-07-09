@@ -1,3 +1,4 @@
+"""Skip connections for neural operators."""
 import torch 
 import torch.nn as nn
 
@@ -8,6 +9,8 @@ Connection = Union['LinearConnection', 'SoftGatingConnection', 'IdentityConnecti
 ConnectionType = Literal['identity', 'linear', 'soft-gating', 'residual']
 
 class LinearConnection(nn.Module): 
+    """Linear skip connection that applies a linear transformation to the input and combines it with the transformed input."""
+
     skip_weight: nn.Parameter
     """Skip weight to scale original data by"""
 
@@ -21,6 +24,15 @@ class LinearConnection(nn.Module):
     """Optional bias to add"""
 
     def __init__(self, in_features: int, out_features: int, n_dim: int, bias: bool = False):
+        """Initialize the linear skip connection.
+        
+        Args:
+            in_features (int): Number of input features.
+            out_features (int): Number of output features.
+            n_dim (int): Number of spatial dimensions.
+            bias (bool): Whether to include a bias term in the connection.
+        
+        """
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -41,14 +53,15 @@ class LinearConnection(nn.Module):
 
     def forward(self, x: Tensor, transformed_x: Tensor) -> Tensor: 
         """ 
-        Forward pass for linear skip connection
+        Forward pass for linear skip connection.
 
         Args:
-            x (Tensor) [B, C, d_1, d_2 ....]: The input tensor
-            transformed_x (Tensor) [B, C, d_1, d_2, ...] The transformed input tensor 
+            x (Tensor): The input tensor [B, C, d_1, d_2 ....]
+            transformed_x (Tensor): The transformed input tensor [B, C, d_1, d_2, ...]
         
         Returns:
             Tensor (Shape depends on whether a projection is applied)
+
         """
         if self.skip_projection is not None:
 
@@ -72,6 +85,7 @@ class LinearConnection(nn.Module):
         return output
         
 class SoftGatingConnection(nn.Module): 
+    """Soft-gating connection that applies a learnable gating mechanism to the skip connection."""
 
     in_features: int
     """Number of input features"""
@@ -83,6 +97,14 @@ class SoftGatingConnection(nn.Module):
     """Optional bias to be added to the skip connection layer"""
 
     def __init__(self, in_features: int, n_dim: int, bias: bool = False):
+        """Initialize the soft-gating connection.
+        
+        Args:
+            in_features (int): Number of input features.
+            n_dim (int): Number of spatial dimensions.
+            bias (bool): Whether to include a bias term in the connection.
+
+        """
         super().__init__() 
 
         self.in_features = in_features
@@ -94,15 +116,15 @@ class SoftGatingConnection(nn.Module):
             self.bias = None
         
     def forward(self, x: Tensor, transformed_x: Tensor) -> Tensor:
-        """
-        Forward pass for the soft-gating connection
+        """Forward pass for the soft-gating connection.
 
         Args:
-            x (Tensor) [B, C, d_1, d_2, ...]: The input tensor 
-            transformed_x (Tensor) [B, C, d_1, d_2, ...]: The transformed input tensor
+            x (Tensor): The input tensor [B, C, d_1, d_2, ...]
+            transformed_x (Tensor) : The transformed input tensor [B, C, d_1, d_2, ...]
 
         Returns:
             Tensor [B, C, d_1, d_2, ....]
+
         """
         gate = torch.sigmoid(self.weight)
         output = gate * x + (1 - gate) * transformed_x
@@ -113,14 +135,13 @@ class SoftGatingConnection(nn.Module):
         return output
 
 class ResidualConnection(nn.Module):
-    """
-    A simple residual connection that adds the input to the output.
+    """A simple residual connection that adds the input to the output.
+
     This is useful for architectures where you want to add the input back to the output.
     """
     
     def forward(self, x: Tensor, transformed_x: Tensor) -> Tensor:
-        """
-        Forward pass for the residual connection.
+        """Forward pass for the residual connection.
 
         Args:
             x (Tensor): Input tensor.
@@ -128,18 +149,18 @@ class ResidualConnection(nn.Module):
 
         Returns:
             Tensor: Output tensor, which is the sum of input and transformed input.
+
         """
         return x + transformed_x
 
 class IdentityConnection(nn.Module):
-    """
-    Identity connection that returns the transformed input.
+    """Identity connection that returns the transformed input.
+
     This maintains consistent interface with other skip connections.
     """
     
     def forward(self, x: Tensor, transformed_x: Tensor) -> Tensor:
-        """
-        Forward pass for the identity connection.
+        """Forward pass for the identity connection.
 
         Args:
             x (Tensor): Input tensor (ignored).
@@ -147,6 +168,7 @@ class IdentityConnection(nn.Module):
 
         Returns:
             Tensor: The transformed input tensor.
+
         """
         return transformed_x
 
@@ -157,8 +179,7 @@ def create_skip_connection(
     bias: bool = False, 
     connection_type: ConnectionType = 'soft-gating'
 ) -> Connection: 
-    """
-    Create a skip connection module.
+    """Create a skip connection module.
     
     Args:
         in_features: Number of input features
@@ -169,8 +190,8 @@ def create_skip_connection(
     
     Returns:
         The appropriate skip connection module
+
     """
-    
     if connection_type == 'identity':
         return IdentityConnection()
     
