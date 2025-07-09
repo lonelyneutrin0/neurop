@@ -1,32 +1,18 @@
+"""Base class for Neural Operators in neurop."""
 from abc import ABC, abstractmethod
 
 import torch 
 from torch.types import Tensor
-from typing import TypedDict
 
-
-class Metrics(TypedDict, total=False):
-    """
-    TypedDict to hold metrics for evaluation.
-    All fields are optional for flexibility
-    """
-    loss: float
-    accuracy: float
 class NeuralOperator(torch.nn.Module, ABC):
-    """
-    Abstract class for Neural Operators.
-    """
+    """Abstract class for Neural Operators."""
 
     def __init__(self, *args, **kwargs):
-        """
-        __init__ method to initialize NeuralOperator
-        """
+        """__init__ method to initialize NeuralOperator."""
         super().__init__()
         pass
     
     @abstractmethod
     def forward(self, *args, **kwargs) -> Tensor:
-        """
-        Forward pass to be implemented by subclasses.
-        """
+        """Forward pass to be implemented by subclasses."""
         pass

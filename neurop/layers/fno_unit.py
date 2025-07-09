@@ -1,3 +1,4 @@
+"""FNO Unit Module."""
 import torch
 import torch.nn as nn
 
@@ -8,8 +9,8 @@ from .spectral_convolution import SpectralConv
 from .skip_connections import create_skip_connection, ConnectionType
 
 class FNOUnit(nn.Module):
-    """
-    Single Fourier Neural Operator Unit.
+    """Single Fourier Neural Operator Unit.
+    
     Consists of: Spectral Convolution -> Activation -> Skip Connection
     """
 
@@ -55,6 +56,21 @@ class FNOUnit(nn.Module):
                  init_scale: float = 1.0,
                  dtype: torch.dtype = torch.cfloat
                  ):
+        """Initialize the FNO unit with the given parameters.
+        
+        Args:
+            in_features (int): Number of input features (channels).
+            out_features (int): Number of output features (channels).
+            modes (Union[int, List[int]]): Number of Fourier modes to consider in each spatial dimension.
+            n_dim (int): Number of spatial dimensions (2D, 3D, etc.).
+            activation_function (nn.Module): Activation function to apply after spectral convolution.
+            conv_module (Type[SpectralConv]): Spectral convolution module to use.
+            skip_connection (ConnectionType): Type of skip connection to use.
+            bias (bool): Whether to include bias parameters in the skip connection.
+            init_scale (float): Scale for initializing the weights of the spectral convolution layer.
+            dtype (torch.dtype): Data type for the spectral convolution layer output, typically complex (torch.cfloat).
+
+        """
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -82,16 +98,15 @@ class FNOUnit(nn.Module):
         )
 
     def forward(self, x: Tensor) -> Tensor:
-        """
-        Forward pass through single FNO unit.
+        """Forward pass through single FNO unit.
         
         Args:
             x (Tensor): Input tensor of shape (B, in_features, *spatial_dims)
             
         Returns:
             Tensor: Output tensor of shape (B, out_features, *spatial_dims)
-        """
 
+        """
         if x.shape[1] != self.in_features:
             raise ValueError(f"Expected {self.in_features} input features, got {x.shape[1]}")
 

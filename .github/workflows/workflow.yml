@@ -32,6 +32,9 @@ jobs:
       - name: Lint with ruff
         run: >-
           ruff check neurop/
+      - name: Check docstrings with ruff
+        run: >-
+          ruff check neurop/ --select D
       - name: Type check with mypy
         run: >-
           mypy neurop/

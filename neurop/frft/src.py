@@ -1,3 +1,4 @@
+"""Fractional Fourier Transform (FrFT) implementation using Bluestein's Algorithm."""
 import torch
 
 from torch.types import Tensor, Device
@@ -5,8 +6,7 @@ from typing import Union, Optional
 
 
 def frft(x: Tensor, alpha: Union[float, Tensor], *, dim: int = -1, device: Optional[Device] = None) -> Tensor: 
-    """
-    Compute the fractional Fourier transform (FRFT) of a tensor using the Chirp Multiplication Algorithm O(nlog n).
+    """Compute the fractional Fourier transform (FRFT) of a tensor using the Chirp Multiplication Algorithm O(nlog n).
     
     The fractional Fourier transform is a generalization of the Fourier transform that allows for fractional orders. 
     This translates to a rotation in the time-frequency plane by an arbitrary angle. 
@@ -18,10 +18,10 @@ def frft(x: Tensor, alpha: Union[float, Tensor], *, dim: int = -1, device: Optio
         dim (int): The dimension along which to perform the FrFT 
         device (Device): The device to run the computation on. Defaults to x.device
 
-    Returns: 
+    Returns:
         Tensor 
-    """
 
+    """
     if not device: 
         device = x.device
 
@@ -83,21 +83,26 @@ def frft(x: Tensor, alpha: Union[float, Tensor], *, dim: int = -1, device: Optio
     return res 
 
 def ifrft(x: Tensor, alpha: Union[float, Tensor], *, dim: int = -1, device: Optional[Device] = None) -> Tensor:
+    """Compute the inverse fractional Fourier transform (iFRFT) of a tensor using the Chirp Multiplication Algorithm O(nlog n).
+    
+    Args:
+        x (Tensor): The input tensor to perform the iFRFT on 
+        alpha (Union[float, Tensor]): The fractional order of the iFRFT 
+        dim (int): The dimension along which to perform the iFRFT 
+        device (Device): The device to run the computation on. Defaults to x.device
+    Returns:
+        Tensor: The result of the inverse fractional Fourier transform
+
+    """
     return frft(x, -alpha, dim = dim, device = device)
 
 def _flip(x: Tensor, *, dim: int = -1) -> Tensor:
-    """
-    Helper function for time reversal. Keep the starting slice unchanged.
-    """
-
+    """Reverse the order of elements, keeping the first slice in place."""
     first, remaining = torch.tensor_split(x, (1,), dim=dim)
     return torch.concat((first, remaining.flip(dim)), dim=dim)
 
 def _decim(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Tensor: 
-    """
-    Decimation by 2 operation 
-    """
-
+    """Decimation by 2 operation."""
     if not device:
         device = x.device
 
@@ -105,10 +110,7 @@ def _decim(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Tens
     return x.index_select(dim, t)
 
 def _interp(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Tensor: 
-    """
-    Bandlimited interpolation function (Calls _interp_real for real and complex parts separately)
-    """
-
+    """Bandlimited interpolation function (Calls _interp_real for real and complex parts separately)."""
     if not device:
         device = x.device
 
@@ -118,10 +120,7 @@ def _interp(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Ten
     return _interp_real(x, dim=dim, device=device)
 
 def _interp_real(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Tensor: 
-    """
-     Real bandlimited interpolation. Prevents aliasing by implementing a low pass filter
-    """
-
+    """Prevent aliasing by implementing a low pass filter."""
     if not device:
         device = x.device
 
@@ -136,9 +135,7 @@ def _interp_real(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -
     return 2 * torch.real(torch.fft.ifft(xf, dim = dim))
 
 def _upsample(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Tensor: 
-    """ 
-    Upsampling function to insert zeros between existing data
-    """
+    """Insert zeros between each element of input data for upsampling."""
     if not device:
         device = x.device
     
@@ -152,9 +149,7 @@ def _vecmul_ndim(
     *,
     dim: int = -1,
 ) -> torch.Tensor:
-    """
-    Multiply two tensors (`torch.mul()`) along a given dimension.
-    """
+    """Multiply two tensors (`torch.mul()`) along a given dimension."""
     return torch.einsum(_get_mul_dim_einstr(len(tensor.shape), dim), tensor, vector)
 
 def _get_mul_dim_einstr(dim_count: int, req_dim: int) -> str:
