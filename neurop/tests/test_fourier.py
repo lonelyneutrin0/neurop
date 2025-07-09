@@ -13,7 +13,7 @@ def test_fourier_operator():
     shape = (8, 8, 8, 8)  # 4 spatial dimensions
 
     # Create a Fourier operator instance
-    fourier_op = FourierOperator(in_features=channels, out_features=channels, hidden_features=32, n_dim = 4, modes=[6, 6, 6, 5], depth=4, activation_function=torch.relu)
+    fourier_op = FourierOperator(in_features=channels, out_features=channels, hidden_features=32, n_dim = 4, modes=[6, 6, 6, 5], depth=4, activation_function=torch.nn.ReLU)
 
     # Generate random input data
     x = torch.randn(batch_size, channels, *shape)
