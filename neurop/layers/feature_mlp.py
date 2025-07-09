@@ -74,7 +74,7 @@ class ConvFeatureMLP(nn.Module):
         if depth < 1:
             raise ValueError("Depth must be at least 1.")
 
-        layer_features = [in_features] + [hidden_features] * (depth - 2) + [out_features]
+        layer_features = [in_features] + [hidden_features] * (depth - 1) + [out_features]
 
         self._build_arbitrary_arch(layer_features, depth)
 
@@ -204,7 +204,7 @@ class LinearFeatureMLP(nn.Module):
         if depth < 1:
             raise ValueError("Depth must be at least 1.")
 
-        layer_features = [in_features] + [hidden_features] * (depth - 2) + [out_features]
+        layer_features = [in_features] + [hidden_features] * (depth - 1) + [out_features]
 
         self._build_arbitrary_arch(layer_features, depth)
 
