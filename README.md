@@ -32,10 +32,10 @@ You can install developer dependencies using
 ```
 pip install neurop[dev]
 ```
-Type-checking, import checking and test cases can be executed using
+Type-checking, import checking, docstring checking, and test cases can be executed using
 ```
 mypy neurop/
-ruff check neurop/
+ruff check --select D neurop/
 pytest tests/
 ```
 within the root directory of the project. 
