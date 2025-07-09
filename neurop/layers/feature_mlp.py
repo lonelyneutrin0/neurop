@@ -45,8 +45,8 @@ class ConvFeatureMLP(nn.Module):
             n_dim (int): Number of dimensions.
             activation_function (Type[nn.Module], optional): Activation function to use. Defaults to nn.ReLU.
             layer_features (List[int]): List of integers representing the number of features in each layer. Used for arbitrary architectures.
-        """
 
+        """
         super().__init__()
         
         if not layer_features:
@@ -69,8 +69,8 @@ class ConvFeatureMLP(nn.Module):
 
         Returns:
             None
-        """
 
+        """
         if depth < 1:
             raise ValueError("Depth must be at least 1.")
 
@@ -87,8 +87,8 @@ class ConvFeatureMLP(nn.Module):
 
         Returns:
             None
-        """
 
+        """
         if len(layer_features) != depth+1: 
             raise ValueError("The length of layers must be equal to depth + 1.")
         
@@ -115,8 +115,8 @@ class ConvFeatureMLP(nn.Module):
         
         Returns:
             Tensor: Output tensor of shape (batch_size, out_features, d_1, d_2, ....).
-        """
 
+        """
         x_shape = list(x.shape)
 
         spatial_dims = len(x_shape[2:])
@@ -178,7 +178,6 @@ class LinearFeatureMLP(nn.Module):
             layer_features (List[int], optional): List of integers representing the number of features in each layer. Used for arbitrary architectures.
         
         """
-
         super().__init__()
         if not layer_features:
             self._build_default_arch(in_features, hidden_features, out_features, depth)
@@ -200,8 +199,8 @@ class LinearFeatureMLP(nn.Module):
 
         Returns:
             None
-        """
 
+        """
         if depth < 1:
             raise ValueError("Depth must be at least 1.")
 
@@ -218,8 +217,8 @@ class LinearFeatureMLP(nn.Module):
 
         Returns:
             None
-        """
 
+        """
         if len(layer_features) != depth + 1:
             raise ValueError("The length of layers must be equal to depth + 1.")
         
@@ -245,8 +244,8 @@ class LinearFeatureMLP(nn.Module):
         
         Returns:
             Tensor: Output tensor of shape (batch_size, out_features, d_1, d_2, ....).
-        """
 
+        """
         if x.shape[1] != self.in_features:
             raise ValueError(f"Input tensor must have {self.in_features} features, but got {x.shape[1]}.")
         
