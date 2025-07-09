@@ -42,7 +42,9 @@ class SpectralConv(torch.nn.Module):
                 out_features: int, 
                 modes: Union[int, List[int]], 
                 init_scale: float = 1.0,
-                dtype: torch.dtype = torch.cfloat):
+                dtype: torch.dtype = torch.cfloat,
+                *, 
+                weight_dtype: torch.dtype = torch.cfloat):
         """Initialize the N-Dimensional Spectral Convolution Layer with the given parameters."""
         super().__init__()
         self.in_features = in_features
@@ -65,7 +67,7 @@ class SpectralConv(torch.nn.Module):
         scale = init_scale / (in_features * out_features)
 
         self.weight = torch.nn.Parameter(
-            torch.randn(in_features, out_features, *self.modes, dtype=torch.cfloat) * scale
+            torch.randn(in_features, out_features, *self.modes, dtype=weight_dtype) * scale
         )
         
         # Store spatial dimensions for forward pass
