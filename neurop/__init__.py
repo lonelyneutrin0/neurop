@@ -1,4 +1,7 @@
-r""".. include:: ../README.md.""" 
+# ruff: noqa
+r""" 
+.. include:: ../README.md
+""" 
 
 __version__ = "0.0.6"
 
