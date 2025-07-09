@@ -1,4 +1,4 @@
-from neurop.layers.spectralconv import SpectralConv1DLayer, SpectralConv2DLayer, SpectralConv3DLayer, SpectralConvNDLayer #type: ignore 
+from neurop.layers.spectral_convolution import SpectralConv1DLayer, SpectralConv2DLayer, SpectralConv3DLayer, SpectralConvNDLayer #type: ignore 
 
 import torch
 

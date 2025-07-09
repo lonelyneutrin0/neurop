@@ -1,4 +1,4 @@
-from neurop.layers.iolayers import ReadinLayer, ReadoutLayer
+from neurop.layers.io_layers import ReadinLayer, ReadoutLayer
 import torch
 
 def test_readin_layer():
