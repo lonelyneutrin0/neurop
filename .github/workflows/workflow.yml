@@ -12,7 +12,6 @@ on:
 jobs:
   
   prebuild:
-    if: github.event_name == 'release' || github.event_name == 'pull_request'
     name: test, lint, type check
     runs-on: ubuntu-latest
     strategy:
