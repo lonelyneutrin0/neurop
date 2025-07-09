@@ -6,7 +6,9 @@ on:
       - main
   release: 
     types: [published]
-
+  pull_request:
+    branches:
+      - main
 jobs:
   
   prebuild:
@@ -71,6 +73,7 @@ jobs:
           path: dist/
   
   create-docs:
+    if: github.event_name == 'release' || github.event_name == 'push'
     runs-on: ubuntu-latest
     needs: prebuild
     permissions:
@@ -97,6 +100,7 @@ jobs:
           path: _build/
 
   deploy-docs:
+    if: github.event_name == 'release' || github.event_name == 'push'
     needs:
       - create-docs
     runs-on: ubuntu-latest
