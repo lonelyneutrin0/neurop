@@ -1,8 +1,8 @@
 from .io_layers import ReadinLayer as ReadinLayer
 from .io_layers import ReadoutLayer as ReadoutLayer
 
-from .spectral_convolution import SpectralConv1DLayer as SpectralConv1DLayer
-from .spectral_convolution import SpectralConv2DLayer as SpectralConv2DLayer
-from .spectral_convolution import SpectralConv3DLayer as SpectralConv3DLayer
+from .spectral_convolution import SpectralConv as SpectralConv
 
-from .skip_connections import skip_connection as skip_connection
+from .skip_connections import create_skip_connection as create_skip_connection
+
+from .fno_unit import FNOUnit as FNOUnit
