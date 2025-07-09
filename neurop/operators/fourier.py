@@ -13,6 +13,15 @@ class FourierOperator(NeuralOperator):
     This operator uses spectral convolutions to learn the mapping between input and output functions.
     """
 
+    readin: ReadinLayer
+    """Layer to read input features and project them to hidden features."""
+
+    fno_units: torch.nn.ModuleList
+    """List of FNO units that apply spectral convolutions and activation functions."""
+
+    readout: ReadoutLayer
+    """Layer to read output features and project them to the final output features."""
+
     def __init__(self,
                  in_features: int,
                  hidden_features: int,
@@ -21,13 +30,27 @@ class FourierOperator(NeuralOperator):
                  n_dim: int,
                  depth: int = 4,
                  activation_function: torch.nn.Module = torch.nn.ReLU(),
-                 conv_modules: Type[SpectralConv] = SpectralConv,
+                 conv_module: Type[SpectralConv] = SpectralConv,
                  skip_connections: Union[ConnectionType, List[ConnectionType]] = 'soft-gating',
                  bias: bool = True,
                  init_scale: float = 1.0,
                  dtype: torch.dtype = torch.cfloat):
         """
         Initializes the FourierOperator with the given parameters.
+
+        Args:
+            in_features (int): Number of input features (channels).
+            hidden_features (int): Number of hidden features (channels).
+            out_features (int): Number of output features (channels).
+            modes (Union[int, List[int]]): Number of Fourier modes to consider in each spatial dimension.
+            n_dim (int): Number of spatial dimensions (2D, 3D, etc.).
+            depth (int): Number of FNO units in the network.
+            activation_function (torch.nn.Module): Activation function to apply after spectral convolution.
+            conv_module (Type[SpectralConv]): Spectral convolution module to use.
+            skip_connections (Union[ConnectionType, List[ConnectionType]]): Type of skip connection to use.
+            bias (bool): Whether to include bias parameters in the skip connection.
+            init_scale (float): Scale for initializing the weights of the spectral convolution layer.
+            dtype (torch.dtype): Data type for the spectral convolution layer output, typically complex (torch.cfloat).
         """
         super().__init__()
 
@@ -41,7 +64,7 @@ class FourierOperator(NeuralOperator):
                     modes=modes,
                     n_dim=n_dim, 
                     activation_function=activation_function,
-                    conv_module=conv_modules,
+                    conv_module=conv_module,
                     skip_connection=skip_connections[i] if isinstance(skip_connections, list) else skip_connections,
                     bias=bias,
                     init_scale=init_scale,
