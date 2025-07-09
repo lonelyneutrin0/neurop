@@ -1,10 +1,11 @@
 """I/O Layer Module."""
 import torch
+import torch.nn as nn
 from torch.types import Tensor
-class ReadinLayer(torch.nn.Module):
+class ReadinLayer(nn.Module):
     """Read in input data and projects it to a higher dimensional space."""
 
-    linear: torch.nn.Linear
+    linear: nn.Linear
     """Linear transformation layer that projects input data to a higher dimensional space."""
 
     def __init__(self, in_features: int, hidden_features: int):
@@ -19,7 +20,7 @@ class ReadinLayer(torch.nn.Module):
 
         """
         super().__init__()
-        self.linear = torch.nn.Linear(in_features, hidden_features)
+        self.linear = nn.Linear(in_features, hidden_features)
     
     def forward(self, x: Tensor) -> Tensor:
         """Forward pass of the ReadinLayer.
@@ -37,10 +38,10 @@ class ReadinLayer(torch.nn.Module):
     
         # Reshape back to (batch_size, hidden_features, d_1, d_2, .... d_n)
         return y.permute(0, -1, *range(1, y.ndim - 1))  
-class ReadoutLayer(torch.nn.Module):
+class ReadoutLayer(nn.Module):
     """Read out data to lower dimensional space."""
 
-    linear: torch.nn.Linear
+    linear: nn.Linear
     """Linear transformation layer that projects input data to a lower dimensional space."""
     
     def __init__(self, hidden_features: int, output_features: int):
@@ -55,7 +56,7 @@ class ReadoutLayer(torch.nn.Module):
 
         """
         super().__init__()
-        self.linear = torch.nn.Linear(hidden_features, output_features)
+        self.linear = nn.Linear(hidden_features, output_features)
     
     def forward(self, x: Tensor) -> Tensor:
         """Forward pass of the ReadoutLayer.

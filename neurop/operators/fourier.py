@@ -2,12 +2,14 @@
 from torch.types import Tensor
 from typing import List, Union, Type
 from ..layers.skip_connections import ConnectionType
+
 import torch
+import torch.nn as nn
 
 from ..base import NeuralOperator
-from ..layers.io_layers import ReadinLayer, ReadoutLayer
 from ..layers.spectral_convolution import SpectralConv
 from ..layers.fno_unit import FNOUnit
+from ..layers.feature_mlp import ConvFeatureMLP, LinearFeatureMLP
 class FourierOperator(NeuralOperator):
     """ 
     Fourier Neural Operator (FNO) for learning mappings between functions in the Fourier domain.
@@ -15,13 +17,13 @@ class FourierOperator(NeuralOperator):
     This operator uses spectral convolutions to learn the mapping between input and output functions.
     """
 
-    readin: ReadinLayer
+    readin: LinearFeatureMLP
     """Layer to read input features and project them to hidden features."""
 
-    fno_units: torch.nn.ModuleList
+    fno_units: nn.ModuleList
     """List of FNO units that apply spectral convolutions and activation functions."""
 
-    readout: ReadoutLayer
+    readout: LinearFeatureMLP
     """Layer to read output features and project them to the final output features."""
 
     def __init__(self,
@@ -31,9 +33,14 @@ class FourierOperator(NeuralOperator):
                  modes: Union[int, List[int]],
                  n_dim: int,
                  depth: int = 4,
-                 activation_function: torch.nn.Module = torch.nn.ReLU(),
+                 activation_function: Type[nn.Module] = nn.ReLU,
                  conv_module: Type[SpectralConv] = SpectralConv,
                  skip_connections: Union[ConnectionType, List[ConnectionType]] = 'soft-gating',
+                 use_feature_mlp: bool = True,
+                 feature_mlp_module: Type[nn.Module] = ConvFeatureMLP,
+                 feature_mlp_depth: int = 4,
+                 feature_mlp_skip_connections: Union[ConnectionType, List[ConnectionType]] = 'soft-gating',
+                 feature_expansion_factor: float = 1.0,
                  bias: bool = True,
                  init_scale: float = 1.0,
                  dtype: torch.dtype = torch.cfloat):
@@ -49,6 +56,11 @@ class FourierOperator(NeuralOperator):
             activation_function (torch.nn.Module): Activation function to apply after spectral convolution.
             conv_module (Type[SpectralConv]): Spectral convolution module to use.
             skip_connections (Union[ConnectionType, List[ConnectionType]]): Type of skip connection to use.
+            use_feature_mlp (bool): Whether to use a feature MLP for additional processing.
+            feature_mlp_module (Type[nn.Module]): Feature MLP module to use for additional processing.
+            feature_mlp_depth (int): Depth of the feature MLP.
+            feature_mlp_skip_connections (Union[ConnectionType, List[ConnectionType]]): Type of skip connection to use for the feature MLP.
+            feature_expansion_factor (float): Factor by which to expand the features in the feature MLP.
             bias (bool): Whether to include bias parameters in the skip connection.
             init_scale (float): Scale for initializing the weights of the spectral convolution layer.
             dtype (torch.dtype): Data type for the spectral convolution layer output, typically complex (torch.cfloat).
@@ -56,7 +68,13 @@ class FourierOperator(NeuralOperator):
         """
         super().__init__()
 
-        self.readin = ReadinLayer(in_features=in_features, hidden_features=hidden_features)
+        self.readin = LinearFeatureMLP(
+            in_features=in_features,
+            hidden_features=hidden_features,
+            out_features=hidden_features,
+            depth=1,
+            n_dim=n_dim,
+        )
 
         self.fno_units = torch.nn.ModuleList(
             [
@@ -65,9 +83,14 @@ class FourierOperator(NeuralOperator):
                     out_features=hidden_features,  
                     modes=modes,
                     n_dim=n_dim, 
-                    activation_function=activation_function,
+                    activation_function=activation_function if i < depth - 1 else None,
                     conv_module=conv_module,
                     skip_connection=skip_connections[i] if isinstance(skip_connections, list) else skip_connections,
+                    use_feature_mlp=use_feature_mlp,
+                    feature_mlp_module=feature_mlp_module,
+                    feature_mlp_depth=feature_mlp_depth,
+                    feature_mlp_skip_connection=feature_mlp_skip_connections[i] if isinstance(feature_mlp_skip_connections, list) else feature_mlp_skip_connections,
+                    feature_expansion_factor=feature_expansion_factor,
                     bias=bias,
                     init_scale=init_scale,
                     dtype=dtype
@@ -76,7 +99,13 @@ class FourierOperator(NeuralOperator):
             ]
         )
 
-        self.readout = ReadoutLayer(hidden_features, out_features)
+        self.readout = LinearFeatureMLP(
+            in_features=hidden_features,
+            hidden_features=hidden_features,
+            out_features=out_features,
+            depth=1,
+            n_dim=n_dim
+        )
 
     def forward(self, x: Tensor) -> Tensor:
         """Forward pass of the Fourier Operator.
