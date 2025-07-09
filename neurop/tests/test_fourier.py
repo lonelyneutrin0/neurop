@@ -1,10 +1,13 @@
+"""Fourier Operator Unit Tests.
+
+This module contains unit tests for the FourierOperator.
+"""
+
 from neurop.operators.fourier import FourierOperator
 import torch
 
 def test_fourier_operator():
-    """
-    Test the FourierOperator functionality.
-    """
+    """Test the FourierOperator functionality."""
     batch_size = 2
     channels = 1
     shape = (8, 8, 8, 8)  # 4 spatial dimensions

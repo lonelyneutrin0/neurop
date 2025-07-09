@@ -1,10 +1,13 @@
+"""I/O Layer Unit Tests.
+
+This module contains unit tests for the ReadinLayer and ReadoutLayer.
+"""
+
 from neurop.layers.io_layers import ReadinLayer, ReadoutLayer
 import torch
 
 def test_readin_layer():
-    """
-    Test the ReadinLayer functionality.
-    """
+    """Test the ReadinLayer functionality."""
     in_features = 5
     hidden_features = 10
     batch_size = 2
@@ -18,10 +21,7 @@ def test_readin_layer():
     assert y.shape == (batch_size, hidden_features, *spatial_dims), "Output shape mismatch in ReadinLayer"
 
 def test_readout_layer():
-    """
-    Test the ReadoutLayer functionality.
-    """
-
+    """Test the ReadoutLayer functionality."""
     hidden_features = 10
     output_features = 3
     batch_size = 2
