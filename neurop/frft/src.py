@@ -1,7 +1,8 @@
 """Fractional Fourier Transform (FrFT) implementation using Bluestein's Algorithm."""
 import torch
 
-from torch.types import Tensor, Device
+from torch.types import Device
+from torch import Tensor
 from typing import Union, Optional
 
 

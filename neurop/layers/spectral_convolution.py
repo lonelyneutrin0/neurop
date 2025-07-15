@@ -2,7 +2,9 @@
 import torch
 
 from torch.types import Tensor
-from typing import Tuple, List, Union
+from typing import Tuple, List, Union, Literal
+
+NormType = Literal['backward', 'forward', 'ortho']
 class SpectralConv(torch.nn.Module):
     r"""N-Dimensional Spectral Convolution Layer.
     
@@ -37,6 +39,8 @@ class SpectralConv(torch.nn.Module):
     spatial_dims: Tuple[int, ...]
     """Tuple of integers representing the indices of the spatial dimensions in the input tensor."""
 
+    norm: NormType
+    """Normalization type for the FFT operation, can be 'backward', 'forward', or 'ortho'."""   
     def __init__(self,
                 in_features: int, 
                 out_features: int, 
@@ -44,7 +48,8 @@ class SpectralConv(torch.nn.Module):
                 init_scale: float = 1.0,
                 dtype: torch.dtype = torch.cfloat,
                 *, 
-                weight_dtype: torch.dtype = torch.cfloat):
+                weight_dtype: torch.dtype = torch.cfloat,
+                norm: NormType = 'ortho'):
         """Initialize the N-Dimensional Spectral Convolution Layer with the given parameters."""
         super().__init__()
         self.in_features = in_features
@@ -73,6 +78,8 @@ class SpectralConv(torch.nn.Module):
         # Store spatial dimensions for forward pass
         self.spatial_dims = tuple(range(2, 2 + self.ndim))
         self.einsum_eq = self._einsum_eq()
+
+        self.norm = norm
 
     def forward(self, x: Tensor, dtype: torch.dtype = torch.cfloat) -> Tensor:
         """Forward pass for the N-dimensional Spectral Convolution layer.
@@ -111,19 +118,19 @@ class SpectralConv(torch.nn.Module):
         effective_modes =  self._get_modes(spatial_shape, is_complex)
 
         if is_complex:
-            x_ft = torch.fft.fftn(x, dim=self.spatial_dims, norm='ortho')
+            x_ft = torch.fft.fftn(x, dim=self.spatial_dims, norm=self.norm)
 
         else: 
-            x_ft = torch.fft.rfftn(x, dim=self.spatial_dims, norm='ortho')
+            x_ft = torch.fft.rfftn(x, dim=self.spatial_dims, norm=self.norm)
         
         out_ft = self._apply_spectral_convolution(x=x_ft, effective_modes=effective_modes, dtype=dtype)
 
         if is_complex:
-            x_out = torch.fft.ifftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm='ortho')
+            x_out = torch.fft.ifftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm=self.norm)
         
         else:
-            x_out = torch.fft.irfftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm='ortho')
-        
+            x_out = torch.fft.irfftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm=self.norm)
+
         return x_out
 
     def _get_modes(self, shape: Tuple[int, ...], is_complex: bool) -> List[int]: 

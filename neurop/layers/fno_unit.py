@@ -5,7 +5,7 @@ import torch.nn as nn
 from torch.types import Tensor
 from typing import Type, Union, List, Optional
 
-from .spectral_convolution import SpectralConv
+from .spectral_convolution import SpectralConv, NormType
 from .feature_mlp import ConvFeatureMLP
 from .skip_connections import create_skip_connection, ConnectionType
 
@@ -44,7 +44,7 @@ class FNOUnit(nn.Module):
 
     feature_mlp_skip_connection: nn.Module
     """Skip connection module for combining input and transformed features after the feature MLP."""
-
+    
     def __init__(self, 
                  in_features: int, 
                  out_features: int,
@@ -60,7 +60,8 @@ class FNOUnit(nn.Module):
                  feature_expansion_factor: float = 1.0,
                  bias: bool = True,
                  init_scale: float = 1.0,
-                 dtype: torch.dtype = torch.cfloat
+                 dtype: torch.dtype = torch.cfloat,
+                 norm: NormType = 'ortho'
                  ):
         """Initialize the FNO unit with the given parameters.
         
@@ -80,7 +81,7 @@ class FNOUnit(nn.Module):
             bias (bool): Whether to include bias parameters in the skip connection.
             init_scale (float): Scale for initializing the weights of the spectral convolution layer.
             dtype (torch.dtype): Data type for the spectral convolution layer output, typically complex (torch.cfloat).
-
+            norm (NormType): Normalization type for the spectral convolution layer, can be 'backward', 'forward', or 'ortho'.
         """
         super().__init__()
         self.in_features = in_features
@@ -117,7 +118,8 @@ class FNOUnit(nn.Module):
             out_features=out_features,
             modes=modes,
             init_scale=init_scale, 
-            dtype=dtype
+            dtype=dtype,
+            norm=norm
         )
         
         # Skip connection
