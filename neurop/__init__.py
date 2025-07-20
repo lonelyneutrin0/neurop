@@ -7,11 +7,13 @@ __version__ = "0.0.6"
 
 __authors__ = [
     "Hrishikesh Belagali",
-    "Aditya Narayan"
+    "Aditya Narayan",
+    "Sidharth Pillai"
 ]
 __author_emails__ = [
     "belagal1@msu.edu",
-    "ma24btech11001@iith.ac.in"
+    "ma24btech11001@iith.ac.in",
+    "psidharth@iisc.ac.in"
 ]
 __url__ = "https://github.com/lonelyneutrin0/neurop"
 
