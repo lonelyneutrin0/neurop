@@ -32,7 +32,7 @@ def frft(x: Tensor, alpha: Union[float, Tensor], *, dim: int = -1, device: Optio
         raise ValueError("Signal size must be even")
 
     if not isinstance(alpha, torch.Tensor): 
-        alpha = torch.Tensor(alpha)
+        alpha = torch.tensor(alpha)
     
     a = torch.fmod(alpha, 4)
 
