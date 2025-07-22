@@ -1,13 +1,13 @@
 """Fourier Neural Operator (FNO) implementation for learning mappings between functions in the Fourier domain."""
 from torch.types import Tensor
-from typing import List, Union, Type
+from typing import List, Union, Type, Optional
 from ..layers.skip_connections import ConnectionType
 
 import torch
 import torch.nn as nn
 
 from ..base import NeuralOperator
-from ..layers.spectral_convolution import SpectralConv
+from ..layers.spectral_convolution import SpectralConv, NormType
 from ..layers.fno_unit import FNOUnit
 from ..layers.feature_mlp import ConvFeatureMLP, LinearFeatureMLP
 class FourierOperator(NeuralOperator):
@@ -26,6 +26,18 @@ class FourierOperator(NeuralOperator):
     readout: LinearFeatureMLP
     """Layer to read output features and project them to the final output features."""
 
+    spectral_normalizer: Optional[nn.Module]
+    """Normalizer to apply to the spectral convolution output."""
+
+    feature_normalizer: Optional[nn.Module]
+    """Normalizer to apply to the feature MLP output."""
+
+    learnable_normalizers: bool
+    """Whether the normalization parameters are learnable."""
+
+    normalizer_eps: float
+    """Epsilon value for numerical stability in normalization layers."""
+
     def __init__(self,
                  in_features: int,
                  hidden_features: int,
@@ -43,7 +55,13 @@ class FourierOperator(NeuralOperator):
                  feature_expansion_factor: float = 1.0,
                  bias: bool = True,
                  init_scale: float = 1.0,
-                 dtype: torch.dtype = torch.cfloat):
+                 dtype: torch.dtype = torch.cfloat,
+                 norm: NormType = 'ortho',
+                 spectral_normalizer: Optional[Type[nn.Module]] = None, 
+                 feature_normalizer: Optional[Type[nn.Module]] = None,
+                 *, 
+                 learnable_normalizers: bool = True,
+                 normalizer_eps: float = 1e-10):
         """Initialize the FourierOperator with the given parameters.
 
         Args:
@@ -64,6 +82,11 @@ class FourierOperator(NeuralOperator):
             bias (bool): Whether to include bias parameters in the skip connection.
             init_scale (float): Scale for initializing the weights of the spectral convolution layer.
             dtype (torch.dtype): Data type for the spectral convolution layer output, typically complex (torch.cfloat).
+            norm (NormType): Normalization type for the spectral convolution layer, can be 'backward', 'forward', or 'ortho'.
+            spectral_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the spectral convolution output.
+            feature_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the feature MLP output.
+            learnable_normalizers (bool): Whether the normalization parameters are learnable.
+            normalizer_eps (float): Epsilon value for numerical stability in normalization layers.
 
         """
         super().__init__()
@@ -93,7 +116,12 @@ class FourierOperator(NeuralOperator):
                     feature_expansion_factor=feature_expansion_factor,
                     bias=bias,
                     init_scale=init_scale,
-                    dtype=dtype
+                    dtype=dtype,
+                    norm=norm,
+                    spectral_normalizer=spectral_normalizer,
+                    feature_normalizer=feature_normalizer,      
+                    learnable_normalizers=learnable_normalizers,
+                    normalizer_eps=normalizer_eps
                 )
                 for i in range(depth)
             ]
