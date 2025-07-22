@@ -82,7 +82,7 @@ class FNOUnit(nn.Module):
                  ):
         """Initialize the FNO unit with the given parameters.
         
-sp        Args:
+        sp        Args:
             in_features (int): Number of input features (channels).
             out_features (int): Number of output features (channels).
             modes (Union[int, List[int]]): Number of Fourier modes to consider in each spatial dimension.
