@@ -66,6 +66,7 @@ class FourierOperator(NeuralOperator):
             init_scale (float): Scale for initializing the weights of the spectral convolution layer.
             dtype (torch.dtype): Data type for the spectral convolution layer output, typically complex (torch.cfloat).
             norm (NormType): Normalization type for the spectral convolution layer, can be 'backward', 'forward', or 'ortho'.
+
         """
         super().__init__()
 
