@@ -44,6 +44,18 @@ class FNOUnit(nn.Module):
 
     feature_mlp_skip_connection: nn.Module
     """Skip connection module for combining input and transformed features after the feature MLP."""
+
+    spectral_normalizer: Optional[nn.Module]
+    """Normalizer to apply to the spectral convolution output."""
+
+    feature_normalizer: Optional[nn.Module]
+    """Normalizer to apply to the feature MLP output."""
+
+    learnable_normalizers: bool
+    """Whether the normalization parameters are learnable."""
+
+    normalizer_eps: float
+    """Epsilon value for numerical stability in normalization layers."""
     
     def __init__(self, 
                  in_features: int, 
@@ -61,11 +73,16 @@ class FNOUnit(nn.Module):
                  bias: bool = True,
                  init_scale: float = 1.0,
                  dtype: torch.dtype = torch.cfloat,
-                 norm: NormType = 'ortho'
+                 norm: NormType = 'ortho',
+                 spectral_normalizer: Optional[Type[nn.Module]] = None, 
+                 feature_normalizer: Optional[Type[nn.Module]] = None,
+                 *, 
+                 learnable_normalizers: bool = True,
+                 normalizer_eps: float = 1e-10
                  ):
         """Initialize the FNO unit with the given parameters.
         
-        Args:
+sp        Args:
             in_features (int): Number of input features (channels).
             out_features (int): Number of output features (channels).
             modes (Union[int, List[int]]): Number of Fourier modes to consider in each spatial dimension.
@@ -82,7 +99,10 @@ class FNOUnit(nn.Module):
             init_scale (float): Scale for initializing the weights of the spectral convolution layer.
             dtype (torch.dtype): Data type for the spectral convolution layer output, typically complex (torch.cfloat).
             norm (NormType): Normalization type for the spectral convolution layer, can be 'backward', 'forward', or 'ortho'.
-
+            spectral_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the spectral convolution output.
+            feature_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the feature MLP output.
+            learnable_normalizers (bool): Whether the normalization parameters are learnable.
+            normalizer_eps (float): Epsilon value for numerical stability in normalization layers.
         """
         super().__init__()
         self.in_features = in_features
@@ -132,6 +152,26 @@ class FNOUnit(nn.Module):
             connection_type=skip_connection
         )
 
+        # Initialize normalizers as None
+        self.spectral_normalizer = None
+        self.feature_normalizer = None
+
+        if spectral_normalizer is not None: 
+            self.spectral_normalizer = spectral_normalizer(
+                num_features=out_features,
+                ndim=n_dim,
+                learnable=learnable_normalizers,
+                tol=normalizer_eps
+            )
+        
+        if feature_normalizer is not None: 
+            self.feature_normalizer = feature_normalizer(
+                num_features=out_features,
+                ndim=n_dim,
+                learnable=learnable_normalizers,
+                tol=normalizer_eps
+            )
+
     def forward(self, x: Tensor) -> Tensor:
         """Forward pass through single FNO unit.
 
@@ -152,6 +192,8 @@ class FNOUnit(nn.Module):
         
         # Apply spectral convolution
         x = self.spectral_conv(x)
+        if self.spectral_normalizer is not None:
+            x = self.spectral_normalizer(x)
         
         # Apply skip connection
         x = self.skip_connection(x = residual, transformed_x = x)
@@ -164,6 +206,9 @@ class FNOUnit(nn.Module):
         if self.feature_mlp is not None:
             # FeatureMLP 
             x = self.feature_mlp(x)
+
+            if self.feature_normalizer is not None:
+                x = self.feature_normalizer(x)
 
             # FeatureMLP Skip Connection
             x = self.feature_mlp_skip_connection(x = new_residual, transformed_x = x)
