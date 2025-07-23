@@ -72,7 +72,7 @@ class LinearConnection(nn.Module):
             x = x.view(-1, self.in_features) # [B * spatial_dims, C]
             x = self.skip_projection(x)
 
-            new_shape = original_shape[:-1] + (self.out_features,) # [B, d_1, d_2, ..., C']
+            new_shape = (original_shape[0],) + original_shape[2:] + (self.out_features,) # [B, d_1, d_2, ..., C']
             x = x.view(*new_shape)
  
             x = x.permute(0, -1, *range(1, len(original_shape)-1)).contiguous() # [B, C', d_1, d_2, ...]

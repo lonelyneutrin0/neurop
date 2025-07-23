@@ -82,7 +82,7 @@ class FNOUnit(nn.Module):
                  ):
         """Initialize the FNO unit with the given parameters.
         
-        sp        Args:
+        Args:
             in_features (int): Number of input features (channels).
             out_features (int): Number of output features (channels).
             modes (Union[int, List[int]]): Number of Fourier modes to consider in each spatial dimension.
@@ -103,19 +103,27 @@ class FNOUnit(nn.Module):
             feature_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the feature MLP output.
             learnable_normalizers (bool): Whether the normalization parameters are learnable.
             normalizer_eps (float): Epsilon value for numerical stability in normalization layers.
+
         """
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.modes = modes
+        
+        if isinstance(modes, int):
+            self.modes = [modes] * n_dim
+        else:
+            if len(modes) != n_dim:
+                raise ValueError(f"Expected {n_dim} modes, got {len(modes)}")
+            self.modes = modes
+        
         self.n_dim = n_dim
         self.activation_function = activation_function() if activation_function is not None else None
         self.skip_connection_type = skip_connection
 
         if use_feature_mlp:
             self.feature_mlp = feature_mlp_module(
-                in_features=in_features,
-                hidden_features=int(feature_expansion_factor * in_features),
+                in_features=out_features,
+                hidden_features=int(feature_expansion_factor * out_features),
                 out_features=out_features,
                 depth=feature_mlp_depth,
                 n_dim=n_dim,
@@ -123,7 +131,7 @@ class FNOUnit(nn.Module):
             )
 
             self.feature_mlp_skip_connection = create_skip_connection(
-                in_features=in_features,
+                in_features=out_features,
                 out_features=out_features,
                 n_dim=n_dim,
                 bias=bias,
@@ -137,7 +145,7 @@ class FNOUnit(nn.Module):
         self.spectral_conv = conv_module(
             in_features=in_features,
             out_features=out_features,
-            modes=modes,
+            modes=self.modes,
             init_scale=init_scale, 
             dtype=dtype,
             norm=norm
@@ -187,31 +195,25 @@ class FNOUnit(nn.Module):
         if x.shape[1] != self.in_features:
             raise ValueError(f"Expected {self.in_features} input features, got {x.shape[1]}")
 
-        # Store input for skip connection
-        residual = x
-        
         # Apply spectral convolution
-        x = self.spectral_conv(x)
+        x_conv = self.spectral_conv(x)
         if self.spectral_normalizer is not None:
-            x = self.spectral_normalizer(x)
+            x_conv = self.spectral_normalizer(x_conv)
         
         # Apply skip connection
-        x = self.skip_connection(x = residual, transformed_x = x)
+        x = self.skip_connection(x = x, transformed_x = x_conv)
 
         if self.activation_function is not None:
             x = self.activation_function(x)
         
-        new_residual = x
-
         if self.feature_mlp is not None:
             # FeatureMLP 
-            x = self.feature_mlp(x)
+            x_mlp = self.feature_mlp(x)
 
             if self.feature_normalizer is not None:
-                x = self.feature_normalizer(x)
+                x_mlp = self.feature_normalizer(x_mlp)
 
-            # FeatureMLP Skip Connection
-            x = self.feature_mlp_skip_connection(x = new_residual, transformed_x = x)
+            x = self.feature_mlp_skip_connection(x = x, transformed_x = x_mlp)
 
             if self.activation_function is not None:
                 x = self.activation_function(x)
