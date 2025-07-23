@@ -1,3 +1,4 @@
+"""Feature MLP Tests."""
 from neurop.layers.feature_mlp import LinearFeatureMLP, ConvFeatureMLP
 import torch
 

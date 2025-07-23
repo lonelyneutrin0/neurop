@@ -1,5 +1,9 @@
+"""Fourier Operator Tests."""
 import torch 
 from neurop.operators.fourier import FourierOperator
+
+from neurop.layers.skip_connections import ConnectionType
+from typing import List 
 
 
 def test_fourier_operator_basic():
@@ -84,7 +88,7 @@ def test_fourier_operator_different_depths():
 
 def test_fourier_operator_skip_connections():
     """Test FourierOperator with different skip connection types."""
-    skip_types = ['identity', 'linear', 'soft-gating']
+    skip_types: List[ConnectionType] = ['identity', 'linear', 'soft-gating']
     
     for skip_type in skip_types:
         operator = FourierOperator(
@@ -151,7 +155,6 @@ def test_fourier_operator_activation_functions():
 
 def test_fourier_operator_different_modes():
     """Test FourierOperator with different mode configurations."""
-
     operator_single = FourierOperator(
         in_features=2, 
         hidden_features=4, 

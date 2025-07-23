@@ -1,3 +1,4 @@
+"""Normalizers Tests."""
 from neurop.layers.normalizers import BatchNormalizer, LayerNormalizer, InstanceNormalizer 
 
 import torch 
@@ -18,7 +19,6 @@ def test_batch_normalizer_learnable():
 
 def test_layer_normalizer_learnable():
     """Test the LayerNormalizer class."""
-
     normalizer = LayerNormalizer(num_features=3, ndim=2, learnable=False)
     x = torch.randn(2, 3, 4, 5) 
     output = normalizer(x)
@@ -33,7 +33,6 @@ def test_layer_normalizer_learnable():
 
 def test_instance_normalizer_learnable():
     """Test the InstanceNormalizer class."""
-
     normalizer = InstanceNormalizer(num_features=3, ndim=2, learnable=False)
     x = torch.randn(2, 3, 4, 5)  # Example input tensor
     output = normalizer(x)
@@ -48,7 +47,6 @@ def test_instance_normalizer_learnable():
 
 def test_instance_normalizer():
     """Test the InstanceNormalizer class."""
-
     normalizer = InstanceNormalizer(num_features=3, ndim=2, learnable=False)
     x = torch.randn(2, 3, 4, 5) 
     output = normalizer(x)
@@ -59,7 +57,6 @@ def test_instance_normalizer():
 
 def test_batch_normalizer():
     """Test the BatchNormalizer class."""
-
     normalizer = BatchNormalizer(num_features=3, ndim=2, learnable=False)
     x = torch.randn(2, 3, 4, 5)  
     output = normalizer(x)
@@ -70,7 +67,6 @@ def test_batch_normalizer():
 
 def test_layer_normalizer():
     """Test the LayerNormalizer class."""
-
     normalizer = LayerNormalizer(num_features=3, ndim=2, learnable=False)
     x = torch.randn(2, 3, 4, 5) 
     output = normalizer(x)

@@ -1,3 +1,4 @@
+"""FNOUnit Tests."""
 from neurop.layers.fno_unit import FNOUnit
 from neurop.layers.normalizers import BatchNormalizer, LayerNormalizer
 
@@ -104,7 +105,6 @@ def test_fno_unit_with_normalizers():
 
 def test_fno_unit_skip_connection_types():
     """Test FNOUnit with different skip connection types."""
-
     unit_identity = FNOUnit(
         in_features=3, 
         out_features=3, 

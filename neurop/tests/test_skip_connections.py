@@ -1,3 +1,4 @@
+"""Skip Connections Tests."""
 from neurop.layers.skip_connections import ResidualConnection, IdentityConnection, SoftGatingConnection, LinearConnection
 
 import torch 

@@ -1,13 +1,16 @@
+"""Fractional Fourier Transform (FRFT) Tests."""
 from neurop.frft import frft
 import torch    
 
 def test_frft_even_size():
+    """Test FRFT with even signal size."""
     x = torch.randn(2, 4, 4)  
     output = frft(x, 1)
     assert output.shape == x.shape, "Output shape should match input shape"
     assert output.dtype == torch.complex64, "FRFT should return complex tensor"
 
 def test_frft_odd_size():
+    """Test FRFT with odd signal size."""
     x = torch.randn(2, 3, 5) 
     try:
         frft(x, 1)
@@ -16,6 +19,7 @@ def test_frft_odd_size():
         assert str(e) == "Signal size must be even", "Should raise ValueError for odd signal size"
 
 def test_frft_invalid_size():
+    """Test FRFT with invalid signal size."""
     x = torch.randn(2, 3, 4)  
     try:
         frft(x, 1)
@@ -23,12 +27,14 @@ def test_frft_invalid_size():
         assert str(e) == "Signal size must be even", "Should raise ValueError for odd signal size"
     
 def test_frft_zero_alpha():
+    """Test FRFT with alpha = 0 (no operation)."""
     x = torch.randn(2, 4, 4)  
     output = frft(x, 0)
     assert torch.allclose(output, x, atol=1e-4), "Output should be equal to input for alpha=0"
     assert output.dtype == x.dtype, "Alpha=0 should preserve input dtype"
 
 def test_frft_time_reversal():
+    """Test FRFT with alpha = 2 for time reversal."""
     x = torch.randn(2, 4, 4)  
     output = frft(x, 2)
 
@@ -38,6 +44,7 @@ def test_frft_time_reversal():
     assert output.dtype == x.dtype, "Alpha=2 should preserve input dtype"
 
 def test_frft_negative_time_reversal():
+    """Test FRFT with alpha = -2 for time reversal."""
     x = torch.randn(2, 4, 4)  
     output = frft(x, -2)
 

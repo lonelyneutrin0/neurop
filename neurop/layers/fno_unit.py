@@ -103,6 +103,7 @@ class FNOUnit(nn.Module):
             feature_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the feature MLP output.
             learnable_normalizers (bool): Whether the normalization parameters are learnable.
             normalizer_eps (float): Epsilon value for numerical stability in normalization layers.
+
         """
         super().__init__()
         self.in_features = in_features
