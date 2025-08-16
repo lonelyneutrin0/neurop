@@ -1,11 +1,10 @@
 import torch
-from typing import Union, Optional
+from typing import Union
 
 from math import ceil
 
 def idfrft(x: torch.Tensor, alpha: Union[float, torch.Tensor], *, dim: int = -1) -> torch.Tensor:
-    """
-    Inverse Discrete Fractional Fourier Transform.
+    """Inverse Discrete Fractional Fourier Transform.
 
     Arguments:
         x (torch.Tensor): Input tensor to be transformed.
@@ -14,12 +13,12 @@ def idfrft(x: torch.Tensor, alpha: Union[float, torch.Tensor], *, dim: int = -1)
 
     Returns:
         torch.Tensor: Inverse transformed tensor.
+
     """
     return dfrft(x, -alpha, dim=dim)
 
 def dfrft(x: torch.Tensor, alpha: Union[float, torch.Tensor], *, dim: int = -1) -> torch.Tensor:
-    """
-    Discrete Fractional Fourier Transform.
+    """Discrete Fractional Fourier Transform.
 
     Arguments:
         x (torch.Tensor): Input tensor to be transformed.
@@ -28,6 +27,7 @@ def dfrft(x: torch.Tensor, alpha: Union[float, torch.Tensor], *, dim: int = -1) 
 
     Returns:
         torch.Tensor: Transformed tensor.
+
     """
     dfrft_matrix = dfrftmtx(x.size(dim), alpha, device=x.device)
     dtype = torch.promote_types(dfrft_matrix.dtype, x.dtype)
@@ -125,22 +125,6 @@ def _dfrft_index(N: int, device: torch.device = torch.device("cpu")) -> torch.Te
 
 
 def _circulant(vector: torch.Tensor) -> torch.Tensor:
-    """
-    Generate a circulant matrix based on the input vector.
-
-    Parameters:
-        vector (torch.Tensor): 1-dimensional PyTorch tensor representing
-        the first row of the circulant matrix.
-
-    Returns:
-        torch.Tensor: The resulting circulant matrix.
-
-    Example:
-        >>> circulant(torch.tensor([1, 2, 3]))
-        tensor([[1, 3, 2],
-                [2, 1, 3],
-                [3, 2, 1]])
-    """
     vector = vector.flatten()
     size = vector.size(-1)
     idx = torch.arange(size, device=vector.device)
@@ -149,20 +133,6 @@ def _circulant(vector: torch.Tensor) -> torch.Tensor:
 
 
 def _conv1d_full(vector: torch.Tensor, kernel1d: torch.Tensor) -> torch.Tensor:
-    """
-    Perform full 1-dimensional convolution on 1-dimensional input tensor and kernel.
-
-    Parameters:
-        input (torch.Tensor): Input 1-dimensional tensor.
-        kernel (torch.Tensor): Convolution kernel (also 1-dimensional).
-
-    Returns:
-        torch.Tensor: Resulting 1-dimensional convolution with full padding.
-
-    Example:
-        >>> conv1d_full(torch.tensor([1, 2, 3, 4]), torch.tensor([1, -1, 2]))
-        tensor([1, 1, 3, 5, 2, 8])
-    """
     padding_size = kernel1d.size(0) - 1
     padded_input = torch.nn.functional.pad(
         vector, (padding_size, padding_size), mode="constant", value=0
