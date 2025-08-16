@@ -1,6 +1,6 @@
 """Fourier Operator Tests."""
 import torch 
-from neurop.operators.fourier import FourierOperator
+from neurop.operators.fourier import FourierOperator, CoreParams, FeatureMLPParams, NormalizerParams
 
 from neurop.layers.skip_connections import ConnectionType
 from typing import List 
@@ -8,7 +8,7 @@ from typing import List
 
 def test_fourier_operator_basic():
     """Test basic FourierOperator functionality."""
-    operator = FourierOperator(
+    core = CoreParams(
         in_features=3, 
         hidden_features=8, 
         out_features=2, 
@@ -16,6 +16,10 @@ def test_fourier_operator_basic():
         modes=[4, 4],
         depth=2
     )
+    feature = FeatureMLPParams()
+    normalizer = NormalizerParams()
+    
+    operator = FourierOperator(core=core, feature=feature, normalizer=normalizer)
     
     x = torch.randn(2, 3, 6, 8)  
     output = operator(x)
@@ -30,7 +34,7 @@ def test_fourier_operator_basic():
 
 def test_fourier_operator_same_features():
     """Test FourierOperator with same input and output features."""
-    operator = FourierOperator(
+    core = CoreParams(
         in_features=4, 
         hidden_features=8, 
         out_features=4, 
@@ -38,6 +42,10 @@ def test_fourier_operator_same_features():
         modes=[3, 3],
         depth=1
     )
+    feature = FeatureMLPParams()
+    normalizer = NormalizerParams()
+    
+    operator = FourierOperator(core=core, feature=feature, normalizer=normalizer)
     
     x = torch.randn(1, 4, 5, 7)
     output = operator(x)
@@ -48,7 +56,7 @@ def test_fourier_operator_same_features():
 
 def test_fourier_operator_3d():
     """Test FourierOperator with 3D spatial dimensions."""
-    operator = FourierOperator(
+    core = CoreParams(
         in_features=2, 
         hidden_features=6, 
         out_features=3, 
@@ -56,6 +64,10 @@ def test_fourier_operator_3d():
         modes=[2, 3, 4],
         depth=2
     )
+    feature = FeatureMLPParams()
+    normalizer = NormalizerParams()
+    
+    operator = FourierOperator(core=core, feature=feature, normalizer=normalizer)
     
     x = torch.randn(1, 2, 4, 6, 8)  
     output = operator(x)
@@ -70,7 +82,7 @@ def test_fourier_operator_different_depths():
     depths = [1, 3, 5]
     
     for depth in depths:
-        operator = FourierOperator(
+        core = CoreParams(
             in_features=2, 
             hidden_features=4, 
             out_features=2, 
@@ -78,6 +90,10 @@ def test_fourier_operator_different_depths():
             modes=[2, 2],
             depth=depth
         )
+        feature = FeatureMLPParams()
+        normalizer = NormalizerParams()
+        
+        operator = FourierOperator(core=core, feature=feature, normalizer=normalizer)
         
         x = torch.randn(1, 2, 4, 4)
         output = operator(x)
@@ -88,19 +104,25 @@ def test_fourier_operator_different_depths():
 
 def test_fourier_operator_skip_connections():
     """Test FourierOperator with different skip connection types."""
-    skip_types: List[ConnectionType] = ['identity', 'linear', 'soft-gating']
+    skip_types: List[ConnectionType] = ['identity', 'conv', 'soft-gating']
     
     for skip_type in skip_types:
-        operator = FourierOperator(
+        core = CoreParams(
             in_features=3, 
             hidden_features=6, 
             out_features=3, 
             n_dim=2, 
+            n_kernel=1,
             modes=[2, 2],
             depth=2,
-            skip_connections=skip_type, 
-            feature_mlp_skip_connections=skip_type 
+            skip_connections=skip_type
         )
+        feature = FeatureMLPParams(
+            feature_mlp_skip_connections=skip_type
+        )
+        normalizer = NormalizerParams()
+        
+        operator = FourierOperator(core=core, feature=feature, normalizer=normalizer)
         
         x = torch.randn(1, 3, 4, 4)
         output = operator(x)
@@ -111,15 +133,20 @@ def test_fourier_operator_skip_connections():
 
 def test_fourier_operator_without_feature_mlp():
     """Test FourierOperator without feature MLP."""
-    operator = FourierOperator(
+    core = CoreParams(
         in_features=2, 
         hidden_features=4, 
         out_features=2, 
         n_dim=2, 
         modes=[3, 3],
-        depth=2,
+        depth=2
+    )
+    feature = FeatureMLPParams(
         use_feature_mlp=False
     )
+    normalizer = NormalizerParams()
+    
+    operator = FourierOperator(core=core, feature=feature, normalizer=normalizer)
     
     x = torch.randn(1, 2, 6, 6)
     output = operator(x)
@@ -136,7 +163,7 @@ def test_fourier_operator_activation_functions():
     activations = [torch.nn.ReLU, torch.nn.GELU, torch.nn.Tanh]
     
     for activation in activations:
-        operator = FourierOperator(
+        core = CoreParams(
             in_features=2, 
             hidden_features=4, 
             out_features=2, 
@@ -145,6 +172,10 @@ def test_fourier_operator_activation_functions():
             depth=2,
             activation_function=activation
         )
+        feature = FeatureMLPParams()
+        normalizer = NormalizerParams()
+        
+        operator = FourierOperator(core=core, feature=feature, normalizer=normalizer)
         
         x = torch.randn(1, 2, 4, 4)
         output = operator(x)
@@ -155,7 +186,7 @@ def test_fourier_operator_activation_functions():
 
 def test_fourier_operator_different_modes():
     """Test FourierOperator with different mode configurations."""
-    operator_single = FourierOperator(
+    core_single = CoreParams(
         in_features=2, 
         hidden_features=4, 
         out_features=2, 
@@ -163,8 +194,12 @@ def test_fourier_operator_different_modes():
         modes=3,  
         depth=1
     )
+    feature = FeatureMLPParams()
+    normalizer = NormalizerParams()
     
-    operator_list = FourierOperator(
+    operator_single = FourierOperator(core=core_single, feature=feature, normalizer=normalizer)
+    
+    core_list = CoreParams(
         in_features=2, 
         hidden_features=4, 
         out_features=2, 
@@ -172,6 +207,8 @@ def test_fourier_operator_different_modes():
         modes=[2, 4],  
         depth=1
     )
+    
+    operator_list = FourierOperator(core=core_list, feature=feature, normalizer=normalizer)
     
     x = torch.randn(1, 2, 6, 8)
     
@@ -184,7 +221,7 @@ def test_fourier_operator_different_modes():
 
 def test_fourier_operator_gradient_flow():
     """Test that gradients flow properly through FourierOperator."""
-    operator = FourierOperator(
+    core = CoreParams(
         in_features=2, 
         hidden_features=4, 
         out_features=1, 
@@ -192,6 +229,10 @@ def test_fourier_operator_gradient_flow():
         modes=[2, 2],
         depth=2
     )
+    feature = FeatureMLPParams()
+    normalizer = NormalizerParams()
+    
+    operator = FourierOperator(core=core, feature=feature, normalizer=normalizer)
     
     x = torch.randn(1, 2, 4, 4, requires_grad=True)
     output = operator(x)
@@ -209,7 +250,7 @@ def test_fourier_operator_gradient_flow():
 
 def test_fourier_operator_batch_processing():
     """Test FourierOperator with different batch sizes."""
-    operator = FourierOperator(
+    core = CoreParams(
         in_features=2, 
         hidden_features=4, 
         out_features=2, 
@@ -217,6 +258,10 @@ def test_fourier_operator_batch_processing():
         modes=[2, 2],
         depth=1
     )
+    feature = FeatureMLPParams()
+    normalizer = NormalizerParams()
+    
+    operator = FourierOperator(core=core, feature=feature, normalizer=normalizer)
     
     batch_sizes = [1, 4, 8]
     spatial_shape = (6, 8)
@@ -232,7 +277,7 @@ def test_fourier_operator_batch_processing():
 def test_fourier_operator_determinism():
     """Test that FourierOperator produces deterministic results."""
     torch.manual_seed(42)
-    operator = FourierOperator(
+    core = CoreParams(
         in_features=2, 
         hidden_features=4, 
         out_features=2, 
@@ -240,6 +285,10 @@ def test_fourier_operator_determinism():
         modes=[2, 2],
         depth=1
     )
+    feature = FeatureMLPParams()
+    normalizer = NormalizerParams()
+    
+    operator = FourierOperator(core=core, feature=feature, normalizer=normalizer)
     
     torch.manual_seed(123)
     x = torch.randn(1, 2, 4, 4)
@@ -252,7 +301,7 @@ def test_fourier_operator_determinism():
 
 def test_fourier_operator_parameter_count():
     """Test that FourierOperator has reasonable number of parameters."""
-    operator = FourierOperator(
+    core = CoreParams(
         in_features=3, 
         hidden_features=8, 
         out_features=2, 
@@ -260,6 +309,10 @@ def test_fourier_operator_parameter_count():
         modes=[4, 4],
         depth=2
     )
+    feature = FeatureMLPParams()
+    normalizer = NormalizerParams()
+    
+    operator = FourierOperator(core=core, feature=feature, normalizer=normalizer)
     
     total_params = sum(p.numel() for p in operator.parameters())
 
