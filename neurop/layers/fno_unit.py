@@ -64,11 +64,12 @@ class FNOUnit(nn.Module):
                  n_dim: int,
                  activation_function: Optional[Type[nn.Module]] = None,
                  conv_module: Type[SpectralConv] = SpectralConv,
-                 skip_connection: ConnectionType = 'soft-gating',
+                 skip_connection: ConnectionType = 'identity',
+                 n_kernel: int = -1,
                  use_feature_mlp: bool = True,
                  feature_mlp_module: Type[nn.Module] = ConvFeatureMLP,
                  feature_mlp_depth: int = 2,
-                 feature_mlp_skip_connection: ConnectionType = 'soft-gating',
+                 feature_mlp_skip_connection: ConnectionType = 'identity',
                  feature_expansion_factor: float = 1.0,
                  bias: bool = True,
                  init_scale: float = 1.0,
@@ -90,6 +91,7 @@ class FNOUnit(nn.Module):
             activation_function (Optional[Type[nn.Module]]): Activation function to apply after spectral convolution. Defaults to None.
             conv_module (Type[SpectralConv]): Spectral convolution module to use.
             skip_connection (ConnectionType): Type of skip connection to use.
+            n_kernel (int): Number of kernels to use in the convolution.
             use_feature_mlp (bool): Whether to use a feature MLP for additional processing.
             feature_mlp_module (Type[nn.Module]): Feature MLP module to use for additional processing.
             feature_mlp_depth (int): Depth of the feature MLP.
@@ -134,6 +136,7 @@ class FNOUnit(nn.Module):
                 in_features=out_features,
                 out_features=out_features,
                 n_dim=n_dim,
+                n_kernel=n_kernel,
                 bias=bias,
                 connection_type=feature_mlp_skip_connection
             )
@@ -157,6 +160,7 @@ class FNOUnit(nn.Module):
             out_features=out_features,
             n_dim=n_dim,
             bias=bias,
+            n_kernel=n_kernel,
             connection_type=skip_connection
         )
 
@@ -183,8 +187,8 @@ class FNOUnit(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         """Forward pass through single FNO unit.
 
-        Convolution -> Skip Connection -> Activation -> FeatureMLP -> Skip Connection -> Activation -> Output
-        
+        Convolution -> Normalization -> Add Skip Connection -> Activation -> FeatureMLP -> Normalization -> Add Skip Connection -> Activation -> Output
+
         Args:
             x (Tensor): Input tensor of shape (B, in_features, *spatial_dims)
             
