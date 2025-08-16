@@ -23,11 +23,9 @@ def test_fno_unit_different_output_features():
         out_features=8, 
         n_dim=2, 
         modes=[3, 3],  
-        skip_connection='linear' 
     )
     x = torch.randn(2, 4, 6, 8)
     output = unit(x)
-    
     assert output.shape == (2, 8, 6, 8), "Output should have correct feature dimensions"
     assert output.dtype == torch.float32, "FNOUnit should return real tensor for real inputs"
 
@@ -47,7 +45,7 @@ def test_fno_unit_3d_different_features():
         out_features=4, 
         n_dim=3, 
         modes=[2, 3, 4],
-        skip_connection='linear'  
+        skip_connection='identity'  
     )
     x = torch.randn(1, 2, 4, 6, 8) 
     output = unit(x)
@@ -119,8 +117,8 @@ def test_fno_unit_skip_connection_types():
         out_features=5, 
         n_dim=2, 
         modes=[4, 4], 
-        skip_connection='linear',
-        feature_mlp_skip_connection='linear'
+        skip_connection='identity',
+        feature_mlp_skip_connection='identity'
     )
     
     x = torch.randn(2, 3, 4, 5)
