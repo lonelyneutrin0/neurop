@@ -29,4 +29,4 @@ def test_conv_connection():
     connection = ConvConnection(in_features=3, out_features=4, n_kernel=1)
     x = torch.randn(2, 3, 4, 5)  # Example input tensor
     transformed_x = torch.randn(2, 4, 4, 5)  # Example transformed tensor
-    output = connection(x, transformed_x)
+    _ = connection(x, transformed_x)
