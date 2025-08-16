@@ -2,11 +2,10 @@
 import torch
 
 from torch.types import Device
-from torch import Tensor
 from typing import Union, Optional
 
 
-def frft(x: Tensor, alpha: Union[float, Tensor], *, dim: int = -1, device: Optional[Device] = None) -> Tensor: 
+def frft(x: torch.Tensor, alpha: Union[float, torch.Tensor], *, dim: int = -1, device: Optional[Device] = None) -> torch.Tensor: 
     """Compute the fractional Fourier transform (FRFT) of a tensor using the Chirp Multiplication Algorithm O(nlog n).
     
     The fractional Fourier transform is a generalization of the Fourier transform that allows for fractional orders. 
@@ -64,11 +63,11 @@ def frft(x: Tensor, alpha: Union[float, Tensor], *, dim: int = -1, device: Optio
 
     # Decomposition Property of FrFT
     if (0 < a < 0.5) or (1.5 < a < 2):
-        res = _frft_core(x, torch.Tensor(1.0), dim = dim)
+        res = _frft_core(x, torch.tensor(1.0), dim = dim)
         a -= 1
     
     if (-0.5 < a < 0) or (-2 < a < -1.5): 
-        res = _frft_core(x, torch.Tensor(-1.0), dim = dim)
+        res = _frft_core(x, torch.tensor(-1.0), dim = dim)
         a += 1
     
     # Select and downscale the signal
@@ -83,7 +82,7 @@ def frft(x: Tensor, alpha: Union[float, Tensor], *, dim: int = -1, device: Optio
     res = _vecmul_ndim(res, y, dim = dim)
     return res 
 
-def ifrft(x: Tensor, alpha: Union[float, Tensor], *, dim: int = -1, device: Optional[Device] = None) -> Tensor:
+def ifrft(x: torch.Tensor, alpha: Union[float, torch.Tensor], *, dim: int = -1, device: Optional[Device] = None) -> torch.Tensor:
     """Compute the inverse fractional Fourier transform (iFRFT) of a tensor using the Chirp Multiplication Algorithm O(nlog n).
     
     Args:
@@ -97,12 +96,12 @@ def ifrft(x: Tensor, alpha: Union[float, Tensor], *, dim: int = -1, device: Opti
     """
     return frft(x, -alpha, dim = dim, device = device)
 
-def _flip(x: Tensor, *, dim: int = -1) -> Tensor:
+def _flip(x: torch.Tensor, *, dim: int = -1) -> torch.Tensor:
     """Reverse the order of elements, keeping the first slice in place."""
     first, remaining = torch.tensor_split(x, (1,), dim=dim)
     return torch.concat((first, remaining.flip(dim)), dim=dim)
 
-def _decim(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Tensor: 
+def _decim(x: torch.Tensor, *, dim: int = -1, device: Optional[Device] = None) -> torch.Tensor: 
     """Decimation by 2 operation."""
     if not device:
         device = x.device
@@ -110,7 +109,7 @@ def _decim(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Tens
     t = torch.arange(0, x.size(dim), 2, device=device)
     return x.index_select(dim, t)
 
-def _interp(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Tensor: 
+def _interp(x: torch.Tensor, *, dim: int = -1, device: Optional[Device] = None) -> torch.Tensor: 
     """Bandlimited interpolation function (Calls _interp_real for real and complex parts separately)."""
     if not device:
         device = x.device
@@ -120,13 +119,13 @@ def _interp(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Ten
     
     return _interp_real(x, dim=dim, device=device)
 
-def _interp_real(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Tensor: 
+def _interp_real(x: torch.Tensor, *, dim: int = -1, device: Optional[Device] = None) -> torch.Tensor: 
     """Prevent aliasing by implementing a low pass filter."""
     if not device:
         device = x.device
 
     N = x.size(dim)
-    N1 = N // 2 + N % 2
+    N1 = N // 2 + (N % 2)
     N2 = 2 * N - (N // 2)
 
     upsampled_signal = _upsample(x, dim=dim)
@@ -135,7 +134,7 @@ def _interp_real(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -
     xf = torch.index_fill(xf, dim, torch.arange(N1, N2, device=device), 0)
     return 2 * torch.real(torch.fft.ifft(xf, dim = dim))
 
-def _upsample(x: Tensor, *, dim: int = -1, device: Optional[Device] = None) -> Tensor: 
+def _upsample(x: torch.Tensor, *, dim: int = -1, device: Optional[Device] = None) -> torch.Tensor: 
     """Insert zeros between each element of input data for upsampling."""
     if not device:
         device = x.device
@@ -161,13 +160,13 @@ def _get_mul_dim_einstr(dim_count: int, req_dim: int) -> str:
     remaining_str = "".join([chr(num) for num in range(97, 97 + diff)])
     return f"...{remaining_str},a->...{remaining_str}"
 
-def _frft_core(x: Tensor, a: Union[float, Tensor], *, dim: int = -1, device: Optional[Device] = None) -> Tensor:
-    
+def _frft_core(x: torch.Tensor, a: Union[float, torch.Tensor], *, dim: int = -1, device: Optional[Device] = None) -> torch.Tensor:
+
     if not device:
         device = x.device
 
     if not isinstance(a, torch.Tensor):
-        a = torch.Tensor(a)
+        a = torch.tensor(a)
 
     N = x.size(dim)
     N_end = N // 2
@@ -200,7 +199,8 @@ def _frft_core(x: Tensor, a: Union[float, Tensor], *, dim: int = -1, device: Opt
     Hc = torch.fft.ifft(
         _vecmul_ndim(
             torch.fft.fft(chirped_x, n = power_two, dim=dim),
-            torch.fft.fft(chirp_ext, n = power_two)
+            torch.fft.fft(chirp_ext, n = power_two),
+            dim=dim,
             ),
             dim = dim
         )
