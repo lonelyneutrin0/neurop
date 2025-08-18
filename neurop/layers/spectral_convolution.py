@@ -2,9 +2,13 @@
 import torch
 
 from torch.types import Tensor
-from typing import Tuple, List, Union, Literal
+from typing import Tuple, List, Union
+from enum import Enum
 
-NormType = Literal['backward', 'forward', 'ortho']
+class FFTNormType(Enum): 
+    BACKWARD = 'backward'
+    FORWARD = 'forward'
+    ORTHO = 'ortho'
 class SpectralConv(torch.nn.Module):
     r"""N-Dimensional Spectral Convolution Layer.
     
@@ -39,7 +43,7 @@ class SpectralConv(torch.nn.Module):
     spatial_dims: Tuple[int, ...]
     """Tuple of integers representing the indices of the spatial dimensions in the input tensor."""
 
-    norm: NormType
+    norm: FFTNormType
     """Normalization type for the FFT operation, can be 'backward', 'forward', or 'ortho'."""   
     def __init__(self,
                 in_features: int, 
@@ -49,7 +53,7 @@ class SpectralConv(torch.nn.Module):
                 dtype: torch.dtype = torch.cfloat,
                 *, 
                 weight_dtype: torch.dtype = torch.cfloat,
-                norm: NormType = 'ortho'):
+                norm: FFTNormType = FFTNormType.ORTHO):
         """Initialize the N-Dimensional Spectral Convolution Layer with the given parameters."""
         super().__init__()
         self.in_features = in_features

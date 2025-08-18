@@ -3,11 +3,13 @@ import torch
 import torch.nn as nn
 
 from torch.types import Tensor
-from typing import Type, Union, List, Optional
+from typing import Type, Union, List, Optional, Self
 
-from .spectral_convolution import SpectralConv, NormType
+from .spectral_convolution import SpectralConv, FFTNormType
 from .feature_mlp import ConvFeatureMLP
-from .skip_connections import create_skip_connection, ConnectionType
+from .skip_connections import create_skip_connection, Connection
+
+from ..base import NeuralOperatorUnitBuilder
 
 class FNOUnit(nn.Module):
     """Single Fourier Neural Operator Unit.
@@ -30,9 +32,6 @@ class FNOUnit(nn.Module):
     activation_function: Optional[nn.Module]
     """Activation function to apply after spectral convolution."""
 
-    skip_connection_type: ConnectionType
-    """Type of skip connection to use (e.g., 'soft-gating', 'identity')."""
-
     feature_mlp: Optional[nn.Module]
     """Feature MLP for additional processing of features."""
 
@@ -48,7 +47,7 @@ class FNOUnit(nn.Module):
     spectral_normalizer: Optional[nn.Module]
     """Normalizer to apply to the spectral convolution output."""
 
-    feature_normalizer: Optional[nn.Module]
+    feature_mlp_normalizer: Optional[nn.Module]
     """Normalizer to apply to the feature MLP output."""
 
     learnable_normalizers: bool
@@ -64,22 +63,22 @@ class FNOUnit(nn.Module):
                  n_dim: int,
                  activation_function: Optional[Type[nn.Module]] = None,
                  conv_module: Type[SpectralConv] = SpectralConv,
-                 skip_connection: ConnectionType = 'identity',
+                 skip_connection: Connection = Connection.IDENTITY,
                  n_kernel: int = -1,
-                 use_feature_mlp: bool = True,
+                 use_feature_mlp: bool = False,
                  feature_mlp_module: Type[nn.Module] = ConvFeatureMLP,
                  feature_mlp_depth: int = 2,
-                 feature_mlp_skip_connection: ConnectionType = 'identity',
+                 feature_mlp_skip_connection: Connection = Connection.IDENTITY,
                  feature_expansion_factor: float = 1.0,
                  bias: bool = True,
                  init_scale: float = 1.0,
-                 dtype: torch.dtype = torch.cfloat,
-                 norm: NormType = 'ortho',
-                 spectral_normalizer: Optional[Type[nn.Module]] = None, 
-                 feature_normalizer: Optional[Type[nn.Module]] = None,
+                 dtype: torch.dtype = torch.float64,
+                 norm: FFTNormType = FFTNormType.ORTHO,
+                 conv_normalizer: Optional[Type[nn.Module]] = None, 
+                 feature_mlp_normalizer: Optional[Type[nn.Module]] = None,
                  *, 
                  learnable_normalizers: bool = True,
-                 normalizer_eps: float = 1e-10
+                 normalizer_eps: float = 1e-10,
                  ):
         """Initialize the FNO unit with the given parameters.
         
@@ -90,19 +89,19 @@ class FNOUnit(nn.Module):
             n_dim (int): Number of spatial dimensions (2D, 3D, etc.).
             activation_function (Optional[Type[nn.Module]]): Activation function to apply after spectral convolution. Defaults to None.
             conv_module (Type[SpectralConv]): Spectral convolution module to use.
-            skip_connection (ConnectionType): Type of skip connection to use.
+            skip_connection (Connection): Type of skip connection to use.
             n_kernel (int): Number of kernels to use in the convolution.
             use_feature_mlp (bool): Whether to use a feature MLP for additional processing.
             feature_mlp_module (Type[nn.Module]): Feature MLP module to use for additional processing.
             feature_mlp_depth (int): Depth of the feature MLP.
-            feature_mlp_skip_connection (ConnectionType): Type of skip connection to use for the feature MLP.
+            feature_mlp_skip_connection (Connection): Type of skip connection to use for the feature MLP.
             feature_expansion_factor (float): Factor by which to expand the features in the feature MLP.
             bias (bool): Whether to include bias parameters in the skip connection.
             init_scale (float): Scale for initializing the weights of the spectral convolution layer.
             dtype (torch.dtype): Data type for the spectral convolution layer output, typically complex (torch.cfloat).
             norm (NormType): Normalization type for the spectral convolution layer, can be 'backward', 'forward', or 'ortho'.
-            spectral_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the spectral convolution output.
-            feature_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the feature MLP output.
+            conv_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the spectral convolution output.
+            feature_mlp_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the feature MLP output.
             learnable_normalizers (bool): Whether the normalization parameters are learnable.
             normalizer_eps (float): Epsilon value for numerical stability in normalization layers.
 
@@ -120,7 +119,6 @@ class FNOUnit(nn.Module):
         
         self.n_dim = n_dim
         self.activation_function = activation_function() if activation_function is not None else None
-        self.skip_connection_type = skip_connection
 
         if use_feature_mlp:
             self.feature_mlp = feature_mlp_module(
@@ -165,19 +163,19 @@ class FNOUnit(nn.Module):
         )
 
         # Initialize normalizers as None
-        self.spectral_normalizer = None
-        self.feature_normalizer = None
+        self.conv_normalizer = None
+        self.feature_mlp_normalizer = None
 
-        if spectral_normalizer is not None: 
-            self.spectral_normalizer = spectral_normalizer(
+        if conv_normalizer is not None: 
+            self.conv_normalizer = conv_normalizer(
                 num_features=out_features,
                 ndim=n_dim,
                 learnable=learnable_normalizers,
                 tol=normalizer_eps
             )
         
-        if feature_normalizer is not None: 
-            self.feature_normalizer = feature_normalizer(
+        if feature_mlp_normalizer is not None: 
+            self.feature_mlp_normalizer = feature_mlp_normalizer(
                 num_features=out_features,
                 ndim=n_dim,
                 learnable=learnable_normalizers,
@@ -201,8 +199,8 @@ class FNOUnit(nn.Module):
 
         # Apply spectral convolution
         x_conv = self.spectral_conv(x)
-        if self.spectral_normalizer is not None:
-            x_conv = self.spectral_normalizer(x_conv)
+        if self.conv_normalizer is not None:
+            x_conv = self.conv_normalizer(x_conv)
         
         # Apply skip connection
         x = self.skip_connection(x = x, transformed_x = x_conv)
@@ -214,8 +212,8 @@ class FNOUnit(nn.Module):
             # FeatureMLP 
             x_mlp = self.feature_mlp(x)
 
-            if self.feature_normalizer is not None:
-                x_mlp = self.feature_normalizer(x_mlp)
+            if self.feature_mlp_normalizer is not None:
+                x_mlp = self.feature_mlp_normalizer(x_mlp)
 
             x = self.feature_mlp_skip_connection(x = x, transformed_x = x_mlp)
 
@@ -224,4 +222,170 @@ class FNOUnit(nn.Module):
             
         return x
 
+class FNOUnitBuilder(NeuralOperatorUnitBuilder): 
+    """Builder class for FNO Units for custom configurations with YAML/JSON"""
 
+    def __init__(self): 
+        super().__init__() 
+        self._reset()
+
+    def _reset(self): 
+        """Reset all parameters to their default values."""
+        # Required parameters (no defaults)
+        self.in_features = None
+        self.out_features = None
+        self.modes = None
+        self.n_dim = None
+        
+        # Optional parameters with defaults
+        self.activation_function = None
+        self.conv_module = SpectralConv
+        self.skip_connection = Connection.IDENTITY
+        self.n_kernel = -1
+        self.use_feature_mlp = False
+        self.feature_mlp_module = ConvFeatureMLP
+        self.feature_mlp_depth = 2
+        self.feature_mlp_skip_connection = Connection.IDENTITY
+        self.feature_expansion_factor = 1.0
+        self.bias = True
+        self.init_scale = 1.0
+        self.dtype = torch.float64
+        self.norm = FFTNormType.ORTHO
+        self.conv_normalizer = None
+        self.feature_mlp_normalizer = None
+        self.learnable_normalizers = True
+        self.normalizer_eps = 1e-10
+        self.post_activation = True
+
+    def set_architecture(self, 
+                         in_features: int, 
+                         out_features: int, 
+                         modes: Union[int, List[int]], 
+                         n_dim: int, *, 
+                         dtype: torch.dtype=torch.float64, 
+                         init_scale: float=1.0) -> Self:
+        """Set the architecture for the FNO Unit.
+        
+        Arguments:
+            in_features (int): Number of input features for the FNO Unit.
+            out_features (int): Number of output features for the FNO Unit. 
+            modes (int): Number of Fourier modes to consider in each spatial dimension.
+            n_dim (int): Number of spatial dimensions (2D, 3D, etc.)
+            dtype (torch.dtype): Data type for the spectral convolution layer output, typically float (torch.float64).
+            init_scale (float): Initial scale for the spectral convolution layer weights.
+
+        Returns:
+            An FNOUnitBuilder object
+
+        """
+        self.in_features = in_features
+        self.out_features = out_features
+        self.modes = modes
+        self.n_dim = n_dim
+        self.dtype = dtype
+        self.init_scale = init_scale
+
+        return self
+
+    def set_activation_function(self, activation_function: Type[nn.Module],) -> Self:
+        """Set the activation function for the FNO Unit.
+        
+        Arguments: 
+            activation_function (Type[nn.Module]): The activation function to apply.
+        
+        Returns: 
+            An FNOUnitBuilder object
+        
+        """
+        self.activation_function = activation_function
+
+        return self
+
+    def set_conv_module(self, 
+                        conv_module: Type[SpectralConv], 
+                        skip_connection: Connection, 
+                        conv_normalizer: Type[nn.Module], 
+                        *, 
+                        norm: FFTNormType = FFTNormType.ORTHO,
+                        conv_kernel: int = -1) -> Self:
+        """Set the convolution module for the FNO Unit.
+
+        Arguments:
+            conv_module (Type[nn.Module]): The convolution module to apply.
+            skip_connection (Connection): The type of skip connection to use.
+            conv_normalizer (nn.Module): The normalization module to apply after the convolution.
+            norm (FFTNormType): The normalization type to use for FFTs.
+            conv_kernel (int): THe kernel size for the convolution skip connection.
+        Returns:
+            An FNOUnitBuilder object
+
+        """
+        self.conv_module = conv_module
+        self.skip_connection = skip_connection
+        self.conv_normalizer = conv_normalizer
+        self.norm = norm
+        self.n_kernel = conv_kernel
+
+        return self
+    
+    def set_feature_mlp(self, 
+                        feature_mlp_module: Type[nn.Module], 
+                        feature_mlp_depth: int, 
+                        feature_mlp_skip_connection: Connection, 
+                        feature_expansion_factor: float, 
+                        feature_mlp_normalizer: Type[nn.Module]) -> Self:
+        """Set the feature MLP for the FNO Unit.
+        
+        Arguments:
+            feature_mlp_module (nn.Module): The feature MLP module to apply.
+            feature_mlp_depth (int): Depth of the feature MLP.
+            feature_mlp_skip_connection (Connection): Type of skip connection to use for the feature MLP.
+            feature_expansion_factor (float): Factor by which to expand the features in the feature MLP.
+        
+        Returns:
+            An FNOUnitBuilder object
+
+        """
+        self.feature_mlp_module = feature_mlp_module
+        self.feature_mlp_depth = feature_mlp_depth
+        self.feature_mlp_skip_connection = feature_mlp_skip_connection
+        self.feature_expansion_factor = feature_expansion_factor
+        self.feature_mlp_normalizer = feature_mlp_normalizer
+        return self
+
+    def use_bias(self, toggle: bool) -> Self:
+        """Set whether to use bias parameters in the skip connections.
+        
+        Arguments:
+            toggle (bool): Whether to include bias parameters in the skip connections.
+        
+        Returns:
+            An FNOUnitBuilder object
+
+        """
+        self.bias = toggle
+        return self
+
+    def use_learnable_normalizers(self, learnable_normalizers: bool, normalizer_eps: float) -> Self:
+        self.learnable_normalizers = learnable_normalizers
+        self.normalizer_eps = normalizer_eps
+        return self
+
+    def build(self,) -> FNOUnit: 
+        """Build the FNO Unit with the specified parameters. Resets the builder to default settings.
+        
+        Returns:
+            An FNOUnit object initialized with the specified parameters.
+
+        """
+        params = {
+            key: value for key, value in self.__dict__.items() 
+            if not key.startswith('_') and not callable(value)
+        }
+        
+        return FNOUnit(**params)
+
+        unit = FNOUnit(**params) 
+
+        self._reset() 
+        return unit

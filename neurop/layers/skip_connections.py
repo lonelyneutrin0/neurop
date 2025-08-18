@@ -3,11 +3,14 @@ import torch
 import torch.nn as nn
 
 from torch.types import Tensor
-from typing import Literal, Optional, Union
+from typing import Optional
+from enum import Enum
 
-Connection = Union['SoftGatingConnection', 'IdentityConnection', 'ConvConnection']
-ConnectionType = Literal['identity', 'soft-gating', 'conv']
-        
+class Connection(Enum): 
+    SOFT_GATING = 'soft-gating'
+    IDENTITY = 'identity'
+    CONV = 'conv'
+
 class SoftGatingConnection(nn.Module): 
     """Soft-gating connection that applies a learnable gating mechanism to the skip connection."""
 
@@ -116,8 +119,8 @@ def create_skip_connection(
     n_dim: int = -1, 
     n_kernel: int = -1, 
     bias: bool = False, 
-    connection_type: ConnectionType = 'soft-gating',
-) -> Connection: 
+    connection_type: Connection = Connection.SOFT_GATING,
+): 
     """Create a skip connection module.
     
     Args:
@@ -126,21 +129,21 @@ def create_skip_connection(
         n_dim (int): Number of spatial dimensions (for soft-gating)
         n_kernel (int): Kernel size (for convolution)
         bias (bool): Whether to include bias parameters
-        connection_type (ConnectionType): Type of connection ('identity', 'soft-gating', 'conv')
+        connection_type (Connection): Type of connection ('identity', 'soft-gating', 'conv')
 
     Returns:
         The appropriate skip connection module
 
     """
-    if connection_type == 'identity':
+    if connection_type == Connection.IDENTITY:
         return IdentityConnection()
-    
-    if connection_type == 'soft-gating':
+
+    if connection_type == Connection.SOFT_GATING:
         if n_dim == -1:
             raise ValueError('Specify the number of spatial dimensions for the soft-gating connection.')
         return SoftGatingConnection(in_features=in_features, n_dim=n_dim, bias=bias)
 
-    if connection_type == 'conv':
+    if connection_type == Connection.CONV:
         if n_kernel == -1: 
             raise ValueError('Specify a kernel size for the convolution skip connection.')
         return ConvConnection(in_features=in_features, out_features=out_features, n_kernel=n_kernel, bias=bias)

@@ -1,8 +1,9 @@
 """neurop layers module."""
 from .spectral_convolution import SpectralConv as SpectralConv
-from .spectral_convolution import NormType as NormType
+from .spectral_convolution import FFTNormType as FFTNormType
 
 from .skip_connections import create_skip_connection as create_skip_connection
+from .skip_connections import Connection as Connection
 
 from .fno_unit import FNOUnit as FNOUnit
 
