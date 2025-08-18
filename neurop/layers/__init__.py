@@ -3,9 +3,13 @@ from .spectral_convolution import SpectralConv as SpectralConv
 from .spectral_convolution import FFTNormType as FFTNormType
 
 from .skip_connections import create_skip_connection as create_skip_connection
+from .skip_connections import SoftGatingConnection as SoftGatingConnection
+from .skip_connections import ConvConnection as ConvConnection
+from .skip_connections import IdentityConnection as IdentityConnection
 from .skip_connections import Connection as Connection
 
 from .fno_unit import FNOUnit as FNOUnit
+from .fno_unit import FNOUnitBuilder as FNOUnitBuilder
 
 from .feature_mlp import LinearFeatureMLP as LinearFeatureMLP
 from .feature_mlp import ConvFeatureMLP as ConvFeatureMLP

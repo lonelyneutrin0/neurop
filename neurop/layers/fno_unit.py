@@ -9,9 +9,9 @@ from .spectral_convolution import SpectralConv, FFTNormType
 from .feature_mlp import ConvFeatureMLP
 from .skip_connections import create_skip_connection, Connection
 
-from ..base import NeuralOperatorUnitBuilder
+from ..base import NeuralOperatorUnitBuilder, NeuralOperatorUnit
 
-class FNOUnit(nn.Module):
+class FNOUnit(NeuralOperatorUnit):
     """Single Fourier Neural Operator Unit.
     
     Consists of: Spectral Convolution -> Skip Connection -> Activation Function -> Feature MLP -> Skip Connection -> Activation Function.

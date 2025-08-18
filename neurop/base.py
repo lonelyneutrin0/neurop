@@ -18,6 +18,19 @@ class NeuralOperator(torch.nn.Module, ABC):
         """Forward pass to be implemented by subclasses."""
         pass
 
+class NeuralOperatorUnit(torch.nn.Module, ABC):
+    """Abstract class for Neural Operator Units."""
+
+    def __init__(self): 
+        """__init__ method to initialize NeuralOperatorUnit."""
+        super().__init__() 
+        pass 
+
+    @abstractmethod
+    def forward(self, *args, **kwargs) -> torch.Tensor:
+        """Forward pass to be implemented by subclasses."""
+        pass
+
 class NeuralOperatorBuilder(ABC): 
     """Abstract class for building Neural Operators."""
 
@@ -56,6 +69,11 @@ class NeuralOperatorBuilder(ABC):
         """Configure settings for learnable normalizers for the Neural Operator."""
         pass
 
+    @abstractmethod
+    def build(self, *args, **kwargs) -> NeuralOperator:
+        """Build and return the NeuralOperator."""
+        pass
+
 class NeuralOperatorUnitBuilder(ABC):
     """Abstract class for a single Neural Operator Layer."""
 
@@ -92,4 +110,9 @@ class NeuralOperatorUnitBuilder(ABC):
     @abstractmethod
     def use_learnable_normalizers(self, *args, **kwargs) -> Self:
         """Configure settings for learnable normalizers for the NeuralOperatorUnit."""
+        pass
+
+    @abstractmethod
+    def build(self, *args, **kwargs) -> NeuralOperatorUnit:
+        """Build and return the NeuralOperatorUnit."""
         pass
