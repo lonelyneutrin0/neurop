@@ -16,6 +16,7 @@ class SkipConnection(nn.Module, ABC):
 
     def __init__(self, *args, **kwargs): 
         """__init__ method for Skip Connections."""
+        super().__init__()
         pass
 
     @abstractmethod
@@ -35,7 +36,7 @@ class SoftGatingConnection(SkipConnection):
     bias: Optional[nn.Parameter]
     """Optional bias to be added to the skip connection layer"""
 
-    def __init__(self, in_features: int, n_dim: int, bias: bool = False):
+    def __init__(self, in_features: int, n_dim: int, bias: bool = False, *args, **kwargs):
         """Initialize the soft-gating connection.
         
         Args:
@@ -73,7 +74,7 @@ class SoftGatingConnection(SkipConnection):
 class ConvConnection(SkipConnection): 
     """Convolution Skip Connection Layer."""
 
-    def __init__(self, in_features: int, out_features: int, n_kernel: int, bias=False):
+    def __init__(self, in_features: int, out_features: int, n_kernel: int, bias=False, *args, **kwargs):
         """Convolution based skip connection.
         
         Arguments:
@@ -111,6 +112,8 @@ class IdentityConnection(SkipConnection):
 
     This maintains consistent interface with other skip connections.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def forward(self, x: torch.Tensor, transformed_x: torch.Tensor) -> torch.Tensor:
         """Forward pass for the identity connection.

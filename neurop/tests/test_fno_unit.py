@@ -5,7 +5,7 @@ from neurop.layers.normalizers import BatchNormalizer, LayerNormalizer
 from neurop.layers.spectral_convolution import SpectralConv
 from neurop.layers.feature_mlp import LinearFeatureMLP
 
-from neurop.layers.skip_connections import Connection
+from neurop.layers.skip_connections import IdentityConnection, SoftGatingConnection
 
 import torch
 import torch.nn as nn
@@ -50,7 +50,7 @@ def test_fno_unit_3d_different_features():
         out_features=4, 
         n_dim=3, 
         modes=[2, 3, 4],
-        skip_connection=Connection.IDENTITY
+        skip_connection=IdentityConnection
     )
     x = torch.randn(1, 2, 4, 6, 8) 
     output = unit(x)
@@ -113,8 +113,8 @@ def test_fno_unit_skip_connection_types():
         out_features=3, 
         n_dim=2, 
         modes=[4, 4],  
-        skip_connection=Connection.IDENTITY,
-        feature_mlp_skip_connection=Connection.IDENTITY
+        skip_connection=IdentityConnection,
+        feature_mlp_skip_connection=IdentityConnection
     )
     
     unit_linear = FNOUnit(
@@ -122,8 +122,8 @@ def test_fno_unit_skip_connection_types():
         out_features=3, 
         n_dim=2, 
         modes=[4, 4], 
-        skip_connection=Connection.SOFT_GATING,
-        feature_mlp_skip_connection=Connection.SOFT_GATING
+        skip_connection=SoftGatingConnection,
+        feature_mlp_skip_connection=SoftGatingConnection
     )
     
     x = torch.randn(2, 3, 4, 5)
@@ -190,12 +190,12 @@ def test_fno_unit_builder():
     .set_activation_function(nn.ReLU)\
     .set_conv_module(
         conv_module=SpectralConv,
-        skip_connection=Connection.IDENTITY,
+        skip_connection=SoftGatingConnection,
         conv_normalizer=BatchNormalizer,
     )\
     .set_feature_mlp(
         feature_mlp_module=LinearFeatureMLP,
-        feature_mlp_skip_connection=Connection.IDENTITY,
+        feature_mlp_skip_connection=SoftGatingConnection,
         feature_mlp_normalizer=LayerNormalizer,
         feature_expansion_factor=2.0,
         feature_mlp_depth=4

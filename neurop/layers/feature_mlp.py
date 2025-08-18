@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 
 class FeatureMLP(nn.Module, ABC): 
     def __init__(self, *args, **kwargs): 
+        super().__init__()
         pass
     
     @abstractmethod

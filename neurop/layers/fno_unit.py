@@ -345,6 +345,7 @@ class FNOUnitBuilder(NeuralOperatorUnitBuilder):
             An FNOUnitBuilder object
 
         """
+        self.use_feature_mlp = True
         self.feature_mlp_module = feature_mlp_module
         self.feature_mlp_depth = feature_mlp_depth
         self.feature_mlp_skip_connection = feature_mlp_skip_connection

@@ -166,6 +166,7 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
     def __init__(self):
         """__init__ method for FourierOperatorBuilder."""
         super().__init__()
+        self._reset()
 
     def _reset(self): 
         """Reset all parameters to their default values."""
@@ -240,7 +241,7 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
         return self
 
     def set_conv_module(self, 
-                        conv_module: Type[SpectralConv], 
+                        conv_module: Type[Conv], 
                         skip_connection: Type[SkipConnection],
                         conv_normalizer: Type[Normalizer],
                         *,
@@ -268,7 +269,7 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
         return self
 
     def set_feature_mlp(self, 
-                        feature_mlp_module: Type[ConvFeatureMLP], 
+                        feature_mlp_module: Type[FeatureMLP], 
                         feature_mlp_depth: int, 
                         feature_mlp_skip_connection: Type[SkipConnection],
                         feature_expansion_factor: float,
@@ -287,6 +288,7 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
         Returns:
             FourierOperatorBuilder
         """
+        self.use_feature_mlp = True
         self.feature_mlp_module = feature_mlp_module
         self.feature_mlp_depth = feature_mlp_depth
         self.feature_mlp_skip_connection = feature_mlp_skip_connection

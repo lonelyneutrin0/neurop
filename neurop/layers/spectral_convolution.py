@@ -16,6 +16,7 @@ class Conv(nn.Module, ABC):
     """Spectral Convolution Layer Abstract Class."""
 
     def __init__(self, *args, **kwargs): 
+        super().__init__()
         pass
 
     @abstractmethod
