@@ -14,17 +14,54 @@ class NeuralOperator(torch.nn.Module, ABC):
         pass
     
     @abstractmethod
-    def forward(self) -> torch.Tensor:
+    def forward(self, *args, **kwargs) -> torch.Tensor:
         """Forward pass to be implemented by subclasses."""
         pass
 
-class NeuralOperatorUnitBuilder(torch.nn.Module, ABC):
+class NeuralOperatorBuilder(ABC): 
+    """Abstract class for building Neural Operators."""
+
+    @abstractmethod
+    def __init__(self): 
+        """__init__ method for the NeuralOperatorBuilder."""
+        pass
+
+    @abstractmethod
+    def set_architecture(self, *args, **kwargs) -> Self: 
+        """Set the architecture for the Neural Operator.""" 
+        pass
+    
+    @abstractmethod
+    def set_activation_function(self, *args, **kwargs) -> Self:
+        """Set the activation function for the Neural Operator."""
+        pass 
+
+    @abstractmethod
+    def set_conv_module(self, *args, **kwargs) -> Self:
+        """Set the convolution module for the Neural Operator."""
+        pass
+
+    @abstractmethod
+    def set_feature_mlp(self, *args, **kwargs) -> Self:
+        """Use a Feature MLP for the Neural Operator."""
+        pass
+
+    @abstractmethod
+    def use_bias(self, *args, **kwargs) -> Self:
+        """Toggle bias for the Neural Operator."""
+        pass
+
+    @abstractmethod
+    def use_learnable_normalizers(self, *args, **kwargs) -> Self:
+        """Configure settings for learnable normalizers for the Neural Operator."""
+        pass
+
+class NeuralOperatorUnitBuilder(ABC):
     """Abstract class for a single Neural Operator Layer."""
 
     @abstractmethod
     def __init__(self):
         """__init__ method for the NeuralOperatorUnit."""
-        super().__init__()
         pass 
 
     @abstractmethod
@@ -34,6 +71,7 @@ class NeuralOperatorUnitBuilder(torch.nn.Module, ABC):
     
     @abstractmethod
     def set_activation_function(self, *args, **kwargs) -> Self:
+        """Set the activation function for the NeuralOperatorUnit."""
         pass 
 
     @abstractmethod
@@ -43,15 +81,15 @@ class NeuralOperatorUnitBuilder(torch.nn.Module, ABC):
 
     @abstractmethod
     def set_feature_mlp(self, *args, **kwargs) -> Self:
-        """Use a Feature MLP for the Unit."""
+        """Use a Feature MLP for the NeuralOperatorUnit."""
         pass
 
     @abstractmethod
-    def set_normalizer(self, *args, **kwargs) -> Self: 
-        """Set a normalizer for the NeuralOperatorUnit."""
+    def use_bias(self, *args, **kwargs) -> Self:
+        """Toggle bias for the NeuralOperatorUnit."""
         pass
 
     @abstractmethod
-    def set_scaling(self, *args, **kwargs) -> Self:
-        """Set the initial scaling and bias for the NeuralOperatorUnit."""
+    def use_learnable_normalizers(self, *args, **kwargs) -> Self:
+        """Configure settings for learnable normalizers for the NeuralOperatorUnit."""
         pass

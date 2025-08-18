@@ -378,14 +378,33 @@ class FNOUnitBuilder(NeuralOperatorUnitBuilder):
             An FNOUnit object initialized with the specified parameters.
 
         """
-        params = {
-            key: value for key, value in self.__dict__.items() 
-            if not key.startswith('_') and not callable(value)
-        }
-        
-        return FNOUnit(**params)
 
-        unit = FNOUnit(**params) 
+        if self.in_features is None or self.out_features is None or self.modes is None or self.n_dim is None:
+            raise ValueError("Required parameters (in_features, out_features, modes, n_dim) must be set before building.")
+        
+        unit = FNOUnit(
+                in_features = self.in_features, 
+                out_features = self.out_features,
+                modes = self.modes,
+                n_dim = self.n_dim,
+                activation_function = self.activation_function,
+                conv_module = self.conv_module,
+                skip_connection = self.skip_connection,
+                n_kernel = self.n_kernel,
+                use_feature_mlp = self.use_feature_mlp,
+                feature_mlp_module = self.feature_mlp_module,
+                feature_mlp_depth = self.feature_mlp_depth,
+                feature_mlp_skip_connection = self.feature_mlp_skip_connection,
+                feature_expansion_factor = self.feature_expansion_factor,
+                bias = self.bias,
+                init_scale = self.init_scale,
+                dtype = self.dtype,
+                norm = self.norm,
+                conv_normalizer = self.conv_normalizer,
+                feature_mlp_normalizer = self.feature_mlp_normalizer,
+                learnable_normalizers = self.learnable_normalizers,
+                normalizer_eps = self.normalizer_eps,
+        )
 
         self._reset() 
         return unit
