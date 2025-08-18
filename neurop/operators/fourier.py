@@ -11,7 +11,7 @@ from ..layers.fno_unit import FNOUnit
 from ..layers.feature_mlp import FeatureMLP, ConvFeatureMLP, LinearFeatureMLP
 from ..layers.normalizers import Normalizer
 
-from typing import Self
+from typing_extensions import Self
 
 class FourierOperator(NeuralOperator):
     """ 

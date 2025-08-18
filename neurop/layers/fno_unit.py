@@ -2,7 +2,8 @@
 import torch
 import torch.nn as nn
 
-from typing import Type, Union, List, Optional, Self
+from typing import Type, Union, List, Optional
+from typing_extensions import Self
 
 from .spectral_convolution import Conv, SpectralConv, FFTNormType
 from .feature_mlp import FeatureMLP, ConvFeatureMLP

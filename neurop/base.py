@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import torch 
 
-from typing import Self
+from typing_extensions import Self
 
 class NeuralOperator(torch.nn.Module, ABC):
     """Abstract class for Neural Operators."""
