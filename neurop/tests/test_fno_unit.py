@@ -1,6 +1,11 @@
 """FNOUnit Tests."""
-from neurop.layers.fno_unit import FNOUnit
+from neurop.layers.fno_unit import FNOUnit, FNOUnitBuilder
 from neurop.layers.normalizers import BatchNormalizer, LayerNormalizer
+
+from neurop.layers.spectral_convolution import SpectralConv
+from neurop.layers.feature_mlp import LinearFeatureMLP
+
+from neurop.layers.skip_connections import Connection
 
 import torch
 import torch.nn as nn
@@ -45,7 +50,7 @@ def test_fno_unit_3d_different_features():
         out_features=4, 
         n_dim=3, 
         modes=[2, 3, 4],
-        skip_connection='identity'  
+        skip_connection=Connection.IDENTITY
     )
     x = torch.randn(1, 2, 4, 6, 8) 
     output = unit(x)
@@ -90,16 +95,16 @@ def test_fno_unit_with_normalizers():
         out_features=3, 
         n_dim=2, 
         modes=[4, 4],  
-        spectral_normalizer=BatchNormalizer,
-        feature_normalizer=LayerNormalizer,
+        conv_normalizer=BatchNormalizer,
+        feature_mlp_normalizer=LayerNormalizer,
         learnable_normalizers=True
     )
     x = torch.randn(2, 3, 4, 5)
     output = unit(x)
     
     assert output.shape == x.shape, "Output shape should match input shape"
-    assert unit.spectral_normalizer is not None, "Spectral normalizer should be initialized"
-    assert unit.feature_normalizer is not None, "Feature normalizer should be initialized"
+    assert unit.conv_normalizer is not None, "Spectral normalizer should be initialized"
+    assert unit.feature_mlp_normalizer is not None, "Feature normalizer should be initialized"
 
 def test_fno_unit_skip_connection_types():
     """Test FNOUnit with different skip connection types."""
@@ -108,17 +113,17 @@ def test_fno_unit_skip_connection_types():
         out_features=3, 
         n_dim=2, 
         modes=[4, 4],  
-        skip_connection='identity',
-        feature_mlp_skip_connection='identity'
+        skip_connection=Connection.IDENTITY,
+        feature_mlp_skip_connection=Connection.IDENTITY
     )
     
     unit_linear = FNOUnit(
         in_features=3, 
-        out_features=5, 
+        out_features=3, 
         n_dim=2, 
         modes=[4, 4], 
-        skip_connection='identity',
-        feature_mlp_skip_connection='identity'
+        skip_connection=Connection.SOFT_GATING,
+        feature_mlp_skip_connection=Connection.SOFT_GATING
     )
     
     x = torch.randn(2, 3, 4, 5)
@@ -127,7 +132,7 @@ def test_fno_unit_skip_connection_types():
     output_linear = unit_linear(x)
     
     assert output_identity.shape == x.shape, "Identity skip connection should preserve shape"
-    assert output_linear.shape == (2, 5, 4, 5), "Linear skip connection should handle feature change"
+    assert output_linear.shape == (2, 3, 4, 5), "Linear skip connection should handle feature change"
 
 def test_fno_unit_input_validation():
     """Test FNOUnit input validation."""
@@ -170,3 +175,30 @@ def test_fno_unit_feature_expansion():
     assert output.shape == x.shape, "Output shape should match input shape"
     # The feature MLP should have expanded hidden dimensions internally
     
+def test_fno_unit_builder(): 
+    """Test FNO Unit Builder."""
+
+    builder = FNOUnitBuilder()\
+    .set_architecture(
+        in_features=3,
+        out_features=3,
+        n_dim=2,
+        modes=[4, 4],
+        dtype=torch.float64,
+        init_scale=1.0
+    )\
+    .set_activation_function(nn.ReLU)\
+    .set_conv_module(
+        conv_module=SpectralConv,
+        skip_connection=Connection.IDENTITY,
+        conv_normalizer=BatchNormalizer,
+    )\
+    .set_feature_mlp(
+        feature_mlp_module=LinearFeatureMLP,
+        feature_mlp_skip_connection=Connection.IDENTITY,
+        feature_mlp_normalizer=LayerNormalizer,
+        feature_expansion_factor=2.0,
+        feature_mlp_depth=4
+    )
+
+    _ = builder.build() 

@@ -2,16 +2,28 @@
 import torch 
 import torch.nn as nn
 
-from torch.types import Tensor
 from typing import Optional
+
+from abc import ABC, abstractmethod
+
 from enum import Enum
 
-class Connection(Enum): 
+class ConnectionType(Enum): 
     SOFT_GATING = 'soft-gating'
-    IDENTITY = 'identity'
     CONV = 'conv'
+    IDENTITY = 'identity'
+class SkipConnection(nn.Module, ABC): 
 
-class SoftGatingConnection(nn.Module): 
+    def __init__(self, *args, **kwargs): 
+        """__init__ method for Skip Connections."""
+        pass
+
+    @abstractmethod
+    def forward(self, *args, **kwargs) -> torch.Tensor:
+        """Forward method for Skip Connections."""
+        pass
+
+class SoftGatingConnection(SkipConnection): 
     """Soft-gating connection that applies a learnable gating mechanism to the skip connection."""
 
     in_features: int
@@ -42,15 +54,15 @@ class SoftGatingConnection(nn.Module):
         else:
             self.bias = None
         
-    def forward(self, x: Tensor, transformed_x: Tensor) -> Tensor:
+    def forward(self, x: torch.Tensor, transformed_x: torch.Tensor) -> torch.Tensor:
         """Forward pass for the soft-gating connection.
 
         Args:
-            x (Tensor): The input tensor [B, C, d_1, d_2, ...]
-            transformed_x (Tensor) : The transformed input tensor [B, C, d_1, d_2, ...]
+            x (torch.Tensor): The input tensor [B, C, d_1, d_2, ...]
+            transformed_x (torch.Tensor) : The transformed input tensor [B, C, d_1, d_2, ...]
 
         Returns:
-            Tensor [B, C, d_1, d_2, ....]
+            torch.Tensor [B, C, d_1, d_2, ....]
 
         """
         if self.bias is not None:
@@ -58,7 +70,7 @@ class SoftGatingConnection(nn.Module):
 
         return self.weight * x + transformed_x
 
-class ConvConnection(nn.Module): 
+class ConvConnection(SkipConnection): 
     """Convolution Skip Connection Layer."""
 
     def __init__(self, in_features: int, out_features: int, n_kernel: int, bias=False):
@@ -78,11 +90,11 @@ class ConvConnection(nn.Module):
         """Forward pass for the convolutional skip connection.
 
         Args:
-            x (Tensor): Input tensor 
-            transformed_x (Tensor): The transformed input tensor
+            x (torch.Tensor): Input tensor 
+            transformed_x (torch.Tensor): The transformed input tensor
 
         Returns:
-            Tensor: Output tensor
+            torch.Tensor: Output tensor
 
         """
         size = list(x.shape)
@@ -94,21 +106,21 @@ class ConvConnection(nn.Module):
 
         return x + transformed_x
 
-class IdentityConnection(nn.Module):
+class IdentityConnection(SkipConnection):
     """Identity connection that returns the transformed input.
 
     This maintains consistent interface with other skip connections.
     """
-    
-    def forward(self, x: Tensor, transformed_x: Tensor) -> Tensor:
+
+    def forward(self, x: torch.Tensor, transformed_x: torch.Tensor) -> torch.Tensor:
         """Forward pass for the identity connection.
 
         Args:
-            x (Tensor): Input tensor (ignored).
-            transformed_x (Tensor): Transformed input tensor.
+            x (torch.Tensor): Input tensor (ignored).
+            transformed_x (torch.Tensor): Transformed input tensor.
 
         Returns:
-            Tensor: The transformed input tensor.
+            torch.Tensor: The transformed input tensor.
 
         """
         return transformed_x
@@ -119,8 +131,8 @@ def create_skip_connection(
     n_dim: int = -1, 
     n_kernel: int = -1, 
     bias: bool = False, 
-    connection_type: Connection = Connection.SOFT_GATING,
-): 
+    connection_type: ConnectionType = ConnectionType.SOFT_GATING,
+) -> SkipConnection: 
     """Create a skip connection module.
     
     Args:
@@ -129,21 +141,21 @@ def create_skip_connection(
         n_dim (int): Number of spatial dimensions (for soft-gating)
         n_kernel (int): Kernel size (for convolution)
         bias (bool): Whether to include bias parameters
-        connection_type (Connection): Type of connection ('identity', 'soft-gating', 'conv')
+        connection_type (ConnectionType): Type of connection ('identity', 'soft-gating', 'conv')
 
     Returns:
         The appropriate skip connection module
 
     """
-    if connection_type == Connection.IDENTITY:
+    if connection_type == ConnectionType.IDENTITY:
         return IdentityConnection()
 
-    if connection_type == Connection.SOFT_GATING:
+    if connection_type == ConnectionType.SOFT_GATING:
         if n_dim == -1:
             raise ValueError('Specify the number of spatial dimensions for the soft-gating connection.')
         return SoftGatingConnection(in_features=in_features, n_dim=n_dim, bias=bias)
 
-    if connection_type == Connection.CONV:
+    if connection_type == ConnectionType.CONV:
         if n_kernel == -1: 
             raise ValueError('Specify a kernel size for the convolution skip connection.')
         return ConvConnection(in_features=in_features, out_features=out_features, n_kernel=n_kernel, bias=bias)

@@ -13,13 +13,13 @@ def frft(x: torch.Tensor, alpha: Union[float, torch.Tensor], *, dim: int = -1, d
     Rotations can be interpreted as a composition of three shear transformations, which can be efficiently computed using the Chirp Multiplication Algorithm.
 
     Args:
-        x (Tensor): The input tensor to perform the FrFT on 
-        alpha (Union[float, Tensor]): The fractional order of the FrFT 
+        x (torch.Tensor): The input tensor to perform the FrFT on 
+        alpha (Union[float, torch.Tensor]): The fractional order of the FrFT 
         dim (int): The dimension along which to perform the FrFT 
         device (Device): The device to run the computation on. Defaults to x.device
 
     Returns:
-        Tensor 
+        torch.Tensor: The result of the fractional Fourier transform
 
     """
     if not device: 

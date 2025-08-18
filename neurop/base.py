@@ -10,7 +10,6 @@ class NeuralOperator(torch.nn.Module, ABC):
 
     def __init__(self):
         """__init__ method to initialize NeuralOperator."""
-        super().__init__()
         pass
     
     @abstractmethod
@@ -23,7 +22,6 @@ class NeuralOperatorUnit(torch.nn.Module, ABC):
 
     def __init__(self): 
         """__init__ method to initialize NeuralOperatorUnit."""
-        super().__init__() 
         pass 
 
     @abstractmethod

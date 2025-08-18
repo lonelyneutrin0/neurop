@@ -1,15 +1,15 @@
 """Fourier Neural Operator (FNO) implementation for learning mappings between functions in the Fourier domain."""
-from torch.types import Tensor
 from typing import List, Union, Type, Optional
-from ..layers.skip_connections import Connection
 
 import torch
 import torch.nn as nn
 
+from ..layers.skip_connections import SkipConnection, IdentityConnection
 from ..base import NeuralOperator, NeuralOperatorBuilder
-from ..layers.spectral_convolution import SpectralConv, FFTNormType
+from ..layers.spectral_convolution import Conv, SpectralConv, FFTNormType
 from ..layers.fno_unit import FNOUnit
-from ..layers.feature_mlp import ConvFeatureMLP, LinearFeatureMLP
+from ..layers.feature_mlp import FeatureMLP, ConvFeatureMLP, LinearFeatureMLP
+from ..layers.normalizers import Normalizer
 
 from typing import Self
 
@@ -29,10 +29,10 @@ class FourierOperator(NeuralOperator):
     readout: LinearFeatureMLP
     """Layer to read output features and project them to the final output features."""
 
-    spectral_normalizer: Optional[nn.Module]
+    spectral_normalizer: Optional[Normalizer]
     """Normalizer to apply to the spectral convolution output."""
 
-    feature_normalizer: Optional[nn.Module]
+    feature_normalizer: Optional[Normalizer]
     """Normalizer to apply to the feature MLP output."""
 
     learnable_normalizers: bool
@@ -49,20 +49,20 @@ class FourierOperator(NeuralOperator):
                  n_dim: int,
                  depth: int = 4,
                  activation_function: Type[nn.Module] = nn.ReLU,
-                 conv_module: Type[SpectralConv] = SpectralConv,
-                 skip_connections: Union[Connection, List[Connection]] = Connection.IDENTITY,
+                 conv_module: Type[Conv] = SpectralConv,
+                 skip_connections: Union[Type[SkipConnection], List[Type[SkipConnection]]] = IdentityConnection,
                  n_kernel: int = -1,
                  use_feature_mlp: bool = True,
-                 feature_mlp_module: Type[nn.Module] = ConvFeatureMLP,
+                 feature_mlp_module: Type[FeatureMLP] = ConvFeatureMLP,
                  feature_mlp_depth: int = 4,
-                 feature_mlp_skip_connections: Union[Connection, List[Connection]] = Connection.IDENTITY,
+                 feature_mlp_skip_connections: Union[Type[SkipConnection], List[Type[SkipConnection]]] = IdentityConnection,
                  feature_expansion_factor: float = 1.0,
                  bias: bool = True,
                  init_scale: float = 1.0,
                  dtype: torch.dtype = torch.cfloat,
                  norm: FFTNormType = FFTNormType.ORTHO,
-                 conv_normalizer: Optional[Type[nn.Module]] = None,
-                 feature_mlp_normalizer: Optional[Type[nn.Module]] = None,
+                 conv_normalizer: Optional[Type[Normalizer]] = None,
+                 feature_mlp_normalizer: Optional[Type[Normalizer]] = None,
                  *,
                  learnable_normalizers: bool = True,
                  normalizer_eps: float = 1e-10):
@@ -75,21 +75,21 @@ class FourierOperator(NeuralOperator):
             modes (Union[int, List[int]]): Number of Fourier modes to consider in each spatial dimension.
             n_dim (int): Number of spatial dimensions (2D, 3D, etc.).
             depth (int): Number of FNO units in the network.
-            activation_function (torch.nn.Module): Activation function to apply after spectral convolution.
-            conv_module (Type[SpectralConv]): Spectral convolution module to use.
-            skip_connections (Union[ConnectionType, List[ConnectionType]]): Type of skip connection to use.
+            activation_function (nn.Module): Activation function to apply after spectral convolution.
+            conv_module (Type[Conv]): Spectral convolution module to use.
+            skip_connections (Union[Type[SkipConnection], List[Type[SkipConnection]]]): Type of skip connection to use.
             n_kernel (int): Kernel size to use in the convolution skip connection.
             use_feature_mlp (bool): Whether to use a feature MLP for additional processing.
-            feature_mlp_module (Type[nn.Module]): Feature MLP module to use for additional processing.
+            feature_mlp_module (Type[FeatureMLP]): Feature MLP module to use for additional processing.
             feature_mlp_depth (int): Depth of the feature MLP.
-            feature_mlp_skip_connections (Union[ConnectionType, List[ConnectionType]]): Type of skip connection to use for the feature MLP.
+            feature_mlp_skip_connections (Union[Type[SkipConnection], List[Type[SkipConnection]]]): Type of skip connection to use for the feature MLP.
             feature_expansion_factor (float): Factor by which to expand the features in the feature MLP.
             bias (bool): Whether to include bias parameters in the skip connection.
             init_scale (float): Scale for initializing the weights of the spectral convolution layer.
             dtype (torch.dtype): Data type for the spectral convolution layer output, typically complex (torch.cfloat).
-            norm (NormType): Normalization type for the spectral convolution layer, can be 'backward', 'forward', or 'ortho'.
-            conv_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the spectral convolution output.
-            feature_mlp_normalizer (Optional[Type[nn.Module]]): Normalizer class to apply to the feature MLP output.
+            norm (FFTNormType): Normalization type for the spectral convolution layer, can be 'backward', 'forward', or 'ortho'.
+            conv_normalizer (Optional[Type[Normalizer]]): Normalizer class to apply to the spectral convolution output.
+            feature_mlp_normalizer (Optional[Type[Normalizer]]): Normalizer class to apply to the feature MLP output.
             learnable_normalizers (bool): Whether the normalization parameters are learnable.
             normalizer_eps (float): Epsilon value for numerical stability in normalization layers.
 
@@ -104,7 +104,7 @@ class FourierOperator(NeuralOperator):
             n_dim=n_dim,
         )
 
-        self.fno_units = torch.nn.ModuleList(
+        self.fno_units = nn.ModuleList(
             [
                 FNOUnit(
                     in_features=hidden_features, 
@@ -141,14 +141,14 @@ class FourierOperator(NeuralOperator):
             n_dim=n_dim
         )
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of the Fourier Operator.
         
         Args:
-            x (Tensor): Input tensor of shape (B, in_features, *spatial_dims).
+            x (torch.Tensor): Input tensor of shape (B, in_features, *spatial_dims).
         
         Returns:
-            Tensor: Output tensor of shape (B, out_features, *spatial_dims).
+            torch.Tensor: Output tensor of shape (B, out_features, *spatial_dims).
 
         """
         x = self.readin(x)
@@ -179,12 +179,12 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
         # Optional parameters with defaults
         self.activation_function = None
         self.conv_module = SpectralConv
-        self.skip_connection = Connection.IDENTITY
+        self.skip_connection = IdentityConnection
         self.n_kernel  = -1
         self.use_feature_mlp = False
         self.feature_mlp_module = ConvFeatureMLP
         self.feature_mlp_depth = 2
-        self.feature_mlp_skip_connection = Connection.IDENTITY
+        self.feature_mlp_skip_connection = IdentityConnection
         self.feature_expansion_factor = 1.0
         self.bias = True
         self.init_scale = 1.0
@@ -241,8 +241,8 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
 
     def set_conv_module(self, 
                         conv_module: Type[SpectralConv], 
-                        skip_connection: Connection,
-                        conv_normalizer: Type[nn.Module],
+                        skip_connection: Type[SkipConnection],
+                        conv_normalizer: Type[Normalizer],
                         *,
                         norm: FFTNormType = FFTNormType.ORTHO,
                         n_kernel: int = -1
@@ -252,8 +252,8 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
 
         Arguments:
             conv_module (Type[SpectralConv]): Convolution module to use in the FourierOperator.
-            skip_connection (Connection): Skip connection to use in the FourierOperator.
-            conv_normalizer (Type[nn.Module]): Normalizer to use for the convolution layer.
+            skip_connection (Type[SkipConnection]): Skip connection to use in the FourierOperator.
+            conv_normalizer (Type[Normalizer]): Normalizer to use for the convolution layer.
             norm (FFTNormType, optional): Normalization type to use. Defaults to FFTNormType.ORTHO.
             n_kernel (int, optional): Kernel size for the convolution layer. Defaults to -1.
 
@@ -270,9 +270,9 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
     def set_feature_mlp(self, 
                         feature_mlp_module: Type[ConvFeatureMLP], 
                         feature_mlp_depth: int, 
-                        feature_mlp_skip_connection: Connection,
+                        feature_mlp_skip_connection: Type[SkipConnection],
                         feature_expansion_factor: float,
-                        feature_mlp_normalizer: Type[nn.Module],
+                        feature_mlp_normalizer: Type[Normalizer],
                         ) -> Self:
         """
         Set the feature MLP for the FourierOperator.
@@ -280,9 +280,9 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
         Arguments:
             feature_mlp_module (Type[ConvFeatureMLP]): Feature MLP module to use in the FourierOperator.
             feature_mlp_depth (int): Depth of the feature MLP.
-            feature_mlp_skip_connection (Connection): Skip connection to use in the feature MLP.
+            feature_mlp_skip_connection (Type[SkipConnection]): Skip connection to use in the feature MLP.
             feature_expansion_factor (float): Expansion factor for the feature MLP.
-            feature_mlp_normalizer (Type[nn.Module]): Normalizer to use for the feature MLP.
+            feature_mlp_normalizer (Type[Normalizer]): Normalizer to use for the feature MLP.
 
         Returns:
             FourierOperatorBuilder
