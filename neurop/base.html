@@ -64,6 +64,78 @@
                 </ul>
 
             </li>
+            <li>
+                    <a class="class" href="#NeuralOperatorUnit">NeuralOperatorUnit</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#NeuralOperatorUnit.__init__">NeuralOperatorUnit</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorUnit.forward">forward</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#NeuralOperatorBuilder">NeuralOperatorBuilder</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#NeuralOperatorBuilder.__init__">NeuralOperatorBuilder</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorBuilder.set_architecture">set_architecture</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorBuilder.set_activation_function">set_activation_function</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorBuilder.set_conv_module">set_conv_module</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorBuilder.set_feature_mlp">set_feature_mlp</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorBuilder.use_bias">use_bias</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorBuilder.use_learnable_normalizers">use_learnable_normalizers</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorBuilder.build">build</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#NeuralOperatorUnitBuilder">NeuralOperatorUnitBuilder</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#NeuralOperatorUnitBuilder.__init__">NeuralOperatorUnitBuilder</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorUnitBuilder.set_architecture">set_architecture</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorUnitBuilder.set_activation_function">set_activation_function</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorUnitBuilder.set_conv_module">set_conv_module</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorUnitBuilder.set_feature_mlp">set_feature_mlp</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorUnitBuilder.use_bias">use_bias</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorUnitBuilder.use_learnable_normalizers">use_learnable_normalizers</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#NeuralOperatorUnitBuilder.build">build</a>
+                        </li>
+                </ul>
+
+            </li>
     </ul>
 
 
@@ -87,24 +159,126 @@
 
                         <label class="view-source-button" for="mod-base-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sd">&quot;&quot;&quot;Base class for Neural Operators in neurop.&quot;&quot;&quot;</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span> 
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">torch.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for Neural Operators.&quot;&quot;&quot;</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method to initialize NeuralOperator.&quot;&quot;&quot;</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>        <span class="k">pass</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass to be implemented by subclasses.&quot;&quot;&quot;</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>        <span class="k">pass</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&quot;&quot;&quot;Base class for Neural Operators in neurop.&quot;&quot;&quot;</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span> 
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for Neural Operators.&quot;&quot;&quot;</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method to initialize NeuralOperator.&quot;&quot;&quot;</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>        <span class="k">pass</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>    
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass to be implemented by subclasses.&quot;&quot;&quot;</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>        <span class="k">pass</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperatorUnit</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for Neural Operator Units.&quot;&quot;&quot;</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method to initialize NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>        <span class="k">pass</span> 
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass to be implemented by subclasses.&quot;&quot;&quot;</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>        <span class="k">pass</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperatorBuilder</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span> 
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for building Neural Operators.&quot;&quot;&quot;</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method for the NeuralOperatorBuilder.&quot;&quot;&quot;</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>        <span class="k">pass</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_architecture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span> 
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the architecture for the Neural Operator.&quot;&quot;&quot;</span> 
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>        <span class="k">pass</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>    
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_activation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the activation function for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>        <span class="k">pass</span> 
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_conv_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the convolution module for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>        <span class="k">pass</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_feature_mlp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Use a Feature MLP for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>        <span class="k">pass</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Toggle bias for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>        <span class="k">pass</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_learnable_normalizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure settings for learnable normalizers for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="k">pass</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NeuralOperator</span><span class="p">:</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and return the NeuralOperator.&quot;&quot;&quot;</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>        <span class="k">pass</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperatorUnitBuilder</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for a single Neural Operator Layer.&quot;&quot;&quot;</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="k">pass</span> 
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_architecture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span> 
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the architecture for the NeuralOperatorUnit.&quot;&quot;&quot;</span> 
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>        <span class="k">pass</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_activation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the activation function for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>        <span class="k">pass</span> 
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_conv_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the convolution module for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="k">pass</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_feature_mlp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Use a Feature MLP for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="k">pass</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Toggle bias for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        <span class="k">pass</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_learnable_normalizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure settings for learnable normalizers for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>        <span class="k">pass</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NeuralOperatorUnit</span><span class="p">:</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and return the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -120,18 +294,18 @@
 
     </div>
     <a class="headerlink" href="#NeuralOperator"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator-8"><a href="#NeuralOperator-8"><span class="linenos"> 8</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-</span><span id="NeuralOperator-9"><a href="#NeuralOperator-9"><span class="linenos"> 9</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for Neural Operators.&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-10"><a href="#NeuralOperator-10"><span class="linenos">10</span></a>
-</span><span id="NeuralOperator-11"><a href="#NeuralOperator-11"><span class="linenos">11</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="NeuralOperator-12"><a href="#NeuralOperator-12"><span class="linenos">12</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method to initialize NeuralOperator.&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-13"><a href="#NeuralOperator-13"><span class="linenos">13</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-</span><span id="NeuralOperator-14"><a href="#NeuralOperator-14"><span class="linenos">14</span></a>        <span class="k">pass</span>
-</span><span id="NeuralOperator-15"><a href="#NeuralOperator-15"><span class="linenos">15</span></a>    
-</span><span id="NeuralOperator-16"><a href="#NeuralOperator-16"><span class="linenos">16</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator-17"><a href="#NeuralOperator-17"><span class="linenos">17</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="NeuralOperator-18"><a href="#NeuralOperator-18"><span class="linenos">18</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass to be implemented by subclasses.&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator-19"><a href="#NeuralOperator-19"><span class="linenos">19</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator-9"><a href="#NeuralOperator-9"><span class="linenos"> 9</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+</span><span id="NeuralOperator-10"><a href="#NeuralOperator-10"><span class="linenos">10</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for Neural Operators.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-11"><a href="#NeuralOperator-11"><span class="linenos">11</span></a>
+</span><span id="NeuralOperator-12"><a href="#NeuralOperator-12"><span class="linenos">12</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="NeuralOperator-13"><a href="#NeuralOperator-13"><span class="linenos">13</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method to initialize NeuralOperator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-14"><a href="#NeuralOperator-14"><span class="linenos">14</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="NeuralOperator-15"><a href="#NeuralOperator-15"><span class="linenos">15</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperator-16"><a href="#NeuralOperator-16"><span class="linenos">16</span></a>    
+</span><span id="NeuralOperator-17"><a href="#NeuralOperator-17"><span class="linenos">17</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperator-18"><a href="#NeuralOperator-18"><span class="linenos">18</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+</span><span id="NeuralOperator-19"><a href="#NeuralOperator-19"><span class="linenos">19</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass to be implemented by subclasses.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperator-20"><a href="#NeuralOperator-20"><span class="linenos">20</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -143,16 +317,16 @@
                                         <input id="NeuralOperator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">NeuralOperator</span><span class="signature pdoc-code condensed">(<span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span>)</span>
+        <span class="name">NeuralOperator</span><span class="signature pdoc-code condensed">()</span>
 
                 <label class="view-source-button" for="NeuralOperator.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#NeuralOperator.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.__init__-11"><a href="#NeuralOperator.__init__-11"><span class="linenos">11</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="NeuralOperator.__init__-12"><a href="#NeuralOperator.__init__-12"><span class="linenos">12</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method to initialize NeuralOperator.&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.__init__-13"><a href="#NeuralOperator.__init__-13"><span class="linenos">13</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-</span><span id="NeuralOperator.__init__-14"><a href="#NeuralOperator.__init__-14"><span class="linenos">14</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.__init__-12"><a href="#NeuralOperator.__init__-12"><span class="linenos">12</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="NeuralOperator.__init__-13"><a href="#NeuralOperator.__init__-13"><span class="linenos">13</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method to initialize NeuralOperator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperator.__init__-14"><a href="#NeuralOperator.__init__-14"><span class="linenos">14</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="NeuralOperator.__init__-15"><a href="#NeuralOperator.__init__-15"><span class="linenos">15</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -173,14 +347,599 @@
 
     </div>
     <a class="headerlink" href="#NeuralOperator.forward"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.forward-16"><a href="#NeuralOperator.forward-16"><span class="linenos">16</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="NeuralOperator.forward-17"><a href="#NeuralOperator.forward-17"><span class="linenos">17</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-</span><span id="NeuralOperator.forward-18"><a href="#NeuralOperator.forward-18"><span class="linenos">18</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass to be implemented by subclasses.&quot;&quot;&quot;</span>
-</span><span id="NeuralOperator.forward-19"><a href="#NeuralOperator.forward-19"><span class="linenos">19</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperator.forward-17"><a href="#NeuralOperator.forward-17"><span class="linenos">17</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperator.forward-18"><a href="#NeuralOperator.forward-18"><span class="linenos">18</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+</span><span id="NeuralOperator.forward-19"><a href="#NeuralOperator.forward-19"><span class="linenos">19</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass to be implemented by subclasses.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperator.forward-20"><a href="#NeuralOperator.forward-20"><span class="linenos">20</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Forward pass to be implemented by subclasses.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="NeuralOperatorUnit">
+                            <input id="NeuralOperatorUnit-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">NeuralOperatorUnit</span><wbr>(<span class="base">torch.nn.modules.module.Module</span>, <span class="base">abc.ABC</span>):
+
+                <label class="view-source-button" for="NeuralOperatorUnit-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnit"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnit-22"><a href="#NeuralOperatorUnit-22"><span class="linenos">22</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperatorUnit</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+</span><span id="NeuralOperatorUnit-23"><a href="#NeuralOperatorUnit-23"><span class="linenos">23</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for Neural Operator Units.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnit-24"><a href="#NeuralOperatorUnit-24"><span class="linenos">24</span></a>
+</span><span id="NeuralOperatorUnit-25"><a href="#NeuralOperatorUnit-25"><span class="linenos">25</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+</span><span id="NeuralOperatorUnit-26"><a href="#NeuralOperatorUnit-26"><span class="linenos">26</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method to initialize NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnit-27"><a href="#NeuralOperatorUnit-27"><span class="linenos">27</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="NeuralOperatorUnit-28"><a href="#NeuralOperatorUnit-28"><span class="linenos">28</span></a>        <span class="k">pass</span> 
+</span><span id="NeuralOperatorUnit-29"><a href="#NeuralOperatorUnit-29"><span class="linenos">29</span></a>
+</span><span id="NeuralOperatorUnit-30"><a href="#NeuralOperatorUnit-30"><span class="linenos">30</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnit-31"><a href="#NeuralOperatorUnit-31"><span class="linenos">31</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnit-32"><a href="#NeuralOperatorUnit-32"><span class="linenos">32</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass to be implemented by subclasses.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnit-33"><a href="#NeuralOperatorUnit-33"><span class="linenos">33</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Abstract class for Neural Operator Units.</p>
+</div>
+
+
+                            <div id="NeuralOperatorUnit.__init__" class="classattr">
+                                        <input id="NeuralOperatorUnit.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">NeuralOperatorUnit</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="NeuralOperatorUnit.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnit.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnit.__init__-25"><a href="#NeuralOperatorUnit.__init__-25"><span class="linenos">25</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+</span><span id="NeuralOperatorUnit.__init__-26"><a href="#NeuralOperatorUnit.__init__-26"><span class="linenos">26</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method to initialize NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnit.__init__-27"><a href="#NeuralOperatorUnit.__init__-27"><span class="linenos">27</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="NeuralOperatorUnit.__init__-28"><a href="#NeuralOperatorUnit.__init__-28"><span class="linenos">28</span></a>        <span class="k">pass</span> 
+</span></pre></div>
+
+
+            <div class="docstring"><p>__init__ method to initialize NeuralOperatorUnit.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorUnit.forward" class="classattr">
+                                        <input id="NeuralOperatorUnit.forward-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">forward</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorUnit.forward-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnit.forward"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnit.forward-30"><a href="#NeuralOperatorUnit.forward-30"><span class="linenos">30</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnit.forward-31"><a href="#NeuralOperatorUnit.forward-31"><span class="linenos">31</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnit.forward-32"><a href="#NeuralOperatorUnit.forward-32"><span class="linenos">32</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass to be implemented by subclasses.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnit.forward-33"><a href="#NeuralOperatorUnit.forward-33"><span class="linenos">33</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Forward pass to be implemented by subclasses.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="NeuralOperatorBuilder">
+                            <input id="NeuralOperatorBuilder-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">NeuralOperatorBuilder</span><wbr>(<span class="base">abc.ABC</span>):
+
+                <label class="view-source-button" for="NeuralOperatorBuilder-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorBuilder"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorBuilder-35"><a href="#NeuralOperatorBuilder-35"><span class="linenos">35</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperatorBuilder</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span> 
+</span><span id="NeuralOperatorBuilder-36"><a href="#NeuralOperatorBuilder-36"><span class="linenos">36</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for building Neural Operators.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder-37"><a href="#NeuralOperatorBuilder-37"><span class="linenos">37</span></a>
+</span><span id="NeuralOperatorBuilder-38"><a href="#NeuralOperatorBuilder-38"><span class="linenos">38</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder-39"><a href="#NeuralOperatorBuilder-39"><span class="linenos">39</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+</span><span id="NeuralOperatorBuilder-40"><a href="#NeuralOperatorBuilder-40"><span class="linenos">40</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method for the NeuralOperatorBuilder.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder-41"><a href="#NeuralOperatorBuilder-41"><span class="linenos">41</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="NeuralOperatorBuilder-42"><a href="#NeuralOperatorBuilder-42"><span class="linenos">42</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperatorBuilder-43"><a href="#NeuralOperatorBuilder-43"><span class="linenos">43</span></a>
+</span><span id="NeuralOperatorBuilder-44"><a href="#NeuralOperatorBuilder-44"><span class="linenos">44</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder-45"><a href="#NeuralOperatorBuilder-45"><span class="linenos">45</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_architecture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span> 
+</span><span id="NeuralOperatorBuilder-46"><a href="#NeuralOperatorBuilder-46"><span class="linenos">46</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the architecture for the Neural Operator.&quot;&quot;&quot;</span> 
+</span><span id="NeuralOperatorBuilder-47"><a href="#NeuralOperatorBuilder-47"><span class="linenos">47</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperatorBuilder-48"><a href="#NeuralOperatorBuilder-48"><span class="linenos">48</span></a>    
+</span><span id="NeuralOperatorBuilder-49"><a href="#NeuralOperatorBuilder-49"><span class="linenos">49</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder-50"><a href="#NeuralOperatorBuilder-50"><span class="linenos">50</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_activation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder-51"><a href="#NeuralOperatorBuilder-51"><span class="linenos">51</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the activation function for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder-52"><a href="#NeuralOperatorBuilder-52"><span class="linenos">52</span></a>        <span class="k">pass</span> 
+</span><span id="NeuralOperatorBuilder-53"><a href="#NeuralOperatorBuilder-53"><span class="linenos">53</span></a>
+</span><span id="NeuralOperatorBuilder-54"><a href="#NeuralOperatorBuilder-54"><span class="linenos">54</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder-55"><a href="#NeuralOperatorBuilder-55"><span class="linenos">55</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_conv_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder-56"><a href="#NeuralOperatorBuilder-56"><span class="linenos">56</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the convolution module for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder-57"><a href="#NeuralOperatorBuilder-57"><span class="linenos">57</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperatorBuilder-58"><a href="#NeuralOperatorBuilder-58"><span class="linenos">58</span></a>
+</span><span id="NeuralOperatorBuilder-59"><a href="#NeuralOperatorBuilder-59"><span class="linenos">59</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder-60"><a href="#NeuralOperatorBuilder-60"><span class="linenos">60</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_feature_mlp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder-61"><a href="#NeuralOperatorBuilder-61"><span class="linenos">61</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Use a Feature MLP for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder-62"><a href="#NeuralOperatorBuilder-62"><span class="linenos">62</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperatorBuilder-63"><a href="#NeuralOperatorBuilder-63"><span class="linenos">63</span></a>
+</span><span id="NeuralOperatorBuilder-64"><a href="#NeuralOperatorBuilder-64"><span class="linenos">64</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder-65"><a href="#NeuralOperatorBuilder-65"><span class="linenos">65</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder-66"><a href="#NeuralOperatorBuilder-66"><span class="linenos">66</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Toggle bias for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder-67"><a href="#NeuralOperatorBuilder-67"><span class="linenos">67</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperatorBuilder-68"><a href="#NeuralOperatorBuilder-68"><span class="linenos">68</span></a>
+</span><span id="NeuralOperatorBuilder-69"><a href="#NeuralOperatorBuilder-69"><span class="linenos">69</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder-70"><a href="#NeuralOperatorBuilder-70"><span class="linenos">70</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_learnable_normalizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder-71"><a href="#NeuralOperatorBuilder-71"><span class="linenos">71</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure settings for learnable normalizers for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder-72"><a href="#NeuralOperatorBuilder-72"><span class="linenos">72</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperatorBuilder-73"><a href="#NeuralOperatorBuilder-73"><span class="linenos">73</span></a>
+</span><span id="NeuralOperatorBuilder-74"><a href="#NeuralOperatorBuilder-74"><span class="linenos">74</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder-75"><a href="#NeuralOperatorBuilder-75"><span class="linenos">75</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NeuralOperator</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder-76"><a href="#NeuralOperatorBuilder-76"><span class="linenos">76</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and return the NeuralOperator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder-77"><a href="#NeuralOperatorBuilder-77"><span class="linenos">77</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Abstract class for building Neural Operators.</p>
+</div>
+
+
+                            <div id="NeuralOperatorBuilder.__init__" class="classattr">
+                                        <input id="NeuralOperatorBuilder.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="name">NeuralOperatorBuilder</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="NeuralOperatorBuilder.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorBuilder.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorBuilder.__init__-38"><a href="#NeuralOperatorBuilder.__init__-38"><span class="linenos">38</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder.__init__-39"><a href="#NeuralOperatorBuilder.__init__-39"><span class="linenos">39</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+</span><span id="NeuralOperatorBuilder.__init__-40"><a href="#NeuralOperatorBuilder.__init__-40"><span class="linenos">40</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method for the NeuralOperatorBuilder.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder.__init__-41"><a href="#NeuralOperatorBuilder.__init__-41"><span class="linenos">41</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="NeuralOperatorBuilder.__init__-42"><a href="#NeuralOperatorBuilder.__init__-42"><span class="linenos">42</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>__init__ method for the NeuralOperatorBuilder.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorBuilder.set_architecture" class="classattr">
+                                        <input id="NeuralOperatorBuilder.set_architecture-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">set_architecture</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorBuilder.set_architecture-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorBuilder.set_architecture"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorBuilder.set_architecture-44"><a href="#NeuralOperatorBuilder.set_architecture-44"><span class="linenos">44</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder.set_architecture-45"><a href="#NeuralOperatorBuilder.set_architecture-45"><span class="linenos">45</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_architecture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span> 
+</span><span id="NeuralOperatorBuilder.set_architecture-46"><a href="#NeuralOperatorBuilder.set_architecture-46"><span class="linenos">46</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the architecture for the Neural Operator.&quot;&quot;&quot;</span> 
+</span><span id="NeuralOperatorBuilder.set_architecture-47"><a href="#NeuralOperatorBuilder.set_architecture-47"><span class="linenos">47</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Set the architecture for the Neural Operator.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorBuilder.set_activation_function" class="classattr">
+                                        <input id="NeuralOperatorBuilder.set_activation_function-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">set_activation_function</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorBuilder.set_activation_function-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorBuilder.set_activation_function"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorBuilder.set_activation_function-49"><a href="#NeuralOperatorBuilder.set_activation_function-49"><span class="linenos">49</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder.set_activation_function-50"><a href="#NeuralOperatorBuilder.set_activation_function-50"><span class="linenos">50</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_activation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder.set_activation_function-51"><a href="#NeuralOperatorBuilder.set_activation_function-51"><span class="linenos">51</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the activation function for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder.set_activation_function-52"><a href="#NeuralOperatorBuilder.set_activation_function-52"><span class="linenos">52</span></a>        <span class="k">pass</span> 
+</span></pre></div>
+
+
+            <div class="docstring"><p>Set the activation function for the Neural Operator.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorBuilder.set_conv_module" class="classattr">
+                                        <input id="NeuralOperatorBuilder.set_conv_module-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">set_conv_module</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorBuilder.set_conv_module-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorBuilder.set_conv_module"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorBuilder.set_conv_module-54"><a href="#NeuralOperatorBuilder.set_conv_module-54"><span class="linenos">54</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder.set_conv_module-55"><a href="#NeuralOperatorBuilder.set_conv_module-55"><span class="linenos">55</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_conv_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder.set_conv_module-56"><a href="#NeuralOperatorBuilder.set_conv_module-56"><span class="linenos">56</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the convolution module for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder.set_conv_module-57"><a href="#NeuralOperatorBuilder.set_conv_module-57"><span class="linenos">57</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Set the convolution module for the Neural Operator.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorBuilder.set_feature_mlp" class="classattr">
+                                        <input id="NeuralOperatorBuilder.set_feature_mlp-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">set_feature_mlp</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorBuilder.set_feature_mlp-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorBuilder.set_feature_mlp"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorBuilder.set_feature_mlp-59"><a href="#NeuralOperatorBuilder.set_feature_mlp-59"><span class="linenos">59</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder.set_feature_mlp-60"><a href="#NeuralOperatorBuilder.set_feature_mlp-60"><span class="linenos">60</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_feature_mlp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder.set_feature_mlp-61"><a href="#NeuralOperatorBuilder.set_feature_mlp-61"><span class="linenos">61</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Use a Feature MLP for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder.set_feature_mlp-62"><a href="#NeuralOperatorBuilder.set_feature_mlp-62"><span class="linenos">62</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Use a Feature MLP for the Neural Operator.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorBuilder.use_bias" class="classattr">
+                                        <input id="NeuralOperatorBuilder.use_bias-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">use_bias</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorBuilder.use_bias-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorBuilder.use_bias"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorBuilder.use_bias-64"><a href="#NeuralOperatorBuilder.use_bias-64"><span class="linenos">64</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder.use_bias-65"><a href="#NeuralOperatorBuilder.use_bias-65"><span class="linenos">65</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder.use_bias-66"><a href="#NeuralOperatorBuilder.use_bias-66"><span class="linenos">66</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Toggle bias for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder.use_bias-67"><a href="#NeuralOperatorBuilder.use_bias-67"><span class="linenos">67</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Toggle bias for the Neural Operator.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorBuilder.use_learnable_normalizers" class="classattr">
+                                        <input id="NeuralOperatorBuilder.use_learnable_normalizers-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">use_learnable_normalizers</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorBuilder.use_learnable_normalizers-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorBuilder.use_learnable_normalizers"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorBuilder.use_learnable_normalizers-69"><a href="#NeuralOperatorBuilder.use_learnable_normalizers-69"><span class="linenos">69</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder.use_learnable_normalizers-70"><a href="#NeuralOperatorBuilder.use_learnable_normalizers-70"><span class="linenos">70</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_learnable_normalizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder.use_learnable_normalizers-71"><a href="#NeuralOperatorBuilder.use_learnable_normalizers-71"><span class="linenos">71</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure settings for learnable normalizers for the Neural Operator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder.use_learnable_normalizers-72"><a href="#NeuralOperatorBuilder.use_learnable_normalizers-72"><span class="linenos">72</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Configure settings for learnable normalizers for the Neural Operator.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorBuilder.build" class="classattr">
+                                        <input id="NeuralOperatorBuilder.build-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">build</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n"><a href="#NeuralOperator">NeuralOperator</a></span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorBuilder.build-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorBuilder.build"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorBuilder.build-74"><a href="#NeuralOperatorBuilder.build-74"><span class="linenos">74</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorBuilder.build-75"><a href="#NeuralOperatorBuilder.build-75"><span class="linenos">75</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NeuralOperator</span><span class="p">:</span>
+</span><span id="NeuralOperatorBuilder.build-76"><a href="#NeuralOperatorBuilder.build-76"><span class="linenos">76</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and return the NeuralOperator.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorBuilder.build-77"><a href="#NeuralOperatorBuilder.build-77"><span class="linenos">77</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Build and return the NeuralOperator.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="NeuralOperatorUnitBuilder">
+                            <input id="NeuralOperatorUnitBuilder-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">NeuralOperatorUnitBuilder</span><wbr>(<span class="base">abc.ABC</span>):
+
+                <label class="view-source-button" for="NeuralOperatorUnitBuilder-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnitBuilder"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnitBuilder-79"><a href="#NeuralOperatorUnitBuilder-79"><span class="linenos"> 79</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NeuralOperatorUnitBuilder</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="NeuralOperatorUnitBuilder-80"><a href="#NeuralOperatorUnitBuilder-80"><span class="linenos"> 80</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for a single Neural Operator Layer.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder-81"><a href="#NeuralOperatorUnitBuilder-81"><span class="linenos"> 81</span></a>
+</span><span id="NeuralOperatorUnitBuilder-82"><a href="#NeuralOperatorUnitBuilder-82"><span class="linenos"> 82</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder-83"><a href="#NeuralOperatorUnitBuilder-83"><span class="linenos"> 83</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="NeuralOperatorUnitBuilder-84"><a href="#NeuralOperatorUnitBuilder-84"><span class="linenos"> 84</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder-85"><a href="#NeuralOperatorUnitBuilder-85"><span class="linenos"> 85</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="NeuralOperatorUnitBuilder-86"><a href="#NeuralOperatorUnitBuilder-86"><span class="linenos"> 86</span></a>        <span class="k">pass</span> 
+</span><span id="NeuralOperatorUnitBuilder-87"><a href="#NeuralOperatorUnitBuilder-87"><span class="linenos"> 87</span></a>
+</span><span id="NeuralOperatorUnitBuilder-88"><a href="#NeuralOperatorUnitBuilder-88"><span class="linenos"> 88</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder-89"><a href="#NeuralOperatorUnitBuilder-89"><span class="linenos"> 89</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_architecture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span> 
+</span><span id="NeuralOperatorUnitBuilder-90"><a href="#NeuralOperatorUnitBuilder-90"><span class="linenos"> 90</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the architecture for the NeuralOperatorUnit.&quot;&quot;&quot;</span> 
+</span><span id="NeuralOperatorUnitBuilder-91"><a href="#NeuralOperatorUnitBuilder-91"><span class="linenos"> 91</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperatorUnitBuilder-92"><a href="#NeuralOperatorUnitBuilder-92"><span class="linenos"> 92</span></a>    
+</span><span id="NeuralOperatorUnitBuilder-93"><a href="#NeuralOperatorUnitBuilder-93"><span class="linenos"> 93</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder-94"><a href="#NeuralOperatorUnitBuilder-94"><span class="linenos"> 94</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_activation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder-95"><a href="#NeuralOperatorUnitBuilder-95"><span class="linenos"> 95</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the activation function for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder-96"><a href="#NeuralOperatorUnitBuilder-96"><span class="linenos"> 96</span></a>        <span class="k">pass</span> 
+</span><span id="NeuralOperatorUnitBuilder-97"><a href="#NeuralOperatorUnitBuilder-97"><span class="linenos"> 97</span></a>
+</span><span id="NeuralOperatorUnitBuilder-98"><a href="#NeuralOperatorUnitBuilder-98"><span class="linenos"> 98</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder-99"><a href="#NeuralOperatorUnitBuilder-99"><span class="linenos"> 99</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_conv_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder-100"><a href="#NeuralOperatorUnitBuilder-100"><span class="linenos">100</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the convolution module for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder-101"><a href="#NeuralOperatorUnitBuilder-101"><span class="linenos">101</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperatorUnitBuilder-102"><a href="#NeuralOperatorUnitBuilder-102"><span class="linenos">102</span></a>
+</span><span id="NeuralOperatorUnitBuilder-103"><a href="#NeuralOperatorUnitBuilder-103"><span class="linenos">103</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder-104"><a href="#NeuralOperatorUnitBuilder-104"><span class="linenos">104</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_feature_mlp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder-105"><a href="#NeuralOperatorUnitBuilder-105"><span class="linenos">105</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Use a Feature MLP for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder-106"><a href="#NeuralOperatorUnitBuilder-106"><span class="linenos">106</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperatorUnitBuilder-107"><a href="#NeuralOperatorUnitBuilder-107"><span class="linenos">107</span></a>
+</span><span id="NeuralOperatorUnitBuilder-108"><a href="#NeuralOperatorUnitBuilder-108"><span class="linenos">108</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder-109"><a href="#NeuralOperatorUnitBuilder-109"><span class="linenos">109</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder-110"><a href="#NeuralOperatorUnitBuilder-110"><span class="linenos">110</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Toggle bias for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder-111"><a href="#NeuralOperatorUnitBuilder-111"><span class="linenos">111</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperatorUnitBuilder-112"><a href="#NeuralOperatorUnitBuilder-112"><span class="linenos">112</span></a>
+</span><span id="NeuralOperatorUnitBuilder-113"><a href="#NeuralOperatorUnitBuilder-113"><span class="linenos">113</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder-114"><a href="#NeuralOperatorUnitBuilder-114"><span class="linenos">114</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_learnable_normalizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder-115"><a href="#NeuralOperatorUnitBuilder-115"><span class="linenos">115</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure settings for learnable normalizers for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder-116"><a href="#NeuralOperatorUnitBuilder-116"><span class="linenos">116</span></a>        <span class="k">pass</span>
+</span><span id="NeuralOperatorUnitBuilder-117"><a href="#NeuralOperatorUnitBuilder-117"><span class="linenos">117</span></a>
+</span><span id="NeuralOperatorUnitBuilder-118"><a href="#NeuralOperatorUnitBuilder-118"><span class="linenos">118</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder-119"><a href="#NeuralOperatorUnitBuilder-119"><span class="linenos">119</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NeuralOperatorUnit</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder-120"><a href="#NeuralOperatorUnitBuilder-120"><span class="linenos">120</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and return the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder-121"><a href="#NeuralOperatorUnitBuilder-121"><span class="linenos">121</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Abstract class for a single Neural Operator Layer.</p>
+</div>
+
+
+                            <div id="NeuralOperatorUnitBuilder.__init__" class="classattr">
+                                        <input id="NeuralOperatorUnitBuilder.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="name">NeuralOperatorUnitBuilder</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="NeuralOperatorUnitBuilder.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnitBuilder.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnitBuilder.__init__-82"><a href="#NeuralOperatorUnitBuilder.__init__-82"><span class="linenos">82</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder.__init__-83"><a href="#NeuralOperatorUnitBuilder.__init__-83"><span class="linenos">83</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="NeuralOperatorUnitBuilder.__init__-84"><a href="#NeuralOperatorUnitBuilder.__init__-84"><span class="linenos">84</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;__init__ method for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder.__init__-85"><a href="#NeuralOperatorUnitBuilder.__init__-85"><span class="linenos">85</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="NeuralOperatorUnitBuilder.__init__-86"><a href="#NeuralOperatorUnitBuilder.__init__-86"><span class="linenos">86</span></a>        <span class="k">pass</span> 
+</span></pre></div>
+
+
+            <div class="docstring"><p>__init__ method for the NeuralOperatorUnit.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorUnitBuilder.set_architecture" class="classattr">
+                                        <input id="NeuralOperatorUnitBuilder.set_architecture-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">set_architecture</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorUnitBuilder.set_architecture-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnitBuilder.set_architecture"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnitBuilder.set_architecture-88"><a href="#NeuralOperatorUnitBuilder.set_architecture-88"><span class="linenos">88</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder.set_architecture-89"><a href="#NeuralOperatorUnitBuilder.set_architecture-89"><span class="linenos">89</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_architecture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span> 
+</span><span id="NeuralOperatorUnitBuilder.set_architecture-90"><a href="#NeuralOperatorUnitBuilder.set_architecture-90"><span class="linenos">90</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the architecture for the NeuralOperatorUnit.&quot;&quot;&quot;</span> 
+</span><span id="NeuralOperatorUnitBuilder.set_architecture-91"><a href="#NeuralOperatorUnitBuilder.set_architecture-91"><span class="linenos">91</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Set the architecture for the NeuralOperatorUnit.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorUnitBuilder.set_activation_function" class="classattr">
+                                        <input id="NeuralOperatorUnitBuilder.set_activation_function-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">set_activation_function</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorUnitBuilder.set_activation_function-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnitBuilder.set_activation_function"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnitBuilder.set_activation_function-93"><a href="#NeuralOperatorUnitBuilder.set_activation_function-93"><span class="linenos">93</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder.set_activation_function-94"><a href="#NeuralOperatorUnitBuilder.set_activation_function-94"><span class="linenos">94</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_activation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder.set_activation_function-95"><a href="#NeuralOperatorUnitBuilder.set_activation_function-95"><span class="linenos">95</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the activation function for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder.set_activation_function-96"><a href="#NeuralOperatorUnitBuilder.set_activation_function-96"><span class="linenos">96</span></a>        <span class="k">pass</span> 
+</span></pre></div>
+
+
+            <div class="docstring"><p>Set the activation function for the NeuralOperatorUnit.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorUnitBuilder.set_conv_module" class="classattr">
+                                        <input id="NeuralOperatorUnitBuilder.set_conv_module-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">set_conv_module</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorUnitBuilder.set_conv_module-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnitBuilder.set_conv_module"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnitBuilder.set_conv_module-98"><a href="#NeuralOperatorUnitBuilder.set_conv_module-98"><span class="linenos"> 98</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder.set_conv_module-99"><a href="#NeuralOperatorUnitBuilder.set_conv_module-99"><span class="linenos"> 99</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_conv_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder.set_conv_module-100"><a href="#NeuralOperatorUnitBuilder.set_conv_module-100"><span class="linenos">100</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the convolution module for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder.set_conv_module-101"><a href="#NeuralOperatorUnitBuilder.set_conv_module-101"><span class="linenos">101</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Set the convolution module for the NeuralOperatorUnit.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorUnitBuilder.set_feature_mlp" class="classattr">
+                                        <input id="NeuralOperatorUnitBuilder.set_feature_mlp-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">set_feature_mlp</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorUnitBuilder.set_feature_mlp-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnitBuilder.set_feature_mlp"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnitBuilder.set_feature_mlp-103"><a href="#NeuralOperatorUnitBuilder.set_feature_mlp-103"><span class="linenos">103</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder.set_feature_mlp-104"><a href="#NeuralOperatorUnitBuilder.set_feature_mlp-104"><span class="linenos">104</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_feature_mlp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder.set_feature_mlp-105"><a href="#NeuralOperatorUnitBuilder.set_feature_mlp-105"><span class="linenos">105</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Use a Feature MLP for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder.set_feature_mlp-106"><a href="#NeuralOperatorUnitBuilder.set_feature_mlp-106"><span class="linenos">106</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Use a Feature MLP for the NeuralOperatorUnit.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorUnitBuilder.use_bias" class="classattr">
+                                        <input id="NeuralOperatorUnitBuilder.use_bias-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">use_bias</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorUnitBuilder.use_bias-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnitBuilder.use_bias"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnitBuilder.use_bias-108"><a href="#NeuralOperatorUnitBuilder.use_bias-108"><span class="linenos">108</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder.use_bias-109"><a href="#NeuralOperatorUnitBuilder.use_bias-109"><span class="linenos">109</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder.use_bias-110"><a href="#NeuralOperatorUnitBuilder.use_bias-110"><span class="linenos">110</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Toggle bias for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder.use_bias-111"><a href="#NeuralOperatorUnitBuilder.use_bias-111"><span class="linenos">111</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Toggle bias for the NeuralOperatorUnit.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorUnitBuilder.use_learnable_normalizers" class="classattr">
+                                        <input id="NeuralOperatorUnitBuilder.use_learnable_normalizers-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">use_learnable_normalizers</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n">typing_extensions</span><span class="o">.</span><span class="n">Self</span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorUnitBuilder.use_learnable_normalizers-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnitBuilder.use_learnable_normalizers"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnitBuilder.use_learnable_normalizers-113"><a href="#NeuralOperatorUnitBuilder.use_learnable_normalizers-113"><span class="linenos">113</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder.use_learnable_normalizers-114"><a href="#NeuralOperatorUnitBuilder.use_learnable_normalizers-114"><span class="linenos">114</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">use_learnable_normalizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder.use_learnable_normalizers-115"><a href="#NeuralOperatorUnitBuilder.use_learnable_normalizers-115"><span class="linenos">115</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure settings for learnable normalizers for the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder.use_learnable_normalizers-116"><a href="#NeuralOperatorUnitBuilder.use_learnable_normalizers-116"><span class="linenos">116</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Configure settings for learnable normalizers for the NeuralOperatorUnit.</p>
+</div>
+
+
+                            </div>
+                            <div id="NeuralOperatorUnitBuilder.build" class="classattr">
+                                        <input id="NeuralOperatorUnitBuilder.build-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator decorator-abstractmethod">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">build</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">*</span><span class="n">args</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">) -> <span class="n"><a href="#NeuralOperatorUnit">NeuralOperatorUnit</a></span>:</span></span>
+
+                <label class="view-source-button" for="NeuralOperatorUnitBuilder.build-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#NeuralOperatorUnitBuilder.build"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NeuralOperatorUnitBuilder.build-118"><a href="#NeuralOperatorUnitBuilder.build-118"><span class="linenos">118</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="NeuralOperatorUnitBuilder.build-119"><a href="#NeuralOperatorUnitBuilder.build-119"><span class="linenos">119</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NeuralOperatorUnit</span><span class="p">:</span>
+</span><span id="NeuralOperatorUnitBuilder.build-120"><a href="#NeuralOperatorUnitBuilder.build-120"><span class="linenos">120</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and return the NeuralOperatorUnit.&quot;&quot;&quot;</span>
+</span><span id="NeuralOperatorUnitBuilder.build-121"><a href="#NeuralOperatorUnitBuilder.build-121"><span class="linenos">121</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Build and return the NeuralOperatorUnit.</p>
 </div>
 
 
