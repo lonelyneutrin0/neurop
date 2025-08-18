@@ -222,9 +222,10 @@ class FNOUnit(NeuralOperatorUnit):
         return x
 
 class FNOUnitBuilder(NeuralOperatorUnitBuilder): 
-    """Builder class for FNO Units for custom configurations with YAML/JSON"""
+    """Builder class for FNO Units for custom configurations with YAML/JSON."""
 
     def __init__(self): 
+        """__init__ method for FNOUnitBuilder class."""
         super().__init__() 
         self._reset()
 
@@ -289,10 +290,10 @@ class FNOUnitBuilder(NeuralOperatorUnitBuilder):
     def set_activation_function(self, activation_function: Type[nn.Module],) -> Self:
         """Set the activation function for the FNO Unit.
         
-        Arguments: 
+        Arguments:
             activation_function (Type[nn.Module]): The activation function to apply.
         
-        Returns: 
+        Returns:
             An FNOUnitBuilder object
         
         """
@@ -315,6 +316,7 @@ class FNOUnitBuilder(NeuralOperatorUnitBuilder):
             conv_normalizer (Type[Normalizer]): The normalization module to apply after the convolution.
             norm (FFTNormType): The normalization type to use for FFTs.
             conv_kernel (int): THe kernel size for the convolution skip connection.
+
         Returns:
             An FNOUnitBuilder object
 
@@ -340,7 +342,8 @@ class FNOUnitBuilder(NeuralOperatorUnitBuilder):
             feature_mlp_depth (int): Depth of the feature MLP.
             feature_mlp_skip_connection (Connection): Type of skip connection to use for the feature MLP.
             feature_expansion_factor (float): Factor by which to expand the features in the feature MLP.
-        
+            feature_mlp_normalizer (Type[Normalizer]): Normalization layer to use for the feature MLP.
+
         Returns:
             An FNOUnitBuilder object
 
@@ -367,6 +370,16 @@ class FNOUnitBuilder(NeuralOperatorUnitBuilder):
         return self
 
     def use_learnable_normalizers(self, learnable_normalizers: bool, normalizer_eps: float) -> Self:
+        """Set whether to use learnable normalizers and their tolerance value.
+        
+        Arguments:
+            learnable_normalizers (bool): Whether or not to use learnable normalizers.
+            normalizer_eps (float): The epsilon value for the normalizers.
+        
+        Returns:
+            An FNOUnitBuilder object
+
+        """
         self.learnable_normalizers = learnable_normalizers
         self.normalizer_eps = normalizer_eps
         return self
@@ -378,7 +391,6 @@ class FNOUnitBuilder(NeuralOperatorUnitBuilder):
             An FNOUnit object initialized with the specified parameters.
 
         """
-
         if self.in_features is None or self.out_features is None or self.modes is None or self.n_dim is None:
             raise ValueError("Required parameters (in_features, out_features, modes, n_dim) must be set before building.")
         

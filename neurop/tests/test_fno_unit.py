@@ -177,7 +177,6 @@ def test_fno_unit_feature_expansion():
     
 def test_fno_unit_builder(): 
     """Test FNO Unit Builder."""
-
     builder = FNOUnitBuilder()\
     .set_architecture(
         in_features=3,

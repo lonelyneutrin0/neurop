@@ -8,6 +8,8 @@ from enum import Enum
 from abc import ABC, abstractmethod
 
 class FFTNormType(Enum): 
+    """Enum Class for FFT Normalization methods."""
+    
     BACKWARD = 'backward'
     FORWARD = 'forward'
     ORTHO = 'ortho'
@@ -16,11 +18,13 @@ class Conv(nn.Module, ABC):
     """Spectral Convolution Layer Abstract Class."""
 
     def __init__(self, *args, **kwargs): 
+        """__init__ method for Conv Abstract Class."""
         super().__init__()
         pass
 
     @abstractmethod
     def forward(self, *args, **kwargs) -> torch.Tensor:
+        """Forward pass for Conv Abstract Class."""
         pass
     
 class SpectralConv(Conv):

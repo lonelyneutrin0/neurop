@@ -9,6 +9,7 @@ class Normalizer(nn.Module, ABC):
     """Normalizer Abstract Class for Neural Operators."""
     
     def __init__(self, *args, **kwargs): 
+        """__init__ method for Normalizer Abstract Class."""
         super().__init__()
         pass
     

@@ -281,7 +281,6 @@ def test_fourier_operator_parameter_count():
 
 def test_fourier_operator_builder():
     """Test FourierOperator construction using the builder pattern."""
-
     builder = FourierOperatorBuilder()\
     .set_architecture(
         in_features=3,

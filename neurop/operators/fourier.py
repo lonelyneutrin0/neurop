@@ -204,8 +204,7 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
                          n_dim: int, 
                          depth: int,
                          ) -> Self:
-        """
-        Set the architecture for the FourierOperator.
+        """Set the architecture for the FourierOperator.
         
         Arguments:
             in_features (int): Number of input features.
@@ -215,7 +214,7 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
             n_dim (int): Number of spatial dimensions.
             depth (int): Number of FNO Units.
         
-        Returns: 
+        Returns:
             FourierOperatorBuilder 
 
         """
@@ -228,14 +227,14 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
         return self
     
     def set_activation_function(self, activation_function: Type[nn.Module]) -> Self:
-        """
-        Set the activation function for the FourierOperator.
+        """Set the activation function for the FourierOperator.
         
-        Arguments: 
+        Arguments:
             activation_function (Type[nn.Module]): Activation function to use in the FourierOperator.
         
         Returns:
             FourierOperatorBuilder
+
         """
         self.activation_function = activation_function
         return self
@@ -248,8 +247,7 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
                         norm: FFTNormType = FFTNormType.ORTHO,
                         n_kernel: int = -1
                         ) -> Self:
-        """
-        Set the convolution module for the FourierOperator.
+        """Set the convolution module for the FourierOperator.
 
         Arguments:
             conv_module (Type[SpectralConv]): Convolution module to use in the FourierOperator.
@@ -260,6 +258,7 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
 
         Returns:
             FourierOperatorBuilder
+
         """
         self.conv_module = conv_module
         self.skip_connection = skip_connection
@@ -275,8 +274,7 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
                         feature_expansion_factor: float,
                         feature_mlp_normalizer: Type[Normalizer],
                         ) -> Self:
-        """
-        Set the feature MLP for the FourierOperator.
+        """Set the feature MLP for the FourierOperator.
 
         Arguments:
             feature_mlp_module (Type[ConvFeatureMLP]): Feature MLP module to use in the FourierOperator.
@@ -287,6 +285,7 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
 
         Returns:
             FourierOperatorBuilder
+
         """
         self.use_feature_mlp = True
         self.feature_mlp_module = feature_mlp_module
@@ -297,21 +296,20 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
         return self
 
     def use_bias(self, toggle: bool) -> Self: 
-        """
-        Whether or not to use bias for the FourierOperator.
+        """Whether or not to use bias for the FourierOperator.
 
         Arguments:
             toggle (bool): Whether to use bias or not.
         
-        Returns: 
+        Returns:
             FourierOperatorBuilder
+
         """
         self.bias = toggle
         return self
     
     def use_learnable_normalizers(self, learnable_normalizers: bool, normalizer_eps: float) -> Self:
-        """
-        Whether or not to use learnable normalizers for the FourierOperator.
+        """Whether or not to use learnable normalizers for the FourierOperator.
 
         Arguments:
             learnable_normalizers (bool): Whether to use learnable normalizers or not.
@@ -319,17 +317,18 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
 
         Returns:
             FourierOperatorBuilder
+
         """
         self.learnable_normalizers = learnable_normalizers
         self.normalizer_eps = normalizer_eps
         return self
     
     def build(self) -> FourierOperator:
-        """
-        Build the FourierOperator with the specified parameters.
+        """Build the FourierOperator with the specified parameters.
 
         Returns:
             FourierOperator: The constructed FourierOperator instance.
+
         """
         if self.in_features is None or self.out_features is None or self.modes is None or self.n_dim is None or self.depth is None or self.activation_function is None:
             raise ValueError("Required parameters (in_features, out_features, modes, n_dim, depth, activation_function) must be set before building.")

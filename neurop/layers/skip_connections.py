@@ -9,10 +9,13 @@ from abc import ABC, abstractmethod
 from enum import Enum
 
 class ConnectionType(Enum): 
+    """Enum Class for Connection Types."""
+
     SOFT_GATING = 'soft-gating'
     CONV = 'conv'
     IDENTITY = 'identity'
 class SkipConnection(nn.Module, ABC): 
+    """Abstract class for Skip Connections."""
 
     def __init__(self, *args, **kwargs): 
         """__init__ method for Skip Connections."""
@@ -43,6 +46,8 @@ class SoftGatingConnection(SkipConnection):
             in_features (int): Number of input features.
             n_dim (int): Number of spatial dimensions.
             bias (bool): Whether to include a bias term in the connection.
+            *args: Additional arguments for the layer
+            **kwargs: Keyword arguments for the layer
 
         """
         super().__init__() 
@@ -82,6 +87,8 @@ class ConvConnection(SkipConnection):
         out_features (int) : The number of output features 
         n_kernel (int): The size of the kernel 
         bias (bool): Bias of the layer
+        *args: Additional arguments for the layer
+        **kwargs: Keyword arguments for the layer
 
         """
         super().__init__() 
@@ -112,7 +119,9 @@ class IdentityConnection(SkipConnection):
 
     This maintains consistent interface with other skip connections.
     """
+
     def __init__(self, *args, **kwargs):
+        """__init__ method for IdentityConnection class."""
         super().__init__(*args, **kwargs)
 
     def forward(self, x: torch.Tensor, transformed_x: torch.Tensor) -> torch.Tensor:

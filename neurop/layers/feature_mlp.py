@@ -7,12 +7,16 @@ from typing import Type, List, Optional
 from abc import ABC, abstractmethod
 
 class FeatureMLP(nn.Module, ABC): 
+    """Abstract class for Feature MLPs."""
+
     def __init__(self, *args, **kwargs): 
+        """__init__ method for FeatureMLP Abstract class."""
         super().__init__()
         pass
     
     @abstractmethod
     def forward(self, *args, **kwargs) -> torch.Tensor:
+        """Forward pass for the FeatureMLP Abstract class."""
         pass
 
 class ConvFeatureMLP(FeatureMLP):
