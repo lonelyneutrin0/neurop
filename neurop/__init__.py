@@ -18,6 +18,10 @@ __author_emails__ = [
 __url__ = "https://github.com/lonelyneutrin0/neurop"
 
 from .base import NeuralOperator as NeuralOperator
+from .base import NeuralOperatorUnit as NeuralOperatorUnit
+
+from .base import NeuralOperatorBuilder as NeuralOperatorBuilder
+from .base import NeuralOperatorUnitBuilder as NeuralOperatorUnitBuilder
 
 from . import operators as operators
 from . import layers as layers

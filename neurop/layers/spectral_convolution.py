@@ -1,11 +1,33 @@
 """Spectral Convolution Layer Implementation."""
 import torch
+from torch import nn
 
-from torch.types import Tensor
-from typing import Tuple, List, Union, Literal
+from typing import Tuple, List, Union
+from enum import Enum
 
-NormType = Literal['backward', 'forward', 'ortho']
-class SpectralConv(torch.nn.Module):
+from abc import ABC, abstractmethod
+
+class FFTNormType(Enum): 
+    """Enum Class for FFT Normalization methods."""
+    
+    BACKWARD = 'backward'
+    FORWARD = 'forward'
+    ORTHO = 'ortho'
+
+class Conv(nn.Module, ABC): 
+    """Spectral Convolution Layer Abstract Class."""
+
+    def __init__(self, *args, **kwargs): 
+        """__init__ method for Conv Abstract Class."""
+        super().__init__()
+        pass
+
+    @abstractmethod
+    def forward(self, *args, **kwargs) -> torch.Tensor:
+        """Forward pass for Conv Abstract Class."""
+        pass
+    
+class SpectralConv(Conv):
     r"""N-Dimensional Spectral Convolution Layer.
     
     The input is assumed to have shape (B, C, *spatial_dims) where:
@@ -33,13 +55,13 @@ class SpectralConv(torch.nn.Module):
     modes: List[int]
     """List of integers representing the number of Fourier modes to consider in each spatial dimension."""
 
-    weight: torch.nn.Parameter
+    weight: nn.Parameter
     """Learnable weights of the spectral convolution layer, initialized with a complex normal distribution."""
 
     spatial_dims: Tuple[int, ...]
     """Tuple of integers representing the indices of the spatial dimensions in the input tensor."""
 
-    norm: NormType
+    norm: FFTNormType
     """Normalization type for the FFT operation, can be 'backward', 'forward', or 'ortho'."""   
     def __init__(self,
                 in_features: int, 
@@ -49,7 +71,7 @@ class SpectralConv(torch.nn.Module):
                 dtype: torch.dtype = torch.cfloat,
                 *, 
                 weight_dtype: torch.dtype = torch.cfloat,
-                norm: NormType = 'ortho'):
+                norm: FFTNormType = FFTNormType.ORTHO):
         """Initialize the N-Dimensional Spectral Convolution Layer with the given parameters."""
         super().__init__()
         self.in_features = in_features
@@ -71,7 +93,7 @@ class SpectralConv(torch.nn.Module):
         
         scale = init_scale / (in_features * out_features)
 
-        self.weight = torch.nn.Parameter(
+        self.weight = nn.Parameter(
             torch.randn(in_features, out_features, *self.modes, dtype=weight_dtype) * scale
         )
         
@@ -81,18 +103,18 @@ class SpectralConv(torch.nn.Module):
 
         self.norm = norm
 
-    def forward(self, x: Tensor, dtype: torch.dtype = torch.cfloat) -> Tensor:
+    def forward(self, x: torch.Tensor, dtype: torch.dtype = torch.cfloat) -> torch.Tensor:
         """Forward pass for the N-dimensional Spectral Convolution layer.
         
         Args:
-            x (Tensor): Input tensor of shape (B, C, *spatial_dims)
+            x (torch.Tensor): Input tensor of shape (B, C, *spatial_dims)
             dtype (torch.dtype): Data type for the output tensor, default is torch.cfloat
         
         Returns:
-            Tensor: Output tensor of shape (B, out_features, *spatial_dims)
+            torch.Tensor: Output tensor of shape (B, out_features, *spatial_dims)
 
         """
-        if not isinstance(x, Tensor):
+        if not isinstance(x, torch.Tensor):
             try:
                 x = torch.as_tensor(x)
             except Exception as e:
@@ -118,18 +140,18 @@ class SpectralConv(torch.nn.Module):
         effective_modes =  self._get_modes(spatial_shape, is_complex)
 
         if is_complex:
-            x_ft = torch.fft.fftn(x, dim=self.spatial_dims, norm=self.norm)
+            x_ft = torch.fft.fftn(x, dim=self.spatial_dims, norm=self.norm.value)
 
         else: 
-            x_ft = torch.fft.rfftn(x, dim=self.spatial_dims, norm=self.norm)
+            x_ft = torch.fft.rfftn(x, dim=self.spatial_dims, norm=self.norm.value)
         
         out_ft = self._apply_spectral_convolution(x=x_ft, effective_modes=effective_modes, dtype=dtype)
 
         if is_complex:
-            x_out = torch.fft.ifftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm=self.norm)
+            x_out = torch.fft.ifftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm=self.norm.value)
         
         else:
-            x_out = torch.fft.irfftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm=self.norm)
+            x_out = torch.fft.irfftn(out_ft, s=spatial_shape, dim=self.spatial_dims, norm=self.norm.value)
 
         return x_out
 

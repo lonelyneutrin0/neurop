@@ -1,10 +1,25 @@
 """Feature MLP Layer."""
 from torch import nn
+import torch
 
-from torch.types import Tensor
 from typing import Type, List, Optional
 
-class ConvFeatureMLP(nn.Module):
+from abc import ABC, abstractmethod
+
+class FeatureMLP(nn.Module, ABC): 
+    """Abstract class for Feature MLPs."""
+
+    def __init__(self, *args, **kwargs): 
+        """__init__ method for FeatureMLP Abstract class."""
+        super().__init__()
+        pass
+    
+    @abstractmethod
+    def forward(self, *args, **kwargs) -> torch.Tensor:
+        """Forward pass for the FeatureMLP Abstract class."""
+        pass
+
+class ConvFeatureMLP(FeatureMLP):
     """Feature MLP Layer.""" 
 
     in_features: int
@@ -107,14 +122,14 @@ class ConvFeatureMLP(nn.Module):
         self.in_features = layer_features[0]
         self.out_features = layer_features[-1]
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of the ConvFeatureMLP layer.
 
         Args:
-            x (Tensor): Input tensor of shape (batch_size, in_features, d_1, d_2, ...).
+            x (torch.Tensor): Input tensor of shape (batch_size, in_features, d_1, d_2, ...).
         
         Returns:
-            Tensor: Output tensor of shape (batch_size, out_features, d_1, d_2, ....).
+            torch.Tensor: Output tensor of shape (batch_size, out_features, d_1, d_2, ....).
 
         """
         x_shape = list(x.shape)
@@ -135,7 +150,7 @@ class ConvFeatureMLP(nn.Module):
 
         return x 
     
-class LinearFeatureMLP(nn.Module):
+class LinearFeatureMLP(FeatureMLP):
     """Feature MLP Layer using Linear layers."""
 
     in_features: int
@@ -236,14 +251,14 @@ class LinearFeatureMLP(nn.Module):
 
         self.layers = layers
     
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of the LinearFeatureMLP layer.
 
         Args:
-            x (Tensor): Input tensor of shape (batch_size, in_features, d_1, d_2, ...).
+            x (torch.Tensor): Input tensor of shape (batch_size, in_features, d_1, d_2, ...).
         
         Returns:
-            Tensor: Output tensor of shape (batch_size, out_features, d_1, d_2, ....).
+            torch.Tensor: Output tensor of shape (batch_size, out_features, d_1, d_2, ....).
 
         """
         if x.shape[1] != self.in_features:

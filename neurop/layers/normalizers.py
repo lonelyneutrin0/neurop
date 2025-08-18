@@ -2,7 +2,23 @@
 from torch import nn 
 import torch
 
-class BatchNormalizer(nn.Module):
+from abc import ABC, abstractmethod
+
+
+class Normalizer(nn.Module, ABC): 
+    """Normalizer Abstract Class for Neural Operators."""
+    
+    def __init__(self, *args, **kwargs): 
+        """__init__ method for Normalizer Abstract Class."""
+        super().__init__()
+        pass
+    
+    @abstractmethod
+    def forward(self, *args, **kwargs) -> torch.Tensor:
+        """Forward method for Normalizers."""
+        pass
+
+class BatchNormalizer(Normalizer):
     """Batch Normalization Layer."""
 
     tol: float
@@ -54,7 +70,7 @@ class BatchNormalizer(nn.Module):
 
         return (x - mean) / torch.sqrt(var + self.tol) 
 
-class LayerNormalizer(nn.Module):
+class LayerNormalizer(Normalizer):
     """Layer Normalization Layer."""
 
     tol: float
@@ -106,7 +122,7 @@ class LayerNormalizer(nn.Module):
 
         return (x - mean) / torch.sqrt(var + self.tol)
 
-class InstanceNormalizer(nn.Module):
+class InstanceNormalizer(Normalizer):
     """Instance Normalization Layer."""
 
     tol: float
