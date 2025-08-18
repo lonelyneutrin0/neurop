@@ -11,6 +11,8 @@ from ..layers.fno_unit import FNOUnit
 from ..layers.feature_mlp import FeatureMLP, ConvFeatureMLP, LinearFeatureMLP
 from ..layers.normalizers import Normalizer
 
+from ..layers.positional_embeddings import Embedding
+
 from typing_extensions import Self
 
 class FourierOperator(NeuralOperator):
@@ -41,6 +43,9 @@ class FourierOperator(NeuralOperator):
     normalizer_eps: float
     """Epsilon value for numerical stability in normalization layers."""
 
+    positional_embedding: Optional[Embedding]
+    """Positional embedding layer to incorporate spatial information."""
+
     def __init__(self,
                  in_features: int,
                  hidden_features: int,
@@ -63,6 +68,7 @@ class FourierOperator(NeuralOperator):
                  norm: FFTNormType = FFTNormType.ORTHO,
                  conv_normalizer: Optional[Type[Normalizer]] = None,
                  feature_mlp_normalizer: Optional[Type[Normalizer]] = None,
+                 positional_embedding: Optional[Type[Embedding]] = None,
                  *,
                  learnable_normalizers: bool = True,
                  normalizer_eps: float = 1e-10):
@@ -96,8 +102,20 @@ class FourierOperator(NeuralOperator):
         """
         super().__init__()
 
+        lifting_features = in_features
+        
+        if positional_embedding is not None:
+            self.positional_embedding = positional_embedding(
+                in_features=in_features, 
+                dim=n_dim,
+                domain=[[0, 1]] * n_dim
+            )
+            lifting_features += n_dim
+        else: 
+            self.positional_embedding = None
+
         self.readin = LinearFeatureMLP(
-            in_features=in_features,
+            in_features=lifting_features,
             hidden_features=hidden_features,
             out_features=hidden_features,
             depth=1,
@@ -151,6 +169,10 @@ class FourierOperator(NeuralOperator):
             torch.Tensor: Output tensor of shape (B, out_features, *spatial_dims).
 
         """
+
+        if self.positional_embedding is not None:
+            x = self.positional_embedding(x)
+        
         x = self.readin(x)
         
         for fno_unit in self.fno_units:
@@ -195,6 +217,7 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
         self.feature_mlp_normalizer = None
         self.learnable_normalizers = True
         self.normalizer_eps = 1e-10
+        self.positional_embedding = None
 
     def set_architecture(self, 
                          in_features: int, 
@@ -322,7 +345,20 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
         self.learnable_normalizers = learnable_normalizers
         self.normalizer_eps = normalizer_eps
         return self
-    
+
+    def set_positional_embedding(self, positional_embedding: Type[Embedding]) -> Self:
+        """Set the positional embedding for the FourierOperator.
+
+        Arguments:
+            positional_embedding (Type[Embedding]): Positional embedding module to use in the FourierOperator.
+
+        Returns:
+            FourierOperatorBuilder
+
+        """
+        self.positional_embedding = positional_embedding
+        return self
+
     def build(self) -> FourierOperator:
         """Build the FourierOperator with the specified parameters.
 
@@ -356,7 +392,8 @@ class FourierOperatorBuilder(NeuralOperatorBuilder):
             conv_normalizer=self.conv_normalizer,
             feature_mlp_normalizer=self.feature_mlp_normalizer,
             learnable_normalizers=self.learnable_normalizers,
-            normalizer_eps=self.normalizer_eps
+            normalizer_eps=self.normalizer_eps,
+            positional_embedding=self.positional_embedding
         )
 
         self._reset() 
