@@ -96,6 +96,7 @@ class FourierOperator(NeuralOperator):
             norm (FFTNormType): Normalization type for the spectral convolution layer, can be 'backward', 'forward', or 'ortho'.
             conv_normalizer (Optional[Type[Normalizer]]): Normalizer class to apply to the spectral convolution output.
             feature_mlp_normalizer (Optional[Type[Normalizer]]): Normalizer class to apply to the feature MLP output.
+            positional_embedding (Optional[Type[Embedding]]): Positional embedding class to use.
             learnable_normalizers (bool): Whether the normalization parameters are learnable.
             normalizer_eps (float): Epsilon value for numerical stability in normalization layers.
 
@@ -169,7 +170,6 @@ class FourierOperator(NeuralOperator):
             torch.Tensor: Output tensor of shape (B, out_features, *spatial_dims).
 
         """
-
         if self.positional_embedding is not None:
             x = self.positional_embedding(x)
         

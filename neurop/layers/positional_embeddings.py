@@ -1,4 +1,4 @@
-"""Positional Embeddings for Neural Operators"""
+"""Positional Embeddings for Neural Operators."""
 from abc import ABC, abstractmethod
 
 import torch
@@ -17,6 +17,7 @@ class Embedding(nn.Module, ABC):
 
     @abstractmethod
     def forward(self, *args, **kwargs) -> torch.Tensor:
+        """Forward pass for the embedding."""
         pass
 
 
@@ -33,6 +34,7 @@ class GridEmbedding(Embedding):
     """The grid boundaries of the embedding"""
 
     def __init__(self, in_features: int, dim: int, domain: List[List[float]]): 
+        """__init__ method for GridEmbedding class."""
         super().__init__()
 
         self.in_features = in_features
@@ -43,7 +45,7 @@ class GridEmbedding(Embedding):
         self.out_channels = self.in_features + self.dim
 
     def make_grid(self, n_dim: torch.Size, device: Device, dtype: torch.dtype):
-        """Generate an N-dimensional grid for positional encoding
+        """Generate an N-dimensional grid for positional encoding.
         
         Arguments:
             n_dim (int): Number of dimensions for the grid.
@@ -52,8 +54,8 @@ class GridEmbedding(Embedding):
         
         Returns:
             torch.Tensor: The generated grid tensor.
-        """
 
+        """
         if self._grid is None or self._res != n_dim: 
             grids = make_regular_grid(n_dim, domain = self.domain)
 
@@ -71,8 +73,8 @@ class GridEmbedding(Embedding):
             
         Returns:
             torch.Tensor: The output tensor of shape (B, C + D, d_1, d_2, ...).
+
         """
-    
         batch_size = x.shape[0]
 
         grids = self.grid(spatial_dims = x.shape[2:], device=x.device, dtype=x.dtype)
@@ -94,7 +96,6 @@ def make_regular_grid(resolutions: torch.Size, domain: List[List[float]]):
         List[torch.Tensor]: A list of tensors representing the grid in each dimension.
     
     """
-
     if len(resolutions) != len(domain):
         raise ValueError("The number of resolutions must match the number of dimensions in the domain.")
     
