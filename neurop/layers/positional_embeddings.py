@@ -44,7 +44,7 @@ class GridEmbedding(Embedding):
         self._res: Optional[torch.Size] = None
         self.out_channels = self.in_features + self.dim
 
-    def make_grid(self, n_dim: torch.Size, device: Device, dtype: torch.dtype):
+    def grid(self, n_dim: torch.Size, device: Device, dtype: torch.dtype):
         """Generate an N-dimensional grid for positional encoding.
         
         Arguments:
@@ -77,7 +77,7 @@ class GridEmbedding(Embedding):
         """
         batch_size = x.shape[0]
 
-        grids = self.grid(spatial_dims = x.shape[2:], device=x.device, dtype=x.dtype)
+        grids = self.grid(n_dim = x.shape[2:], device=x.device, dtype=x.dtype)
         grids = [x.repeat(batch_size, *[1] * (self.dim + 1)) for x in grids]
         out = torch.cat((x, *grids), dim=1)
 
