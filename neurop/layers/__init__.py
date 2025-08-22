@@ -20,3 +20,6 @@ from .normalizers import Normalizer as Normalizer
 from .normalizers import BatchNormalizer as BatchNormalizer
 from .normalizers import LayerNormalizer as LayerNormalizer
 from .normalizers import InstanceNormalizer as InstanceNormalizer
+
+from .positional_embeddings import Embedding as Embedding
+from .positional_embeddings import GridEmbedding as GridEmbedding
